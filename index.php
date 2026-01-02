@@ -574,7 +574,7 @@ if (isset($_SESSION['partida'])) {
               <button type="submit" name="cargar" class="btn-cargar">📁 Cargar</button>
             </form>
             <form method="post" style="display: inline;">
-              <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Nueva Partida</button>
+              <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Reiniciar</button>
             </form>
           </div>
 
@@ -611,25 +611,33 @@ if (isset($_SESSION['partida'])) {
               .then(r => r.json())
               .then(data => {
                 const fmt = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-                document.getElementById('tiempo-blancas').textContent = fmt(data.tiempo_blancas);
-                document.getElementById('tiempo-negras').textContent = fmt(data.tiempo_negras);
 
-                const tb = document.getElementById('tiempo-blancas');
-                const tn = document.getElementById('tiempo-negras');
-                data.tiempo_blancas < 60 ? tb.classList.add('tiempo-critico') : tb.classList.remove('tiempo-critico');
-                data.tiempo_negras < 60 ? tn.classList.add('tiempo-critico') : tn.classList.remove('tiempo-critico');
+                // Solo actualizar si los datos son válidos
+                if (data.tiempo_blancas !== undefined && data.tiempo_negras !== undefined) {
+                  document.getElementById('tiempo-blancas').textContent = fmt(data.tiempo_blancas);
+                  document.getElementById('tiempo-negras').textContent = fmt(data.tiempo_negras);
 
-                document.querySelectorAll('.reloj').forEach(r => {
-                  if (r.classList.contains('reloj-blancas')) {
-                    data.reloj_activo === 'blancas' ? (r.classList.add('reloj-activo'), r.classList.remove('reloj-inactivo')) : (r.classList.remove('reloj-activo'), r.classList.add('reloj-inactivo'));
-                  } else if (r.classList.contains('reloj-negras')) {
-                    data.reloj_activo === 'negras' ? (r.classList.add('reloj-activo'), r.classList.remove('reloj-inactivo')) : (r.classList.remove('reloj-activo'), r.classList.add('reloj-inactivo'));
+                  const tb = document.getElementById('tiempo-blancas');
+                  const tn = document.getElementById('tiempo-negras');
+
+                  // Aplicar clase de tiempo crítico
+                  data.tiempo_blancas < 60 ? tb.classList.add('tiempo-critico') : tb.classList.remove('tiempo-critico');
+                  data.tiempo_negras < 60 ? tn.classList.add('tiempo-critico') : tn.classList.remove('tiempo-critico');
+
+                  // Actualizar reloj activo/inactivo
+                  document.querySelectorAll('.reloj').forEach(r => {
+                    if (r.classList.contains('reloj-blancas')) {
+                      data.reloj_activo === 'blancas' ? (r.classList.add('reloj-activo'), r.classList.remove('reloj-inactivo')) : (r.classList.remove('reloj-activo'), r.classList.add('reloj-inactivo'));
+                    } else if (r.classList.contains('reloj-negras')) {
+                      data.reloj_activo === 'negras' ? (r.classList.add('reloj-activo'), r.classList.remove('reloj-inactivo')) : (r.classList.remove('reloj-activo'), r.classList.add('reloj-inactivo'));
+                    }
+                  });
+
+                  // Verificar si el tiempo se agotó
+                  if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
+                    alert('¡Tiempo agotado para ' + (data.tiempo_blancas <= 0 ? 'blancas' : 'negras') + '!');
+                    location.reload();
                   }
-                });
-
-                if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
-                  alert('¡Tiempo agotado para ' + (data.tiempo_blancas <= 0 ? 'blancas' : 'negras') + '!');
-                  location.reload();
                 }
               })
               .catch(e => console.error('Error:', e));
