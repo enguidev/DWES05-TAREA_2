@@ -1,0 +1,348 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Contenedor principal */
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+}
+
+/* Título */
+h1 {
+  font-size: 2.5em;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Mensaje de estado */
+.mensaje {
+  background: #e3f2fd;
+  border-left: 4px solid #2196F3;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  font-size: 1.1em;
+  text-align: center;
+}
+
+.mensaje.terminada {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+/* Marcador */
+.marcador {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.marcador-item {
+  flex: 1;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1.1em;
+}
+
+.marcador-item.blancas {
+  background: #f0f0f0;
+  border: 3px solid #333;
+}
+
+.marcador-item.negras {
+  background: #333;
+  color: white;
+  border: 3px solid #666;
+}
+
+/* Tablero */
+.tablero-contenedor {
+  display: grid;
+  grid-template-columns: 30px repeat(8, 1fr) 30px;
+  grid-template-rows: 30px repeat(8, 1fr) 30px;
+  gap: 0;
+  margin: 0 auto 30px;
+  max-width: 700px;
+}
+
+/* Bordes y esquinas del tablero */
+.coordenada-esquina-superior-izquierda {
+  border-top: 2px solid #333;
+  border-left: 2px solid #333;
+  border-right: 1px solid #ddd;
+  border-top-left-radius: 10px;
+}
+
+.coordenada-esquina-superior-derecha {
+  border-top: 2px solid #333;
+  border-right: 2px solid #333;
+  border-left: 1px solid #ddd;
+  border-top-right-radius: 10px;
+}
+
+.coordenada-esquina-inferior-izquierda {
+  border-top: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-left: 2px solid #333;
+  border-bottom: 2px solid #333;
+  border-bottom-left-radius: 10px;
+}
+
+.coordenada-esquina-inferior-derecha {
+  border-top: 1px solid #ddd;
+  border-right: 2px solid #333;
+  border-left: 1px solid #ddd;
+  border-bottom: 2px solid #333;
+  border-bottom-right-radius: 10px;
+}
+
+/* Coordenadas */
+.coordenada-superior,
+.coordenada-inferior,
+.coordenada-izquierda,
+.coordenada-derecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #333;
+  background: #f8f9fa;
+}
+
+.coordenada-superior {
+  border-top: 2px solid #333;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+.coordenada-inferior {
+  border-bottom: 2px solid #333;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+.coordenada-izquierda,
+.coordenada-derecha {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.coordenada-izquierda {
+  border-left: 2px solid #333;
+}
+
+.coordenada-derecha {
+  border-right: 2px solid #333;
+}
+
+/* Casillas del tablero */
+.casilla {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.casilla.blanca {
+  background: #f0d9b5;
+}
+
+.casilla.negra {
+  background: #222222;
+}
+
+/* Casilla seleccionada */
+.casilla.seleccionada {
+  box-shadow: inset 0 0 0 3px #ffd700;
+  background: #fff59d !important;
+}
+
+/* Formulario dentro de la casilla */
+.formulario {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Botón para seleccionar pieza */
+.btn-pieza-casilla {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-pieza-casilla:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* Imagen de pieza */
+.imagen-pieza {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+  transform: scale(1.3);
+}
+
+/* Botón de movimiento */
+.btn-movimiento {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-movimiento:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+/* Indicador de movimiento posible */
+.indicador-movimiento {
+  width: 70%;
+  height: 70%;
+  background: red;
+  border-radius: 50%;
+  border: 3px solid #388E3C;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
+  transition: all 0.2s ease;
+}
+
+.btn-movimiento:hover .indicador-movimiento {
+  background: #66BB6A;
+  transform: scale(1.3);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.8);
+}
+
+/* Botones de control */
+.botones-control {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-reiniciar,
+.btn-cancelar {
+  font-size: 1.1em;
+  font-weight: bold;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-reiniciar {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-reiniciar:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+.btn-cancelar {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background: #e67e22;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+}
+
+/* Instrucciones */
+.instrucciones {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.instrucciones p {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.instrucciones ol {
+  margin-left: 20px;
+  color: #555;
+}
+
+.instrucciones li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  .tablero-contenedor {
+    max-width: 100%;
+  }
+
+  .marcador {
+    flex-direction: column;
+  }
+}
