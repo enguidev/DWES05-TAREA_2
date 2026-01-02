@@ -59,15 +59,23 @@ function formatearTiempo($segundos)
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
   if (isset($_SESSION['tiempo_blancas']) && isset($_SESSION['tiempo_negras']) && isset($_SESSION['reloj_activo'])) {
     $ahora = time();
-    $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
 
-    if ($_SESSION['reloj_activo'] === 'blancas') {
-      $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+    // Solo restar tiempo si han pasado segundos desde el último tick
+    if (isset($_SESSION['ultimo_tick'])) {
+      $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
+
+      // Solo restar si ha pasado al menos 1 segundo
+      if ($tiempoTranscurrido > 0) {
+        if ($_SESSION['reloj_activo'] === 'blancas') {
+          $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+        } else {
+          $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+        }
+        $_SESSION['ultimo_tick'] = $ahora;
+      }
     } else {
-      $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+      $_SESSION['ultimo_tick'] = $ahora;
     }
-
-    $_SESSION['ultimo_tick'] = $ahora;
 
     header('Content-Type: application/json');
     echo json_encode([
@@ -157,9 +165,20 @@ if (isset($_SESSION['partida'])) {
         $exito = $partida->jugada($origen, $destino);
 
         if ($exito) {
+          // Actualizar el tiempo antes de cambiar de turno
+          $ahora = time();
+          $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
+
           $turnoAnterior = $_SESSION['reloj_activo'];
 
-          // Incremento Fischer
+          // Restar el tiempo transcurrido al jugador que acaba de mover
+          if ($turnoAnterior === 'blancas') {
+            $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+          } else {
+            $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+          }
+
+          // Incremento Fischer (después de restar el tiempo transcurrido)
           if ($_SESSION['config']['incremento'] > 0) {
             if ($turnoAnterior === 'blancas') {
               $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
@@ -168,8 +187,9 @@ if (isset($_SESSION['partida'])) {
             }
           }
 
+          // Cambiar de turno y resetear el tick
           $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
-          $_SESSION['ultimo_tick'] = time();
+          $_SESSION['ultimo_tick'] = time(); // Nuevo timestamp para el siguiente jugador
         }
 
         $_SESSION['casilla_seleccionada'] = null;
@@ -252,14 +272,14 @@ if (isset($_SESSION['partida'])) {
           <div class="jugador-config blancas-config">
             <div class="config-icon">♔</div>
             <label><strong>⚪ Jugador Blancas:</strong></label>
-            <input type="text" name="nombre_blancas" placeholder="Nombre jugador 1..." maxlength="20" class="input-nombre" autofocus>
+            <input type="text" name="nombre_blancas" placeholder="María, Juan..." maxlength="20" class="input-nombre" autofocus>
             <small>Las blancas empiezan primero</small>
           </div>
           <div class="vs-separator">VS</div>
           <div class="jugador-config negras-config">
             <div class="config-icon">♚</div>
             <label><strong>⚫ Jugador Negras:</strong></label>
-            <input type="text" name="nombre_negras" placeholder="Nombre jugador 2..." maxlength="20" class="input-nombre">
+            <input type="text" name="nombre_negras" placeholder="Pedro, Ana..." maxlength="20" class="input-nombre">
             <small>Las negras juegan segundo</small>
           </div>
           <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎯 Iniciar Partida</button>
