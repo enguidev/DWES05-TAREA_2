@@ -138,18 +138,4 @@ class Peon extends Pieza
     return $this->esPrimerMovimiento;
   }
 
-  public function snapshot()
-  {
-    $base = parent::snapshot();
-    $base['esPrimerMovimiento'] = $this->esPrimerMovimiento;
-    return $base;
-  }
-
-  public function restore($snap)
-  {
-    parent::restore($snap);
-    if (isset($snap['esPrimerMovimiento'])) {
-      $this->esPrimerMovimiento = $snap['esPrimerMovimiento'];
-    }
-  }
 }

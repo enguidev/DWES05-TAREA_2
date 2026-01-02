@@ -87,30 +87,27 @@ class Partida
     }
 
     // Evitar movimientos que dejen al propio rey en jaque
-    // Simulamos temporalmente el movimiento y comprobamos
-    $snapshotOrigen = $piezaOrigen->snapshot();
-    $piezaDestinoSnapshot = null;
-    $piezaDestinoObj = $this->obtenerPiezaEnPosicion($destino);
-    if ($piezaDestinoObj) {
-      $piezaDestinoSnapshot = $piezaDestinoObj->snapshot();
-      $piezaDestinoObj->capturar();
+    // Simulamos el movimiento en una copia clonada de $this->jugadores
+    $backup = serialize($this->jugadores);
+    $tempJugadores = unserialize($backup);
+
+    // Obtener las piezas dentro del estado temporal
+    $piezaOrigenTemp = $tempJugadores[$this->turno]->getPiezaEnPosicion($origen);
+    $piezaDestinoTemp = $this->obtenerPiezaEnPosicion($destino, $tempJugadores);
+
+    if ($piezaDestinoTemp) {
+      $piezaDestinoTemp->capturar();
     }
 
-    // Aplicar movimiento temporalmente (sin llamar a movimiento para no alterar flags internamente)
-    $piezaOrigen->setPosicion($destino);
-    if ($piezaOrigen instanceof Peon) {
-      $piezaOrigen->setEsPrimerMovimiento(false);
+    if ($piezaOrigenTemp) {
+      $piezaOrigenTemp->setPosicion($destino);
+      if ($piezaOrigenTemp instanceof Peon) {
+        $piezaOrigenTemp->setEsPrimerMovimiento(false);
+      }
     }
 
-    // Si tras el movimiento el rey propio queda en jaque, revertir y bloquear
     $miColor = $this->turno;
-    $quedaEnJaque = $this->estaEnJaque($miColor);
-
-    // Revertir estado temporal
-    $piezaOrigen->restore($snapshotOrigen);
-    if ($piezaDestinoObj && $piezaDestinoSnapshot) {
-      $piezaDestinoObj->restore($piezaDestinoSnapshot);
-    }
+    $quedaEnJaque = $this->estaEnJaque($miColor, $tempJugadores);
 
     if ($quedaEnJaque) {
       $this->mensaje = "Movimiento inválido: deja en jaque a tu rey";
@@ -173,14 +170,16 @@ class Partida
    * @param string $posicion Posición a buscar
    * @return Pieza|null La pieza encontrada o null
    */
-  private function obtenerPiezaEnPosicion($posicion)
+  private function obtenerPiezaEnPosicion($posicion, $jugadores = null)
   {
+    $jugadoresUso = $jugadores ?? $this->jugadores;
+
     // Buscar en las piezas blancas
-    $pieza = $this->jugadores['blancas']->getPiezaEnPosicion($posicion);
+    $pieza = $jugadoresUso['blancas']->getPiezaEnPosicion($posicion);
     if ($pieza) return $pieza;
 
     // Buscar en las piezas negras
-    $pieza = $this->jugadores['negras']->getPiezaEnPosicion($posicion);
+    $pieza = $jugadoresUso['negras']->getPiezaEnPosicion($posicion);
     if ($pieza) return $pieza;
 
     return null;
@@ -191,15 +190,17 @@ class Partida
    * @param string $color "blancas" o "negras"
    * @return bool
    */
-  public function estaEnJaque($color)
+  public function estaEnJaque($color, $jugadores = null)
   {
-    $rey = $this->jugadores[$color]->getRey();
+    $jugadoresUso = $jugadores ?? $this->jugadores;
+
+    $rey = $jugadoresUso[$color]->getRey();
     if ($rey === null) return false;
 
     $posRey = $rey->getPosicion();
     $oponente = ($color === 'blancas') ? 'negras' : 'blancas';
 
-    foreach ($this->jugadores[$oponente]->getPiezas() as $pieza) {
+    foreach ($jugadoresUso[$oponente]->getPiezas() as $pieza) {
       if ($pieza->estCapturada()) continue;
 
       if ($pieza instanceof Peon) {
@@ -214,7 +215,7 @@ class Partida
       if (!($pieza instanceof Caballo)) {
         $bloqueado = false;
         for ($i = 0; $i < count($movs) - 1; $i++) {
-          if ($this->obtenerPiezaEnPosicion($movs[$i]) !== null) {
+          if ($this->obtenerPiezaEnPosicion($movs[$i], $jugadoresUso) !== null) {
             $bloqueado = true;
             break;
           }
@@ -274,28 +275,28 @@ class Partida
           if ($bloqueado) continue;
         }
 
-        // Simular el movimiento temporalmente
-        $snapOrigen = $pieza->snapshot();
-        $origenPos = isset($snapOrigen['posicion']) ? $snapOrigen['posicion'] : null;
-        $piezaDestinoObj = $this->obtenerPiezaEnPosicion($destino);
-        $snapDestino = $piezaDestinoObj ? $piezaDestinoObj->snapshot() : null;
+        // Simular el movimiento en una copia clonada del estado de jugadores
+        $jugadoresUso = $this->jugadores;
+        $backup = serialize($jugadoresUso);
+        $tempJugadores = unserialize($backup);
 
-        if ($piezaDestinoObj) {
-          $piezaDestinoObj->capturar();
+        // Encontrar la pieza correspondiente en el estado temporal (buscando por posición original)
+        $origenPos = $pieza->getPosicion();
+        $piezaTemp = $tempJugadores[$color]->getPiezaEnPosicion($origenPos);
+        $piezaDestinoTemp = $this->obtenerPiezaEnPosicion($destino, $tempJugadores);
+
+        if ($piezaDestinoTemp) {
+          $piezaDestinoTemp->capturar();
         }
 
-        $pieza->setPosicion($destino);
-        if ($pieza instanceof Peon) {
-          $pieza->setEsPrimerMovimiento(false);
+        if ($piezaTemp) {
+          $piezaTemp->setPosicion($destino);
+          if ($piezaTemp instanceof Peon) {
+            $piezaTemp->setEsPrimerMovimiento(false);
+          }
         }
 
-        $quedaEnJaque = $this->estaEnJaque($color);
-
-        // Revertir
-        $pieza->restore($snapOrigen);
-        if ($piezaDestinoObj && $snapDestino) {
-          $piezaDestinoObj->restore($snapDestino);
-        }
+        $quedaEnJaque = $this->estaEnJaque($color, $tempJugadores);
 
         if (!$quedaEnJaque) {
           return false; // Existe una jugada que quita el jaque

@@ -142,27 +142,4 @@ class Pieza
     return [];
   }
 
-  /**
-   * Devuelve un snapshot serializable del estado de la pieza
-   * @return array
-   */
-  public function snapshot()
-  {
-    return [
-      'posicion' => $this->posicion,
-      'valor' => $this->valor,
-      'color' => $this->color
-    ];
-  }
-
-  /**
-   * Restaura el estado desde un snapshot
-   * @param array $snap
-   */
-  public function restore($snap)
-  {
-    $this->posicion = $snap['posicion'];
-    $this->valor = $snap['valor'];
-    $this->color = $snap['color'];
-  }
 }
