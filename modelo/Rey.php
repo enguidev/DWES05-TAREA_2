@@ -45,6 +45,7 @@ class Rey extends Pieza
 
     if ($esMovimientoValido) {
       $this->posicion = $nuevaPosicion;
+      $this->haMovido = true;
       return true;
     }
 

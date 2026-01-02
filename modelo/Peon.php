@@ -137,4 +137,25 @@ class Peon extends Pieza
   {
     return $this->esPrimerMovimiento;
   }
+
+  /**
+   * Verifica si el peón puede promoverse en su posición actual
+   * @return bool True si puede promoverse
+   */
+  public function puedePromoverse()
+  {
+    if ($this->estCapturada()) return false;
+
+    $coords = $this->notacionACoords($this->posicion);
+    if (!$coords) return false;
+
+    list($fila, $columna) = $coords;
+
+    // Blancas promueven en fila 7 (índice 7, que es fila 8 en notación)
+    // Negras promueven en fila 0 (índice 0, que es fila 1 en notación)
+    if ($this->color === 'blancas' && $fila === 7) return true;
+    if ($this->color === 'negras' && $fila === 0) return true;
+
+    return false;
+  }
 }

@@ -137,4 +137,48 @@ class Jugador
     $rey = $this->getRey();
     return $rey === null || $rey->estCapturada();
   }
+
+  /**
+   * Promueve un peón a otra pieza
+   * @param Peon $peon El peón a promover
+   * @param string $tipoPieza Tipo de pieza ('Dama', 'Torre', 'Alfil', 'Caballo')
+   * @return bool True si se promovió exitosamente
+   */
+  public function promoverPeon($peon, $tipoPieza = 'Dama')
+  {
+    if (!$peon instanceof Peon || !$peon->puedePromoverse()) {
+      return false;
+    }
+
+    $posicion = $peon->getPosicion();
+    $color = $peon->getColor();
+
+    // Crear la nueva pieza
+    switch ($tipoPieza) {
+      case 'Dama':
+        $nuevaPieza = new Dama($posicion, $color);
+        break;
+      case 'Torre':
+        $nuevaPieza = new Torre($posicion, $color);
+        break;
+      case 'Alfil':
+        $nuevaPieza = new Alfil($posicion, $color);
+        break;
+      case 'Caballo':
+        $nuevaPieza = new Caballo($posicion, $color);
+        break;
+      default:
+        return false;
+    }
+
+    // Reemplazar el peón en la lista de piezas
+    foreach ($this->piezas as $key => $pieza) {
+      if ($pieza === $peon) {
+        $this->piezas[$key] = $nuevaPieza;
+        return true;
+      }
+    }
+
+    return false;
+  }
 }

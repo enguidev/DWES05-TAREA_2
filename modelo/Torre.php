@@ -42,6 +42,7 @@ class Torre extends Pieza
 
     if ($esHorizontal || $esVertical) {
       $this->posicion = $nuevaPosicion;
+      $this->haMovido = true;
       return true;
     }
 

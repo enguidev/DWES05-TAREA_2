@@ -9,6 +9,7 @@ class Pieza
   protected $posicion;  // Posición en notación de ajedrez (ej: "A1", "C4") o "CAPTURADA"
   protected $valor;     // Valor numérico de la pieza
   protected $color;     // Color de la pieza: "blancas" o "negras"
+  protected $haMovido;  // Indica si la pieza ya se ha movido
 
   /**
    * Constructor de la clase Pieza
@@ -20,6 +21,7 @@ class Pieza
     $this->posicion = $posicion;
     $this->color = $color;
     $this->valor = 0; // Se establecerá en las subclases
+    $this->haMovido = false;
   }
 
   /**
@@ -73,6 +75,23 @@ class Pieza
   public function capturar()
   {
     $this->posicion = "CAPTURADA";
+  }
+
+  /**
+   * Verifica si la pieza ya se ha movido
+   * @return bool True si se ha movido
+   */
+  public function haMovido()
+  {
+    return $this->haMovido;
+  }
+
+  /**
+   * Marca la pieza como movida
+   */
+  public function setHaMovido()
+  {
+    $this->haMovido = true;
   }
 
   /**

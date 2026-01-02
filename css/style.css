@@ -326,6 +326,10 @@ h1 {
 }
 
 /* Indicador especial para capturas */
+.btn-captura {
+  cursor: pointer;
+}
+
 .btn-captura .imagen-pieza {
   cursor: pointer;
 }

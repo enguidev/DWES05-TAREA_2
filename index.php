@@ -39,11 +39,47 @@ if (isset($_POST['seleccionar_casilla'])) {
   }
 }
 
+// Procesar deshacer jugada
+if (isset($_POST['deshacer'])) {
+  $partida->deshacerJugada();
+  $_SESSION['casilla_seleccionada'] = null;
+  $_SESSION['partida'] = serialize($partida);
+}
+
+// Procesar guardar partida
+if (isset($_POST['guardar'])) {
+  $data = [
+    'partida' => serialize($partida),
+    'casilla_seleccionada' => $_SESSION['casilla_seleccionada']
+  ];
+  file_put_contents('partida_guardada.json', json_encode($data));
+  $mensaje = "Partida guardada.";
+}
+
+// Procesar cargar partida
+if (isset($_POST['cargar'])) {
+  if (file_exists('partida_guardada.json')) {
+    $data = json_decode(file_get_contents('partida_guardada.json'), true);
+    $_SESSION['partida'] = $data['partida'];
+    $_SESSION['casilla_seleccionada'] = $data['casilla_seleccionada'];
+    $partida = unserialize($_SESSION['partida']);
+    $mensaje = "Partida cargada.";
+  } else {
+    $mensaje = "No hay partida guardada.";
+  }
+}
+
 $casillaSeleccionada = $_SESSION['casilla_seleccionada'];
 $marcador = $partida->marcador();
 $mensaje = $partida->getMensaje();
 $turno = $partida->getTurno();
 $jugadores = $partida->getJugadores();
+
+// Obtener posibilidades de reglas avanzadas
+$enroqueCorto = $partida->puedeEnrocarCorto($turno);
+$enroqueLargo = $partida->puedeEnrocarLargo($turno);
+$capturaAlPaso = $partida->capturaAlPasoDisponible($turno);
+$esTablas = $partida->esTablas();
 
 // Obtener piezas capturadas
 $piezasCapturadas = [
@@ -143,65 +179,8 @@ function obtenerPiezaEnCasilla($posicion, $partida)
         </div>
       </div>
 
-      <div class="piezas-capturadas">
-        <div class="capturadas-grupo">
-          <h3>♟️ Piezas blancas capturadas:</h3>
-          <div class="capturadas-lista">
-            <?php foreach ($piezasCapturadas['blancas'] as $pieza): ?>
-              <img src="<?php echo obtenerImagenPieza($pieza); ?>"
-                alt="Capturada"
-                class="pieza-capturada">
-            <?php endforeach; ?>
-            <?php if (empty($piezasCapturadas['blancas'])): ?>
-              <span style="color: #999; font-size: 0.9em;">Ninguna</span>
-            <?php endif; ?>
-          </div>
-        </div>
-        <div class="capturadas-grupo">
-          <h3>♟️ Piezas negras capturadas:</h3>
-          <div class="capturadas-lista">
-            <?php foreach ($piezasCapturadas['negras'] as $pieza): ?>
-              <img src="<?php echo obtenerImagenPieza($pieza); ?>"
-                alt="Capturada"
-                class="pieza-capturada">
-            <?php endforeach; ?>
-            <?php if (empty($piezasCapturadas['negras'])): ?>
-              <span style="color: #999; font-size: 0.9em;">Ninguna</span>
-            <?php endif; ?>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="tablero-wrapper">
-      <div class="tablero-contenedor">
-        <div class="coordenada-esquina-superior-izquierda"></div>
 
-        <?php
-        $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-        foreach ($letras as $letra):
-        ?>
-          <div class="coordenada-superior"><?php echo $letra; ?></div>
-        <?php endforeach; ?>
-
-        <div class="coordenada-esquina-superior-derecha"></div>
-
-        <?php
-        for ($fila = 0; $fila < 8; $fila++):
-          $numeroFila = 8 - $fila;
-        ?>
-          <div class="coordenada-izquierda"><?php echo $numeroFila; ?></div>
-
-          <?php
-          for ($col = 0; $col < 8; $col++):
-            $columna = $letras[$col];
-            $posicion = $columna . $numeroFila;
-
-            $colorCasilla = ($fila + $col) % 2 == 0 ? 'blanca' : 'negra';
-            $pieza = obtenerPiezaEnCasilla($posicion, $partida);
-            $esSeleccionada = ($casillaSeleccionada === $posicion);
-
-            // Calcular movimientos posibles
             $esMovimientoPosible = false;
             $esCaptura = false;
 
@@ -285,10 +264,29 @@ function obtenerPiezaEnCasilla($posicion, $partida)
       </div>
     </div>
 
+    <div class="temporizador">
+      <h3>Tiempo restante: <span id="tiempo">10:00</span></h3>
+    </div>
+
     <div class="botones-control">
       <form method="post" style="display: inline;">
         <button type="submit" name="reiniciar" class="btn-reiniciar">
           🔄 Reiniciar Partida
+        </button>
+      </form>
+      <form method="post" style="display: inline;">
+        <button type="submit" name="deshacer" class="btn-deshacer">
+          ↶ Deshacer Jugada
+        </button>
+      </form>
+      <form method="post" style="display: inline;">
+        <button type="submit" name="guardar" class="btn-guardar">
+          💾 Guardar Partida
+        </button>
+      </form>
+      <form method="post" style="display: inline;">
+        <button type="submit" name="cargar" class="btn-cargar">
+          📁 Cargar Partida
         </button>
       </form>
     </div>
@@ -304,6 +302,23 @@ function obtenerPiezaEnCasilla($posicion, $partida)
       </ol>
     </div>
   </div>
+<script>
+  let tiempoRestante = 600; // 10 minutos en segundos
+  const tiempoElement = document.getElementById('tiempo');
+
+  function actualizarTemporizador() {
+    const minutos = Math.floor(tiempoRestante / 60);
+    const segundos = tiempoRestante % 60;
+    tiempoElement.textContent = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+    if (tiempoRestante > 0) {
+      tiempoRestante--;
+    } else {
+      alert('Tiempo agotado!');
+    }
+  }
+
+  setInterval(actualizarTemporizador, 1000);
+</script>
 </body>
 
 </html>

@@ -12,6 +12,7 @@ class Partida
   private $turno;      // Jugador al que le toca mover
   private $mensaje;    // Mensaje de estado de la partida
   private $partidaTerminada; // Indica si la partida ha terminado
+  private $historial;  // Historial de snapshots para deshacer jugadas
 
   /**
    * Constructor de Partida
@@ -28,6 +29,7 @@ class Partida
     $this->turno = 'blancas'; // Las blancas siempre empiezan
     $this->mensaje = "Turno de " . $this->jugadores['blancas']->getNombre() . " (blancas)";
     $this->partidaTerminada = false;
+    $this->historial = [];
   }
 
   /**
@@ -41,6 +43,18 @@ class Partida
     if ($this->partidaTerminada) {
       $this->mensaje = "La partida ha terminado";
       return false;
+    }
+
+    // Guardar snapshot del estado actual para poder deshacer
+    $this->historial[] = serialize([
+      'jugadores' => $this->jugadores,
+      'turno' => $this->turno,
+      'mensaje' => $this->mensaje,
+      'partidaTerminada' => $this->partidaTerminada
+    ]);
+    // Limitar historial a 10 movimientos para no consumir memoria
+    if (count($this->historial) > 10) {
+      array_shift($this->historial);
     }
 
     // 1. Verificar que existe una pieza en el origen
@@ -101,6 +115,7 @@ class Partida
 
     if ($piezaOrigenTemp) {
       $piezaOrigenTemp->setPosicion($destino);
+      $piezaOrigenTemp->setHaMovido();
       if ($piezaOrigenTemp instanceof Peon) {
         $piezaOrigenTemp->setEsPrimerMovimiento(false);
       }
@@ -141,6 +156,12 @@ class Partida
       $piezaOrigen->movimiento($destino, $esCaptura);
     } else {
       $piezaOrigen->movimiento($destino);
+    }
+
+    // 6.5. Verificar promoción de peón
+    if ($piezaOrigen instanceof Peon && $piezaOrigen->puedePromoverse()) {
+      $this->jugadores[$this->turno]->promoverPeon($piezaOrigen, 'Dama');
+      $this->mensaje = "Peón promovido a dama";
     }
 
     // 7. Cambiar el turno
@@ -324,15 +345,28 @@ class Partida
   }
 
   /**
-   * Devuelve el marcador de la partida (puntos de cada jugador)
+   * Devuelve el marcador de la partida (puntos por piezas capturadas del oponente)
    * @return array Array con los puntos [puntosBlancas, puntosNegras]
    */
   public function marcador()
   {
-    return [
-      $this->jugadores['blancas']->calcularPuntos(),
-      $this->jugadores['negras']->calcularPuntos()
-    ];
+    $puntosBlancas = 0;
+    $puntosNegras = 0;
+
+    // Sumar puntos de piezas capturadas del oponente
+    foreach ($this->jugadores['negras']->getPiezas() as $pieza) {
+      if ($pieza->estCapturada()) {
+        $puntosBlancas += $pieza->getValor();
+      }
+    }
+
+    foreach ($this->jugadores['blancas']->getPiezas() as $pieza) {
+      if ($pieza->estCapturada()) {
+        $puntosNegras += $pieza->getValor();
+      }
+    }
+
+    return [$puntosBlancas, $puntosNegras];
   }
 
   /**
@@ -420,5 +454,145 @@ class Partida
   public function getJugadores()
   {
     return $this->jugadores;
+  }
+
+  /**
+   * Deshace la última jugada realizada
+   * @return bool True si se pudo deshacer, false si no hay jugadas para deshacer
+   */
+  public function deshacerJugada()
+  {
+    if (empty($this->historial)) {
+      $this->mensaje = "No hay jugadas para deshacer";
+      return false;
+    }
+
+    // Restaurar el último snapshot
+    $snapshot = unserialize(array_pop($this->historial));
+    $this->jugadores = $snapshot['jugadores'];
+    $this->turno = $snapshot['turno'];
+    $this->mensaje = $snapshot['mensaje'];
+    $this->partidaTerminada = $snapshot['partidaTerminada'];
+
+    return true;
+  }
+
+  /**
+   * Verifica si el enroque corto está disponible para el color dado
+   * @param string $color 'blancas' o 'negras'
+   * @return bool True si está disponible
+   */
+  public function puedeEnrocarCorto($color)
+  {
+    $rey = $this->jugadores[$color]->getRey();
+    if (!$rey || $rey->haMovido() || $this->estaEnJaque($color)) return false;
+
+    $torre = $this->jugadores[$color]->getPiezaEnPosicion($color === 'blancas' ? 'H1' : 'H8');
+    if (!$torre || !($torre instanceof Torre) || $torre->haMovido()) return false;
+
+    // Verificar casillas libres y no en jaque
+    $casillas = $color === 'blancas' ? ['F1', 'G1'] : ['F8', 'G8'];
+    foreach ($casillas as $casilla) {
+      if ($this->jugadores[$color]->getPiezaEnPosicion($casilla) || $this->jugadores[$this->oponente($color)]->getPiezaEnPosicion($casilla)) return false;
+      // Simular movimiento del rey a esa casilla y verificar jaque
+      $rey->setPosicion($casilla);
+      if ($this->estaEnJaque($color)) {
+        $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
+        return false;
+      }
+      $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
+    }
+    return true;
+  }
+
+  /**
+   * Verifica si el enroque largo está disponible para el color dado
+   * @param string $color 'blancas' o 'negras'
+   * @return bool True si está disponible
+   */
+  public function puedeEnrocarLargo($color)
+  {
+    $rey = $this->jugadores[$color]->getRey();
+    if (!$rey || $rey->haMovido() || $this->estaEnJaque($color)) return false;
+
+    $torre = $this->jugadores[$color]->getPiezaEnPosicion($color === 'blancas' ? 'A1' : 'A8');
+    if (!$torre || !($torre instanceof Torre) || $torre->haMovido()) return false;
+
+    // Verificar casillas libres y no en jaque
+    $casillas = $color === 'blancas' ? ['B1', 'C1', 'D1'] : ['B8', 'C8', 'D8'];
+    foreach ($casillas as $casilla) {
+      if ($this->jugadores[$color]->getPiezaEnPosicion($casilla) || $this->jugadores[$this->oponente($color)]->getPiezaEnPosicion($casilla)) return false;
+      if ($casilla === ($color === 'blancas' ? 'D1' : 'D8')) continue; // D1/D8 no necesita check de jaque para rey
+      // Simular movimiento del rey a esa casilla y verificar jaque
+      $rey->setPosicion($casilla);
+      if ($this->estaEnJaque($color)) {
+        $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
+        return false;
+      }
+      $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
+    }
+    return true;
+  }
+
+  /**
+   * Verifica si hay captura al paso disponible
+   * @param string $color 'blancas' o 'negras'
+   * @return array|null Posición de captura o null
+   */
+  public function capturaAlPasoDisponible($color)
+  {
+    // Implementación simplificada: verificar si el último movimiento fue un peón avanzando 2 casillas
+    // Asumir que se guarda el último movimiento
+    // Por simplicidad, devolver null por ahora (no implementado completamente)
+    return null;
+  }
+
+  /**
+   * Verifica si la partida está en tablas
+   * @return bool True si hay tablas
+   */
+  public function esTablas()
+  {
+    // Verificar stalemate: turno actual no puede mover pero no está en jaque
+    if (!$this->estaEnJaque($this->turno) && !$this->tieneMovimientosLegales($this->turno)) return true;
+
+    // Insuficiente material: solo reyes, o rey + caballo/alfil vs rey
+    $piezasBlancas = array_filter($this->jugadores['blancas']->getPiezas(), fn($p) => !$p->estCapturada());
+    $piezasNegras = array_filter($this->jugadores['negras']->getPiezas(), fn($p) => !$p->estCapturada());
+
+    $tieneBlancasPiezas = count(array_filter($piezasBlancas, fn($p) => !($p instanceof Rey))) > 0;
+    $tieneNegrasPiezas = count(array_filter($piezasNegras, fn($p) => !($p instanceof Rey))) > 0;
+
+    if (!$tieneBlancasPiezas && !$tieneNegrasPiezas) return true; // Solo reyes
+
+    // Más complejos, pero por ahora solo stalemate
+    return false;
+  }
+
+  /**
+   * Verifica si el jugador tiene movimientos legales
+   * @param string $color 'blancas' o 'negras'
+   * @return bool True si tiene al menos un movimiento
+   */
+  private function tieneMovimientosLegales($color)
+  {
+    // Simplificado: verificar si alguna pieza puede mover sin dejar rey en jaque
+    foreach ($this->jugadores[$color]->getPiezas() as $pieza) {
+      if ($pieza->estCapturada()) continue;
+      // Simular movimientos posibles
+      // Por simplicidad, asumir que si no está en jaque y hay piezas, hay movimientos
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Devuelve el oponente del color dado
+   * @param string $color 'blancas' o 'negras'
+   * @return string El color oponente
+   */
+  private function oponente($color)
+  {
+    return $color === 'blancas' ? 'negras' : 'blancas';
   }
 }
