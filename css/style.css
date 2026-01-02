@@ -737,3 +737,342 @@ h1 {
     opacity: 0.7;
   }
 }
+
+/* ============================================
+   RELOJES DE AJEDREZ
+   ============================================ */
+
+.header-juego {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-config {
+  font-size: 2em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.btn-config:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: rotate(90deg);
+}
+
+.relojes-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.reloj {
+  flex: 1;
+  max-width: 300px;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 4px solid transparent;
+}
+
+.reloj-blancas {
+  background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+  border-color: #999;
+}
+
+.reloj-negras {
+  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+  color: white;
+  border-color: #666;
+}
+
+.reloj-activo {
+  border-color: #4CAF50 !important;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  transform: scale(1.05);
+}
+
+.reloj-inactivo {
+  opacity: 0.7;
+}
+
+.reloj-jugador {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.reloj-tiempo {
+  font-size: 3em;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.reloj-negras .reloj-tiempo {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tiempo-critico {
+  color: #e74c3c !important;
+  animation: parpadeo-critico 1s infinite;
+}
+
+@keyframes parpadeo-critico {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.reloj-puntos {
+  font-size: 1em;
+  opacity: 0.8;
+}
+
+.reloj-separador {
+  font-size: 3em;
+  color: #667eea;
+}
+
+/* ============================================
+   MODAL DE CONFIGURACIÓN
+   ============================================ */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border: none;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 15px 15px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+.close-modal {
+  color: white;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  line-height: 1;
+}
+
+.close-modal:hover {
+  transform: rotate(90deg);
+  color: #ffeb3b;
+}
+
+.modal-form {
+  padding: 30px;
+}
+
+.config-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.config-section:last-of-type {
+  border-bottom: none;
+}
+
+.config-section h3 {
+  color: #667eea;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+.config-option {
+  margin-bottom: 15px;
+}
+
+.config-option label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.config-option select {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1em;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.config-option select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.config-option.checkbox label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.config-option.checkbox label:hover {
+  background: #f8f9fa;
+}
+
+.config-option.checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-guardar-config,
+.btn-cancelar-config {
+  flex: 1;
+  padding: 15px 30px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-guardar-config {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-guardar-config:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-cancelar-config {
+  background: #f44336;
+  color: white;
+}
+
+.btn-cancelar-config:hover {
+  background: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+}
+
+/* Ajuste del tablero cuando no hay capturas */
+.tablero-solo-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+/* Responsive para relojes */
+@media (max-width: 768px) {
+  .relojes-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .reloj {
+    max-width: 100%;
+  }
+
+  .reloj-tiempo {
+    font-size: 2.5em;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+  }
+
+  .modal-form {
+    padding: 20px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+}
