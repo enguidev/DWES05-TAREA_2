@@ -23,17 +23,17 @@ DWES05/
 │   └── Partida.php
 └── imagenes/
     ├── fichas_blancas/
-    │   ├── torre_blanca.png
+    │   ├── torre_blanco.png
     │   ├── caballo_blanco.png
     │   ├── alfil_blanco.png
-    │   ├── dama_blanca.png
+    │   ├── dama_blanco.png
     │   ├── rey_blanco.png
     │   └── peon_blanco.png
     └── fichas_negras/
-        ├── torre_negra.png
+        ├── torre_negro.png
         ├── caballo_negro.png
         ├── alfil_negro.png
-        ├── dama_negra.png
+        ├── dama_negro.png
         ├── rey_negro.png
         └── peon_negro.png
 
@@ -41,13 +41,21 @@ DWES05/
 SOBRE LAS IMÁGENES:
 -------------------
 
-Necesitas UNA imagen de cada tipo de pieza por color:
-- torre_blanca.png y torre_negra.png
-- caballo_blanco.png y caballo_negro.png
-- alfil_blanco.png y alfil_negro.png
-- dama_blanca.png y dama_negra.png
-- rey_blanco.png y rey_negro.png
-- peon_blanco.png y peon_negro.png
+IMPORTANTE: Los nombres de archivos deben usar género MASCULINO:
+- torre_blanco.png (no torre_blanca.png)
+- caballo_blanco.png (no caballo_blanca.png)
+- alfil_blanco.png (no alfil_blanca.png)
+- dama_blanco.png (no dama_blanca.png)
+- rey_blanco.png (no rey_blanca.png)
+- peon_blanco.png (no peon_blanca.png)
+
+Y para las negras:
+- torre_negro.png
+- caballo_negro.png
+- alfil_negro.png
+- dama_negro.png
+- rey_negro.png
+- peon_negro.png
 
 Todas dentro de:
 - imagenes/fichas_blancas/
@@ -55,11 +63,6 @@ Todas dentro de:
 
 Aunque haya 2 torres, 2 caballos, 2 alfiles y 8 peones de cada color,
 el código usa la misma imagen para todas las piezas del mismo tipo.
-
-Puedes usar las imágenes de tu Tarea 4, solo necesitas:
-1. Crear las carpetas fichas_blancas/ y fichas_negras/
-2. Copiar las imágenes y renombrarlas según el esquema de arriba
-3. Añadir las imágenes del peón que no estaban en la Tarea 4
 
 
 CÓMO FUNCIONA EL JUEGO:
@@ -70,16 +73,18 @@ CÓMO FUNCIONA EL JUEGO:
 3. Para mover una pieza:
    a) Haz clic en una pieza del color del turno actual
    b) La casilla se iluminará en amarillo
-   c) Aparecerán círculos rojos en las casillas donde puede moverse
+   c) Aparecerán círculos verdes en las casillas donde puede moverse
    d) Haz clic en una de esas casillas para mover
 
 4. CAPTURAS:
    - Si hay una pieza enemiga en el destino, se capturará automáticamente
+   - Las piezas capturadas aparecen en el panel lateral
    - Si capturas el rey enemigo, ganas la partida
 
 5. MARCADOR:
    - Se muestra la suma de puntos de las piezas activas de cada jugador
    - Torre = 5, Dama = 9, Alfil = 3, Caballo = 3, Peón = 1, Rey = 0
+   - El jugador en turno tiene un borde dorado en su marcador
 
 6. VALIDACIONES IMPLEMENTADAS:
    ✓ Movimientos según las reglas de cada pieza
@@ -89,6 +94,8 @@ CÓMO FUNCIONA EL JUEGO:
    ✓ El peón captura en diagonal
    ✓ El peón puede avanzar 2 casillas en su primer movimiento
    ✓ Fin de partida cuando se captura el rey
+   ✓ Visualización de piezas capturadas
+   ✓ Indicadores visuales de movimientos posibles y capturas
 
 
 FUNCIONALIDADES NO IMPLEMENTADAS:
@@ -110,11 +117,29 @@ CARACTERÍSTICAS DEL CÓDIGO:
 3. Métodos movimiento() y simulaMovimiento() en todas las piezas
 4. Clase Jugador con 16 piezas
 5. Clase Partida que gestiona el juego completo
-6. Sistema de turnos
+6. Sistema de turnos con indicador visual
 7. Validación completa de movimientos
-8. Sistema de capturas
+8. Sistema de capturas con panel de piezas capturadas
 9. Marcador automático
-10. Interfaz visual basada en tu Tarea 4
+10. Interfaz visual moderna con efectos y animaciones
+11. CSS separado en archivo externo (css/style.css)
+12. Código limpio con comentarios explicativos
+
+
+MEJORAS VISUALES IMPLEMENTADAS:
+--------------------------------
+
+✨ Tablero con coordenadas (A-H, 1-8)
+✨ Indicadores visuales de turno activo
+✨ Panel de piezas capturadas
+✨ Círculos verdes para movimientos posibles
+✨ Borde rojo pulsante para capturas
+✨ Casilla seleccionada resaltada en amarillo
+✨ Efectos hover en las piezas
+✨ Diseño responsive para móviles
+✨ Gradiente de fondo moderno
+✨ Animaciones suaves
+✨ Instrucciones claras de juego
 
 
 NOTAS IMPORTANTES:
@@ -124,6 +149,7 @@ NOTAS IMPORTANTES:
 - Todas las clases están en archivos separados (buena práctica POO)
 - Los comentarios explican cada método
 - El código sigue la estructura del enunciado exactamente
+- El CSS está separado en un archivo externo
 
 
 EVALUACIÓN (10 puntos):
@@ -141,8 +167,9 @@ PARA PROBAR:
 
 1. Coloca todos los archivos en tu servidor web (XAMPP, WAMP, etc.)
 2. Asegúrate de que las imágenes están en las carpetas correctas
-3. Abre index.php en tu navegador
-4. ¡Juega al ajedrez!
+3. Verifica que los nombres de las imágenes sean correctos (género masculino)
+4. Abre index.php en tu navegador
+5. ¡Juega al ajedrez!
 
 
 ¡IMPORTANTE! NOMENCLATURA DEL ARCHIVO:

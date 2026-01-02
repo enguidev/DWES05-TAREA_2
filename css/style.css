@@ -22,7 +22,7 @@ body {
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   padding: 40px;
-  max-width: 800px;
+  max-width: 900px;
   width: 100%;
 }
 
@@ -52,40 +52,90 @@ h1 {
   font-size: 1.3em;
 }
 
-/* Marcador */
-.marcador {
+/* Marcador y piezas capturadas */
+.marcador-y-capturas {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   margin-bottom: 20px;
   gap: 20px;
 }
 
-.marcador-item {
+.marcador {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   flex: 1;
+}
+
+.marcador-item {
   padding: 15px;
   border-radius: 10px;
   text-align: center;
   font-size: 1.1em;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
 }
 
 .marcador-item.blancas {
   background: #f0f0f0;
-  border: 3px solid #333;
+  border-color: #999;
 }
 
 .marcador-item.negras {
   background: #333;
   color: white;
-  border: 3px solid #666;
+  border-color: #666;
+}
+
+.marcador-item.turno-activo {
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  transform: scale(1.05);
+}
+
+.piezas-capturadas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.capturadas-grupo {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.capturadas-grupo h3 {
+  font-size: 0.9em;
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.capturadas-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.pieza-capturada {
+  width: 30px;
+  height: 30px;
+  opacity: 0.6;
 }
 
 /* Tablero */
+.tablero-wrapper {
+  margin-bottom: 30px;
+}
+
 .tablero-contenedor {
   display: grid;
   grid-template-columns: 30px repeat(8, 1fr) 30px;
   grid-template-rows: 30px repeat(8, 1fr) 30px;
   gap: 0;
-  margin: 0 auto 30px;
+  margin: 0 auto;
   max-width: 700px;
 }
 
@@ -213,8 +263,20 @@ h1 {
 }
 
 .btn-pieza-casilla:hover {
-  transform: scale(1.1);
-  filter: brightness(1.2);
+  transform: scale(1.15);
+}
+
+.btn-pieza-casilla.puede-seleccionar {
+  cursor: pointer;
+}
+
+.btn-pieza-casilla.puede-seleccionar:hover {
+  filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+}
+
+.btn-pieza-casilla.no-puede-seleccionar {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* Imagen de pieza */
@@ -223,7 +285,7 @@ h1 {
   height: 100%;
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3)) brightness(1.1) contrast(1.1);
   transform: scale(1.3);
 }
 
@@ -243,14 +305,14 @@ h1 {
 }
 
 .btn-movimiento:hover {
-  background: rgba(76, 175, 80, 0.1);
+  background: rgba(76, 175, 80, 0.2);
 }
 
 /* Indicador de movimiento posible */
 .indicador-movimiento {
   width: 70%;
   height: 70%;
-  background: red;
+  background: rgba(76, 175, 80, 0.7);
   border-radius: 50%;
   border: 3px solid #388E3C;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
@@ -263,6 +325,42 @@ h1 {
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.8);
 }
 
+/* Indicador especial para capturas */
+.btn-captura .imagen-pieza {
+  cursor: pointer;
+}
+
+.btn-captura::after {
+  content: '';
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border: 3px solid #e74c3c;
+  border-radius: 50%;
+  background: rgba(231, 76, 60, 0.15);
+  animation: pulse 1.5s infinite;
+  pointer-events: none;
+}
+
+.btn-captura:hover::after {
+  background: rgba(231, 76, 60, 0.3);
+  border-width: 4px;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+}
+
 /* Botones de control */
 .botones-control {
   display: flex;
@@ -272,8 +370,7 @@ h1 {
   flex-wrap: wrap;
 }
 
-.btn-reiniciar,
-.btn-cancelar {
+.btn-reiniciar {
   font-size: 1.1em;
   font-weight: bold;
   padding: 15px 30px;
@@ -281,9 +378,6 @@ h1 {
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.btn-reiniciar {
   background: #e74c3c;
   color: white;
 }
@@ -292,17 +386,6 @@ h1 {
   background: #c0392b;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
-}
-
-.btn-cancelar {
-  background: #f39c12;
-  color: white;
-}
-
-.btn-cancelar:hover {
-  background: #e67e22;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
 }
 
 /* Instrucciones */
@@ -342,7 +425,7 @@ h1 {
     max-width: 100%;
   }
 
-  .marcador {
+  .marcador-y-capturas {
     flex-direction: column;
   }
 }
