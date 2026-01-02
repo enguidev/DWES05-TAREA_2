@@ -159,9 +159,10 @@ class Partida
     }
 
     // 6.5. Verificar promoción de peón
+    $huboPromocion = false;
     if ($piezaOrigen instanceof Peon && $piezaOrigen->puedePromoverse()) {
       $this->jugadores[$this->turno]->promoverPeon($piezaOrigen, 'Dama');
-      $this->mensaje = "Peón promovido a dama";
+      $huboPromocion = true;
     }
 
     // 7. Cambiar el turno
@@ -175,12 +176,23 @@ class Partida
         $ganadorColor = ($jugadorSiguiente === 'blancas') ? 'negras' : 'blancas';
         $nombreGanador = $this->jugadores[$ganadorColor]->getNombre();
         $this->mensaje = "¡Jaque mate! " . $nombreGanador . " ha ganado la partida";
+        if ($huboPromocion) {
+          $this->mensaje = "¡Peón promovido a dama! " . $this->mensaje;
+        }
       } else {
         $this->mensaje = "Jaque a " . $this->jugadores[$jugadorSiguiente]->getNombre();
+        if ($huboPromocion) {
+          $this->mensaje = "¡Peón promovido a dama! " . $this->mensaje;
+        }
       }
     } else {
-      $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
-        " (" . $this->turno . ")";
+      if ($huboPromocion) {
+        $this->mensaje = "¡Peón promovido a dama! Turno de " . $this->jugadores[$this->turno]->getNombre() .
+          " (" . $this->turno . ")";
+      } else {
+        $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
+          " (" . $this->turno . ")";
+      }
     }
 
     return true;

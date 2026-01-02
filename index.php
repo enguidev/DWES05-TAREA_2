@@ -7,6 +7,7 @@ require_once 'modelo/Partida.php';
 if (!isset($_SESSION['partida']) || isset($_POST['reiniciar'])) {
   $_SESSION['partida'] = serialize(new Partida("Jugador 1", "Jugador 2"));
   $_SESSION['casilla_seleccionada'] = null;
+  $_SESSION['tiempo_restante'] = 600; // Reiniciar temporizador
 }
 
 $partida = unserialize($_SESSION['partida']);
@@ -178,142 +179,147 @@ function obtenerPiezaEnCasilla($posicion, $partida)
           <?php endif; ?>
         </div>
       </div>
-
-      <div class="piezas-capturadas">
-        <div class="capturadas-grupo">
-          <h3>Piezas blancas capturadas:</h3>
-          <div class="capturadas-lista">
-            <?php foreach ($piezasCapturadas['blancas'] as $pieza): ?>
-              <img src="<?php echo obtenerImagenPieza($pieza); ?>" alt="Pieza capturada" class="pieza-capturada">
-            <?php endforeach; ?>
-          </div>
-        </div>
-        <div class="capturadas-grupo">
-          <h3>Piezas negras capturadas:</h3>
-          <div class="capturadas-lista">
-            <?php foreach ($piezasCapturadas['negras'] as $pieza): ?>
-              <img src="<?php echo obtenerImagenPieza($pieza); ?>" alt="Pieza capturada" class="pieza-capturada">
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- TABLERO DE AJEDREZ -->
-    <div class="tablero-wrapper">
-      <div class="tablero-contenedor">
-        <?php
-        $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    <!-- TABLERO CON PIEZAS CAPTURADAS A LOS LADOS -->
+    <div class="tablero-y-capturas-wrapper">
+      <!-- Piezas capturadas del lado izquierdo (BLANCAS capturadas por NEGRAS) -->
+      <div class="piezas-capturadas-lado">
+        <h3>Capturadas por negras:</h3>
+        <div class="capturadas-vertical">
+          <?php foreach ($piezasCapturadas['blancas'] as $pieza): ?>
+            <img src="<?php echo obtenerImagenPieza($pieza); ?>" alt="Pieza capturada" class="pieza-capturada">
+          <?php endforeach; ?>
+        </div>
+      </div>
 
-        // Esquina superior izquierda
-        echo '<div class="coordenada-esquina-superior-izquierda"></div>';
+      <!-- TABLERO DE AJEDREZ -->
+      <div class="tablero-wrapper">
+        <div class="tablero-contenedor">
+          <?php
+          $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-        // Coordenadas superiores (letras)
-        foreach ($letras as $letra) {
-          echo '<div class="coordenada-superior">' . $letra . '</div>';
-        }
+          // Esquina superior izquierda
+          echo '<div class="coordenada-esquina-superior-izquierda"></div>';
 
-        echo '<div class="coordenada-esquina-superior-derecha"></div>';
+          // Coordenadas superiores (letras)
+          foreach ($letras as $letra) {
+            echo '<div class="coordenada-superior">' . $letra . '</div>';
+          }
 
-        // Generar filas del tablero (8 a 1)
-        for ($fila = 8; $fila >= 1; $fila--):
-          $numeroFila = $fila;
-          echo '<div class="coordenada-izquierda">' . $numeroFila . '</div>';
+          echo '<div class="coordenada-esquina-superior-derecha"></div>';
 
-          // Generar columnas (A-H)
-          for ($columna = 0; $columna < 8; $columna++):
-            $posicion = $letras[$columna] . $fila;
-            $pieza = obtenerPiezaEnCasilla($posicion, $partida);
+          // Generar filas del tablero (8 a 1)
+          for ($fila = 8; $fila >= 1; $fila--):
+            $numeroFila = $fila;
+            echo '<div class="coordenada-izquierda">' . $numeroFila . '</div>';
 
-            // Determinar color de la casilla
-            $colorCasilla = (($fila + $columna) % 2 === 0) ? 'blanca' : 'negra';
+            // Generar columnas (A-H)
+            for ($columna = 0; $columna < 8; $columna++):
+              $posicion = $letras[$columna] . $fila;
+              $pieza = obtenerPiezaEnCasilla($posicion, $partida);
 
-            // Verificar si está seleccionada
-            $esSeleccionada = ($casillaSeleccionada === $posicion);
+              // Determinar color de la casilla
+              $colorCasilla = (($fila + $columna) % 2 === 0) ? 'blanca' : 'negra';
 
-            // Verificar si es un movimiento posible
-            $esMovimientoPosible = false;
-            $esCaptura = false;
+              // Verificar si está seleccionada
+              $esSeleccionada = ($casillaSeleccionada === $posicion);
 
-            if ($casillaSeleccionada !== null && !$esSeleccionada) {
-              $piezaSeleccionada = obtenerPiezaEnCasilla($casillaSeleccionada, $partida);
-              if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $turno) {
-                $piezaEnDestino = obtenerPiezaEnCasilla($posicion, $partida);
-                $hayPiezaDestino = ($piezaEnDestino !== null);
+              // Verificar si es un movimiento posible
+              $esMovimientoPosible = false;
+              $esCaptura = false;
 
-                if ($piezaSeleccionada instanceof Peon) {
-                  $movimientos = $piezaSeleccionada->simulaMovimiento($posicion, $hayPiezaDestino);
-                } else {
-                  $movimientos = $piezaSeleccionada->simulaMovimiento($posicion);
-                }
+              if ($casillaSeleccionada !== null && !$esSeleccionada) {
+                $piezaSeleccionada = obtenerPiezaEnCasilla($casillaSeleccionada, $partida);
+                if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $turno) {
+                  $piezaEnDestino = obtenerPiezaEnCasilla($posicion, $partida);
+                  $hayPiezaDestino = ($piezaEnDestino !== null);
 
-                if (!empty($movimientos)) {
-                  $bloqueado = false;
-
-                  if (!($piezaSeleccionada instanceof Caballo)) {
-                    for ($i = 0; $i < count($movimientos) - 1; $i++) {
-                      if (obtenerPiezaEnCasilla($movimientos[$i], $partida) !== null) {
-                        $bloqueado = true;
-                        break;
-                      }
-                    }
+                  if ($piezaSeleccionada instanceof Peon) {
+                    $movimientos = $piezaSeleccionada->simulaMovimiento($posicion, $hayPiezaDestino);
+                  } else {
+                    $movimientos = $piezaSeleccionada->simulaMovimiento($posicion);
                   }
 
-                  if (!$bloqueado) {
-                    if ($piezaEnDestino !== null) {
-                      if ($piezaEnDestino->getColor() !== $turno) {
-                        $esMovimientoPosible = true;
-                        $esCaptura = true;
+                  if (!empty($movimientos)) {
+                    $bloqueado = false;
+
+                    if (!($piezaSeleccionada instanceof Caballo)) {
+                      for ($i = 0; $i < count($movimientos) - 1; $i++) {
+                        if (obtenerPiezaEnCasilla($movimientos[$i], $partida) !== null) {
+                          $bloqueado = true;
+                          break;
+                        }
                       }
-                    } else {
-                      $esMovimientoPosible = true;
+                    }
+
+                    if (!$bloqueado) {
+                      if ($piezaEnDestino !== null) {
+                        if ($piezaEnDestino->getColor() !== $turno) {
+                          $esMovimientoPosible = true;
+                          $esCaptura = true;
+                        }
+                      } else {
+                        $esMovimientoPosible = true;
+                      }
                     }
                   }
                 }
               }
-            }
-        ?>
-            <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
-              <?php if ($pieza !== null): ?>
-                <form method="post" class="formulario">
-                  <?php
-                  $puedeSeleccionar = ($pieza->getColor() === $turno);
-                  $claseBoton = $puedeSeleccionar ? 'puede-seleccionar' : 'no-puede-seleccionar';
-                  ?>
-                  <button type="submit"
-                    name="seleccionar_casilla"
-                    value="<?php echo $posicion; ?>"
-                    class="btn-pieza-casilla <?php echo $claseBoton; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>">
-                    <img src="<?php echo obtenerImagenPieza($pieza); ?>"
-                      alt="<?php echo get_class($pieza); ?>"
-                      class="imagen-pieza">
-                  </button>
-                </form>
-              <?php elseif ($esMovimientoPosible): ?>
-                <form method="post" class="formulario">
-                  <button type="submit"
-                    name="seleccionar_casilla"
-                    value="<?php echo $posicion; ?>"
-                    class="btn-movimiento">
-                    <span class="indicador-movimiento"></span>
-                  </button>
-                </form>
-              <?php endif; ?>
-            </div>
+          ?>
+              <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
+                <?php if ($pieza !== null): ?>
+                  <form method="post" class="formulario">
+                    <?php
+                    $puedeSeleccionar = ($pieza->getColor() === $turno);
+                    $claseBoton = $puedeSeleccionar ? 'puede-seleccionar' : 'no-puede-seleccionar';
+                    ?>
+                    <button type="submit"
+                      name="seleccionar_casilla"
+                      value="<?php echo $posicion; ?>"
+                      class="btn-pieza-casilla <?php echo $claseBoton; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>">
+                      <img src="<?php echo obtenerImagenPieza($pieza); ?>"
+                        alt="<?php echo get_class($pieza); ?>"
+                        class="imagen-pieza">
+                    </button>
+                  </form>
+                <?php elseif ($esMovimientoPosible): ?>
+                  <form method="post" class="formulario">
+                    <button type="submit"
+                      name="seleccionar_casilla"
+                      value="<?php echo $posicion; ?>"
+                      class="btn-movimiento">
+                      <span class="indicador-movimiento"></span>
+                    </button>
+                  </form>
+                <?php endif; ?>
+              </div>
+            <?php endfor; ?>
+
+            <div class="coordenada-derecha"><?php echo $numeroFila; ?></div>
           <?php endfor; ?>
 
-          <div class="coordenada-derecha"><?php echo $numeroFila; ?></div>
-        <?php endfor; ?>
+          <div class="coordenada-esquina-inferior-izquierda"></div>
 
-        <div class="coordenada-esquina-inferior-izquierda"></div>
+          <?php foreach ($letras as $letra): ?>
+            <div class="coordenada-inferior"><?php echo $letra; ?></div>
+          <?php endforeach; ?>
 
-        <?php foreach ($letras as $letra): ?>
-          <div class="coordenada-inferior"><?php echo $letra; ?></div>
-        <?php endforeach; ?>
-
-        <div class="coordenada-esquina-inferior-derecha"></div>
+          <div class="coordenada-esquina-inferior-derecha"></div>
+        </div>
       </div>
-    </div>
+
+      <!-- Piezas capturadas del lado derecho (NEGRAS capturadas por BLANCAS) -->
+      <div class="piezas-capturadas-lado">
+        <h3>Capturadas por blancas:</h3>
+        <div class="capturadas-vertical">
+          <?php foreach ($piezasCapturadas['negras'] as $pieza): ?>
+            <img src="<?php echo obtenerImagenPieza($pieza); ?>" alt="Pieza capturada" class="pieza-capturada">
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+    </div> <!-- Cierre de tablero-y-capturas-wrapper -->
 
     <div class="temporizador">
       <h3>Tiempo restante: <span id="tiempo">10:00</span></h3>
@@ -354,7 +360,8 @@ function obtenerPiezaEnCasilla($posicion, $partida)
     </div>
   </div>
   <script>
-    let tiempoRestante = 600; // 10 minutos en segundos
+    // Recuperar el tiempo de la sesión o iniciar en 600
+    let tiempoRestante = <?php echo isset($_SESSION['tiempo_restante']) ? $_SESSION['tiempo_restante'] : 600; ?>;
     const tiempoElement = document.getElementById('tiempo');
 
     function actualizarTemporizador() {
@@ -363,9 +370,17 @@ function obtenerPiezaEnCasilla($posicion, $partida)
       tiempoElement.textContent = `${minutos}:${segundos.toString().padStart(2, '0')}`;
       if (tiempoRestante > 0) {
         tiempoRestante--;
+        // Guardar en localStorage para persistencia
+        localStorage.setItem('tiempoRestante', tiempoRestante);
       } else {
         alert('Tiempo agotado!');
       }
+    }
+
+    // Intentar recuperar de localStorage si existe
+    const tiempoGuardado = localStorage.getItem('tiempoRestante');
+    if (tiempoGuardado && tiempoGuardado > 0) {
+      tiempoRestante = parseInt(tiempoGuardado);
     }
 
     setInterval(actualizarTemporizador, 1000);

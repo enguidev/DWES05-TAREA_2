@@ -151,10 +151,11 @@ class Peon extends Pieza
 
     list($fila, $columna) = $coords;
 
-    // Blancas promueven en fila 7 (índice 7, que es fila 8 en notación)
-    // Negras promueven en fila 0 (índice 0, que es fila 1 en notación)
-    if ($this->color === 'blancas' && $fila === 7) return true;
-    if ($this->color === 'negras' && $fila === 0) return true;
+    // Sistema de coordenadas: A8 = fila 0, A7 = fila 1, ..., A1 = fila 7
+    // Blancas promueven al llegar a la fila 8 (índice 0)
+    // Negras promueven al llegar a la fila 1 (índice 7)
+    if ($this->color === 'blancas' && $fila === 0) return true;
+    if ($this->color === 'negras' && $fila === 7) return true;
 
     return false;
   }
