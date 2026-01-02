@@ -312,7 +312,7 @@ class Partida
    */
   private function obtenerTodasCasillas()
   {
-    $cols = ['A','B','C','D','E','F','G','H'];
+    $cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     $out = [];
     for ($fila = 1; $fila <= 8; $fila++) {
       foreach ($cols as $c) {
