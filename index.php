@@ -72,7 +72,7 @@ function obtenerImagenPieza($pieza)
 
   $color = $pieza->getColor();
   $carpeta = ($color === 'blancas') ? 'imagenes/fichas_blancas' : 'imagenes/fichas_negras';
-  $colorNombre = ($color === 'blancas') ? 'blanco' : 'negro';
+  $colorNombre = ($color === 'blancas') ? 'blanca' : 'negra';
 
   if ($pieza instanceof Torre) {
     $nombre = 'torre_' . $colorNombre;

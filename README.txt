@@ -23,19 +23,19 @@ DWES05/
 │   └── Partida.php
 └── imagenes/
     ├── fichas_blancas/
-    │   ├── torre_blanco.png
-    │   ├── caballo_blanco.png
-    │   ├── alfil_blanco.png
-    │   ├── dama_blanco.png
-    │   ├── rey_blanco.png
-    │   └── peon_blanco.png
+    │   ├── torre_blanca.png
+    │   ├── caballo_blanca.png
+    │   ├── alfil_blanca.png
+    │   ├── dama_blanca.png
+    │   ├── rey_blanca.png
+    │   └── peon_blanca.png
     └── fichas_negras/
-        ├── torre_negro.png
-        ├── caballo_negro.png
-        ├── alfil_negro.png
-        ├── dama_negro.png
-        ├── rey_negro.png
-        └── peon_negro.png
+        ├── torre_negra.png
+        ├── caballo_negra.png
+        ├── alfil_negra.png
+        ├── dama_negra.png
+        ├── rey_negra.png
+        └── peon_negra.png
 
 
 SOBRE LAS IMÁGENES:
