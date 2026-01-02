@@ -137,5 +137,4 @@ class Peon extends Pieza
   {
     return $this->esPrimerMovimiento;
   }
-
 }

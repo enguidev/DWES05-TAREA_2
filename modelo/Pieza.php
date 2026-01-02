@@ -141,5 +141,4 @@ class Pieza
     // Las subclases deben implementar este método
     return [];
   }
-
 }
