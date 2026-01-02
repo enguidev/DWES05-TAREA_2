@@ -252,15 +252,17 @@ if (isset($_SESSION['partida'])) {
       <div class="marcador-y-capturas">
         <div class="marcador">
           <div class="marcador-item blancas <?php echo $turno === 'blancas' ? 'turno-activo' : ''; ?>">
-            <strong>⚪ Blancas:</strong> <?php echo $marcador[0]; ?> puntos
+            <div class="nombre-jugador">⚪ <?php echo $jugadores['blancas']->getNombre(); ?></div>
+            <div class="puntos-jugador"><?php echo $marcador[0]; ?> puntos</div>
             <?php if ($turno === 'blancas'): ?>
-              <div style="font-size: 0.9em; margin-top: 5px;">👈 Tu turno</div>
+              <div class="indicador-turno">👈 Tu turno</div>
             <?php endif; ?>
           </div>
           <div class="marcador-item negras <?php echo $turno === 'negras' ? 'turno-activo' : ''; ?>">
-            <strong>⚫ Negras:</strong> <?php echo $marcador[1]; ?> puntos
+            <div class="nombre-jugador">⚫ <?php echo $jugadores['negras']->getNombre(); ?></div>
+            <div class="puntos-jugador"><?php echo $marcador[1]; ?> puntos</div>
             <?php if ($turno === 'negras'): ?>
-              <div style="font-size: 0.9em; margin-top: 5px;">👈 Tu turno</div>
+              <div class="indicador-turno">👈 Tu turno</div>
             <?php endif; ?>
           </div>
         </div>

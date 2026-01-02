@@ -691,3 +691,49 @@ h1 {
     padding: 15px 30px;
   }
 }
+
+/* ============================================
+   ESTILOS MEJORADOS PARA MARCADOR CON NOMBRES
+   ============================================ */
+
+.nombre-jugador {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
+.puntos-jugador {
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.indicador-turno {
+  font-size: 0.9em;
+  margin-top: 8px;
+  padding: 5px 10px;
+  background: rgba(255, 215, 0, 0.2);
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.marcador-item.turno-activo .nombre-jugador {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.marcador-item.turno-activo .indicador-turno {
+  background: rgba(255, 215, 0, 0.4);
+  animation: parpadeo 2s infinite;
+}
+
+@keyframes parpadeo {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
