@@ -179,8 +179,59 @@ function obtenerPiezaEnCasilla($posicion, $partida)
         </div>
       </div>
 
+      <div class="piezas-capturadas">
+        <div class="capturadas-grupo">
+          <h3>Piezas blancas capturadas:</h3>
+          <div class="capturadas-lista">
+            <?php foreach ($piezasCapturadas['blancas'] as $pieza): ?>
+              <img src="<?php echo obtenerImagenPieza($pieza); ?>" alt="Pieza capturada" class="pieza-capturada">
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <div class="capturadas-grupo">
+          <h3>Piezas negras capturadas:</h3>
+          <div class="capturadas-lista">
+            <?php foreach ($piezasCapturadas['negras'] as $pieza): ?>
+              <img src="<?php echo obtenerImagenPieza($pieza); ?>" alt="Pieza capturada" class="pieza-capturada">
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- TABLERO DE AJEDREZ -->
+    <div class="tablero-wrapper">
+      <div class="tablero-contenedor">
+        <?php
+        $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
+        // Esquina superior izquierda
+        echo '<div class="coordenada-esquina-superior-izquierda"></div>';
+
+        // Coordenadas superiores (letras)
+        foreach ($letras as $letra) {
+          echo '<div class="coordenada-superior">' . $letra . '</div>';
+        }
+
+        echo '<div class="coordenada-esquina-superior-derecha"></div>';
+
+        // Generar filas del tablero (8 a 1)
+        for ($fila = 8; $fila >= 1; $fila--):
+          $numeroFila = $fila;
+          echo '<div class="coordenada-izquierda">' . $numeroFila . '</div>';
+
+          // Generar columnas (A-H)
+          for ($columna = 0; $columna < 8; $columna++):
+            $posicion = $letras[$columna] . $fila;
+            $pieza = obtenerPiezaEnCasilla($posicion, $partida);
+
+            // Determinar color de la casilla
+            $colorCasilla = (($fila + $columna) % 2 === 0) ? 'blanca' : 'negra';
+
+            // Verificar si está seleccionada
+            $esSeleccionada = ($casillaSeleccionada === $posicion);
+
+            // Verificar si es un movimiento posible
             $esMovimientoPosible = false;
             $esCaptura = false;
 
@@ -221,7 +272,7 @@ function obtenerPiezaEnCasilla($posicion, $partida)
                 }
               }
             }
-          ?>
+        ?>
             <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
               <?php if ($pieza !== null): ?>
                 <form method="post" class="formulario">
@@ -302,23 +353,23 @@ function obtenerPiezaEnCasilla($posicion, $partida)
       </ol>
     </div>
   </div>
-<script>
-  let tiempoRestante = 600; // 10 minutos en segundos
-  const tiempoElement = document.getElementById('tiempo');
+  <script>
+    let tiempoRestante = 600; // 10 minutos en segundos
+    const tiempoElement = document.getElementById('tiempo');
 
-  function actualizarTemporizador() {
-    const minutos = Math.floor(tiempoRestante / 60);
-    const segundos = tiempoRestante % 60;
-    tiempoElement.textContent = `${minutos}:${segundos.toString().padStart(2, '0')}`;
-    if (tiempoRestante > 0) {
-      tiempoRestante--;
-    } else {
-      alert('Tiempo agotado!');
+    function actualizarTemporizador() {
+      const minutos = Math.floor(tiempoRestante / 60);
+      const segundos = tiempoRestante % 60;
+      tiempoElement.textContent = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+      if (tiempoRestante > 0) {
+        tiempoRestante--;
+      } else {
+        alert('Tiempo agotado!');
+      }
     }
-  }
 
-  setInterval(actualizarTemporizador, 1000);
-</script>
+    setInterval(actualizarTemporizador, 1000);
+  </script>
 </body>
 
 </html>
