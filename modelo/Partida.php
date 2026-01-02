@@ -75,16 +75,45 @@ class Partida
     for ($i = 0; $i < count($casillasRecorridas) - 1; $i++) {
       $casilla = $casillasRecorridas[$i];
 
-      // Buscar si hay alguna pieza (de cualquier color) en esta casilla
       if ($this->obtenerPiezaEnPosicion($casilla) !== null) {
         $hayPiezasIntermedias = true;
         break;
       }
     }
-
     // El caballo puede saltar, los demás no
     if ($hayPiezasIntermedias && !($piezaOrigen instanceof Caballo)) {
       $this->mensaje = "Hay piezas bloqueando el camino";
+      return false;
+    }
+
+    // Evitar movimientos que dejen al propio rey en jaque
+    // Simulamos temporalmente el movimiento y comprobamos
+    $snapshotOrigen = $piezaOrigen->snapshot();
+    $piezaDestinoSnapshot = null;
+    $piezaDestinoObj = $this->obtenerPiezaEnPosicion($destino);
+    if ($piezaDestinoObj) {
+      $piezaDestinoSnapshot = $piezaDestinoObj->snapshot();
+      $piezaDestinoObj->capturar();
+    }
+
+    // Aplicar movimiento temporalmente (sin llamar a movimiento para no alterar flags internamente)
+    $piezaOrigen->setPosicion($destino);
+    if ($piezaOrigen instanceof Peon) {
+      $piezaOrigen->setEsPrimerMovimiento(false);
+    }
+
+    // Si tras el movimiento el rey propio queda en jaque, revertir y bloquear
+    $miColor = $this->turno;
+    $quedaEnJaque = $this->estaEnJaque($miColor);
+
+    // Revertir estado temporal
+    $piezaOrigen->restore($snapshotOrigen);
+    if ($piezaDestinoObj && $piezaDestinoSnapshot) {
+      $piezaDestinoObj->restore($piezaDestinoSnapshot);
+    }
+
+    if ($quedaEnJaque) {
+      $this->mensaje = "Movimiento inválido: deja en jaque a tu rey";
       return false;
     }
 
@@ -119,8 +148,22 @@ class Partida
 
     // 7. Cambiar el turno
     $this->turno = ($this->turno === 'blancas') ? 'negras' : 'blancas';
-    $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
-      " (" . $this->turno . ")";
+    // Comprobar si el jugador al que le toca está en jaque o jaque mate
+    $jugadorSiguiente = $this->turno;
+    if ($this->estaEnJaque($jugadorSiguiente)) {
+      if ($this->esJaqueMate($jugadorSiguiente)) {
+        $this->partidaTerminada = true;
+        // El ganador es el jugador que movió (el anterior)
+        $ganadorColor = ($jugadorSiguiente === 'blancas') ? 'negras' : 'blancas';
+        $nombreGanador = $this->jugadores[$ganadorColor]->getNombre();
+        $this->mensaje = "¡Jaque mate! " . $nombreGanador . " ha ganado la partida";
+      } else {
+        $this->mensaje = "Jaque a " . $this->jugadores[$jugadorSiguiente]->getNombre();
+      }
+    } else {
+      $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
+        " (" . $this->turno . ")";
+    }
 
     return true;
   }
@@ -141,6 +184,142 @@ class Partida
     if ($pieza) return $pieza;
 
     return null;
+  }
+
+  /**
+   * Comprueba si el rey del color dado está en jaque
+   * @param string $color "blancas" o "negras"
+   * @return bool
+   */
+  public function estaEnJaque($color)
+  {
+    $rey = $this->jugadores[$color]->getRey();
+    if ($rey === null) return false;
+
+    $posRey = $rey->getPosicion();
+    $oponente = ($color === 'blancas') ? 'negras' : 'blancas';
+
+    foreach ($this->jugadores[$oponente]->getPiezas() as $pieza) {
+      if ($pieza->estCapturada()) continue;
+
+      if ($pieza instanceof Peon) {
+        $movs = $pieza->simulaMovimiento($posRey, true);
+      } else {
+        $movs = $pieza->simulaMovimiento($posRey);
+      }
+
+      if (empty($movs)) continue;
+
+      // Comprobar bloqueo para piezas que no son caballo
+      if (!($pieza instanceof Caballo)) {
+        $bloqueado = false;
+        for ($i = 0; $i < count($movs) - 1; $i++) {
+          if ($this->obtenerPiezaEnPosicion($movs[$i]) !== null) {
+            $bloqueado = true;
+            break;
+          }
+        }
+        if ($bloqueado) continue;
+      }
+
+      // Si llega aquí, la pieza amenaza la casilla del rey
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Comprueba si el color dado está en jaque mate
+   * @param string $color
+   * @return bool
+   */
+  public function esJaqueMate($color)
+  {
+    if (!$this->estaEnJaque($color)) return false;
+
+    // Probar todas las jugadas posibles del color y ver si alguna quita el jaque
+    $misPiezas = $this->jugadores[$color]->getPiezas();
+    $todas = $this->obtenerTodasCasillas();
+
+    foreach ($misPiezas as $pieza) {
+      if ($pieza->estCapturada()) continue;
+
+      foreach ($todas as $destino) {
+        // Determinar si el destino está ocupado y por quién
+        $piezaDestinoObj = $this->obtenerPiezaEnPosicion($destino);
+        if ($piezaDestinoObj && $piezaDestinoObj->getColor() === $color) {
+          continue; // No podemos mover a una casilla ocupada por pieza propia
+        }
+
+        // Determinar si el movimiento es posible según la pieza
+        if ($pieza instanceof Peon) {
+          $esCaptura = ($piezaDestinoObj !== null) && ($piezaDestinoObj->getColor() !== $color);
+          $movs = $pieza->simulaMovimiento($destino, $esCaptura);
+        } else {
+          $movs = $pieza->simulaMovimiento($destino);
+        }
+
+        if (empty($movs)) continue;
+
+        // Comprobar bloqueo para piezas que no son caballo
+        if (!($pieza instanceof Caballo)) {
+          $bloqueado = false;
+          for ($i = 0; $i < count($movs) - 1; $i++) {
+            if ($this->obtenerPiezaEnPosicion($movs[$i]) !== null) {
+              $bloqueado = true;
+              break;
+            }
+          }
+          if ($bloqueado) continue;
+        }
+
+        // Simular el movimiento temporalmente
+        $snapOrigen = $pieza->snapshot();
+        $origenPos = isset($snapOrigen['posicion']) ? $snapOrigen['posicion'] : null;
+        $piezaDestinoObj = $this->obtenerPiezaEnPosicion($destino);
+        $snapDestino = $piezaDestinoObj ? $piezaDestinoObj->snapshot() : null;
+
+        if ($piezaDestinoObj) {
+          $piezaDestinoObj->capturar();
+        }
+
+        $pieza->setPosicion($destino);
+        if ($pieza instanceof Peon) {
+          $pieza->setEsPrimerMovimiento(false);
+        }
+
+        $quedaEnJaque = $this->estaEnJaque($color);
+
+        // Revertir
+        $pieza->restore($snapOrigen);
+        if ($piezaDestinoObj && $snapDestino) {
+          $piezaDestinoObj->restore($snapDestino);
+        }
+
+        if (!$quedaEnJaque) {
+          return false; // Existe una jugada que quita el jaque
+        }
+      }
+    }
+
+    return true; // Ninguna jugada quita el jaque
+  }
+
+  /**
+   * Devuelve todas las casillas A1..H8
+   * @return array
+   */
+  private function obtenerTodasCasillas()
+  {
+    $cols = ['A','B','C','D','E','F','G','H'];
+    $out = [];
+    for ($fila = 1; $fila <= 8; $fila++) {
+      foreach ($cols as $c) {
+        $out[] = $c . $fila;
+      }
+    }
+    return $out;
   }
 
   /**

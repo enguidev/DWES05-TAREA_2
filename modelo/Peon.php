@@ -26,6 +26,15 @@ class Peon extends Pieza
   }
 
   /**
+   * Permite forzar el estado de primer movimiento (útil para simulaciones)
+   * @param bool $v
+   */
+  public function setEsPrimerMovimiento($v)
+  {
+    $this->esPrimerMovimiento = (bool)$v;
+  }
+
+  /**
    * Verifica si el movimiento es válido para un peón
    * @param string $nuevaPosicion Posición destino
    * @param bool $esCaptura Indica si el movimiento es una captura
@@ -127,5 +136,20 @@ class Peon extends Pieza
   public function getEsPrimerMovimiento()
   {
     return $this->esPrimerMovimiento;
+  }
+
+  public function snapshot()
+  {
+    $base = parent::snapshot();
+    $base['esPrimerMovimiento'] = $this->esPrimerMovimiento;
+    return $base;
+  }
+
+  public function restore($snap)
+  {
+    parent::restore($snap);
+    if (isset($snap['esPrimerMovimiento'])) {
+      $this->esPrimerMovimiento = $snap['esPrimerMovimiento'];
+    }
   }
 }
