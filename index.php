@@ -60,28 +60,30 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
   if (isset($_SESSION['tiempo_blancas']) && isset($_SESSION['tiempo_negras']) && isset($_SESSION['reloj_activo'])) {
     $ahora = time();
 
-    // Solo restar tiempo si han pasado segundos desde el último tick
-    if (isset($_SESSION['ultimo_tick'])) {
-      $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
+    // Solo actualizar si no está en pausa
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+      if (isset($_SESSION['ultimo_tick'])) {
+        $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
 
-      // Solo restar si ha pasado al menos 1 segundo
-      if ($tiempoTranscurrido > 0) {
-        if ($_SESSION['reloj_activo'] === 'blancas') {
-          $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
-        } else {
-          $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+        if ($tiempoTranscurrido > 0) {
+          if ($_SESSION['reloj_activo'] === 'blancas') {
+            $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+          } else {
+            $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+          }
+          $_SESSION['ultimo_tick'] = $ahora;
         }
+      } else {
         $_SESSION['ultimo_tick'] = $ahora;
       }
-    } else {
-      $_SESSION['ultimo_tick'] = $ahora;
     }
 
     header('Content-Type: application/json');
     echo json_encode([
       'tiempo_blancas' => $_SESSION['tiempo_blancas'],
       'tiempo_negras' => $_SESSION['tiempo_negras'],
-      'reloj_activo' => $_SESSION['reloj_activo']
+      'reloj_activo' => $_SESSION['reloj_activo'],
+      'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false
     ]);
   }
   exit;
@@ -99,25 +101,18 @@ if (!isset($_SESSION['config'])) {
   $_SESSION['config'] = $configDefecto;
 }
 
-// Procesar configuración
-if (isset($_POST['guardar_configuracion'])) {
+// Iniciar partida con nombres Y configuración
+if (isset($_POST['iniciar_partida'])) {
+  $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
+  $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
+
+  // Guardar configuración elegida
   $_SESSION['config'] = [
     'tiempo_inicial' => (int)$_POST['tiempo_inicial'],
     'incremento' => (int)$_POST['incremento'],
     'mostrar_coordenadas' => isset($_POST['mostrar_coordenadas']),
     'mostrar_capturas' => isset($_POST['mostrar_capturas'])
   ];
-
-  if (isset($_SESSION['partida'])) {
-    $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
-    $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
-  }
-}
-
-// Iniciar partida con nombres
-if (isset($_POST['iniciar_partida'])) {
-  $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
-  $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
 
   $_SESSION['partida'] = serialize(new Partida($nombreBlancas, $nombreNegras));
   $_SESSION['casilla_seleccionada'] = null;
@@ -126,6 +121,19 @@ if (isset($_POST['iniciar_partida'])) {
   $_SESSION['reloj_activo'] = 'blancas';
   $_SESSION['ultimo_tick'] = time();
   $_SESSION['nombres_configurados'] = true;
+  $_SESSION['pausa'] = false;
+}
+
+// Pausar/Reanudar
+if (isset($_POST['toggle_pausa'])) {
+  if (isset($_SESSION['pausa'])) {
+    $_SESSION['pausa'] = !$_SESSION['pausa'];
+
+    // Si se reanuda, resetear ultimo_tick
+    if (!$_SESSION['pausa']) {
+      $_SESSION['ultimo_tick'] = time();
+    }
+  }
 }
 
 // Reiniciar
@@ -137,6 +145,7 @@ if (isset($_POST['reiniciar'])) {
   unset($_SESSION['reloj_activo']);
   unset($_SESSION['ultimo_tick']);
   unset($_SESSION['nombres_configurados']);
+  unset($_SESSION['pausa']);
   header("Location: " . $_SERVER['PHP_SELF']);
   exit;
 }
@@ -145,8 +154,8 @@ if (isset($_POST['reiniciar'])) {
 if (isset($_SESSION['partida'])) {
   $partida = unserialize($_SESSION['partida']);
 
-  // Procesar jugada
-  if (isset($_POST['seleccionar_casilla'])) {
+  // Procesar jugada (solo si no está en pausa)
+  if (isset($_POST['seleccionar_casilla']) && (!isset($_SESSION['pausa']) || !$_SESSION['pausa'])) {
     $casilla = $_POST['seleccionar_casilla'];
 
     if ($_SESSION['casilla_seleccionada'] === null) {
@@ -189,7 +198,7 @@ if (isset($_SESSION['partida'])) {
 
           // Cambiar de turno y resetear el tick
           $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
-          $_SESSION['ultimo_tick'] = time(); // Nuevo timestamp para el siguiente jugador
+          $_SESSION['ultimo_tick'] = time();
         }
 
         $_SESSION['casilla_seleccionada'] = null;
@@ -213,7 +222,8 @@ if (isset($_SESSION['partida'])) {
       'tiempo_blancas' => $_SESSION['tiempo_blancas'],
       'tiempo_negras' => $_SESSION['tiempo_negras'],
       'reloj_activo' => $_SESSION['reloj_activo'],
-      'config' => $_SESSION['config']
+      'config' => $_SESSION['config'],
+      'pausa' => $_SESSION['pausa']
     ];
     file_put_contents('partida_guardada.json', json_encode($data));
   }
@@ -230,6 +240,11 @@ if (isset($_SESSION['partida'])) {
       $_SESSION['ultimo_tick'] = time();
       if (isset($data['config'])) {
         $_SESSION['config'] = $data['config'];
+      }
+      if (isset($data['pausa'])) {
+        $_SESSION['pausa'] = $data['pausa'];
+      } else {
+        $_SESSION['pausa'] = false;
       }
       $partida = unserialize($_SESSION['partida']);
     }
@@ -267,85 +282,95 @@ if (isset($_SESSION['partida'])) {
     <div class="container">
       <h1>🎮 Configurar Partida</h1>
       <div class="config-wrapper">
-        <p class="config-intro">Introduce los nombres de los jugadores:</p>
         <form method="post" class="config-form">
+          <p class="config-intro"><strong>📋 Paso 1: Nombres de los jugadores</strong></p>
+
           <div class="jugador-config blancas-config">
             <div class="config-icon">♔</div>
             <label><strong>⚪ Jugador Blancas:</strong></label>
             <input type="text" name="nombre_blancas" placeholder="María, Juan..." maxlength="20" class="input-nombre" autofocus>
             <small>Las blancas empiezan primero</small>
           </div>
+
           <div class="vs-separator">VS</div>
+
           <div class="jugador-config negras-config">
             <div class="config-icon">♚</div>
             <label><strong>⚫ Jugador Negras:</strong></label>
             <input type="text" name="nombre_negras" placeholder="Pedro, Ana..." maxlength="20" class="input-nombre">
             <small>Las negras juegan segundo</small>
           </div>
+
+          <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+          <p class="config-intro"><strong>⏱️ Paso 2: Configuración del tiempo</strong></p>
+
+          <div class="config-section-inicio">
+            <div class="config-option">
+              <label>Tiempo inicial por jugador:</label>
+              <select name="tiempo_inicial" class="select-tiempo">
+                <option value="60">1 minuto (Bullet)</option>
+                <option value="180">3 minutos (Blitz)</option>
+                <option value="300">5 minutos (Blitz)</option>
+                <option value="600" selected>10 minutos (Rápidas)</option>
+                <option value="900">15 minutos (Rápidas)</option>
+                <option value="1800">30 minutos (Clásicas)</option>
+                <option value="3600">60 minutos (Clásicas)</option>
+              </select>
+            </div>
+            <div class="config-option">
+              <label>Incremento Fischer:</label>
+              <select name="incremento" class="select-tiempo">
+                <option value="0" selected>Sin incremento</option>
+                <option value="1">+1 segundo</option>
+                <option value="2">+2 segundos</option>
+                <option value="3">+3 segundos</option>
+                <option value="5">+5 segundos</option>
+                <option value="10">+10 segundos</option>
+              </select>
+              <small style="display: block; margin-top: 5px;">Al mover, recuperas tiempo adicional</small>
+            </div>
+          </div>
+
+          <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+          <p class="config-intro"><strong>🎨 Paso 3: Opciones de interfaz</strong></p>
+
+          <div class="config-section-inicio">
+            <div class="config-option checkbox">
+              <label><input type="checkbox" name="mostrar_coordenadas" checked> Mostrar coordenadas (A-H, 1-8)</label>
+            </div>
+            <div class="config-option checkbox">
+              <label><input type="checkbox" name="mostrar_capturas" checked> Mostrar piezas capturadas</label>
+            </div>
+          </div>
+
           <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎯 Iniciar Partida</button>
           <p class="config-nota">💡 <em>Campos vacíos usarán nombres por defecto</em></p>
         </form>
       </div>
     </div>
   <?php else: ?>
-    <!-- MODAL CONFIG -->
-    <div id="modalConfig" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>⚙️ Configuración</h2>
-          <span class="close-modal">&times;</span>
-        </div>
-        <form method="post" class="modal-form">
-          <div class="config-section">
-            <h3>⏱️ Temporizadores</h3>
-            <div class="config-option">
-              <label>Tiempo inicial:</label>
-              <select name="tiempo_inicial">
-                <option value="60" <?php echo $_SESSION['config']['tiempo_inicial'] == 60 ? 'selected' : ''; ?>>1 min (Bullet)</option>
-                <option value="180" <?php echo $_SESSION['config']['tiempo_inicial'] == 180 ? 'selected' : ''; ?>>3 min (Blitz)</option>
-                <option value="300" <?php echo $_SESSION['config']['tiempo_inicial'] == 300 ? 'selected' : ''; ?>>5 min (Blitz)</option>
-                <option value="600" <?php echo $_SESSION['config']['tiempo_inicial'] == 600 ? 'selected' : ''; ?>>10 min (Rápidas)</option>
-                <option value="900" <?php echo $_SESSION['config']['tiempo_inicial'] == 900 ? 'selected' : ''; ?>>15 min (Rápidas)</option>
-                <option value="1800" <?php echo $_SESSION['config']['tiempo_inicial'] == 1800 ? 'selected' : ''; ?>>30 min (Clásicas)</option>
-              </select>
-            </div>
-            <div class="config-option">
-              <label>Incremento Fischer:</label>
-              <select name="incremento">
-                <option value="0" <?php echo $_SESSION['config']['incremento'] == 0 ? 'selected' : ''; ?>>Sin incremento</option>
-                <option value="1" <?php echo $_SESSION['config']['incremento'] == 1 ? 'selected' : ''; ?>>+1 seg</option>
-                <option value="2" <?php echo $_SESSION['config']['incremento'] == 2 ? 'selected' : ''; ?>>+2 seg</option>
-                <option value="3" <?php echo $_SESSION['config']['incremento'] == 3 ? 'selected' : ''; ?>>+3 seg</option>
-                <option value="5" <?php echo $_SESSION['config']['incremento'] == 5 ? 'selected' : ''; ?>>+5 seg</option>
-                <option value="10" <?php echo $_SESSION['config']['incremento'] == 10 ? 'selected' : ''; ?>>+10 seg</option>
-              </select>
-            </div>
-          </div>
-          <div class="config-section">
-            <h3>🎨 Interfaz</h3>
-            <div class="config-option checkbox">
-              <label><input type="checkbox" name="mostrar_coordenadas" <?php echo $_SESSION['config']['mostrar_coordenadas'] ? 'checked' : ''; ?>> Coordenadas (A-H, 1-8)</label>
-            </div>
-            <div class="config-option checkbox">
-              <label><input type="checkbox" name="mostrar_capturas" <?php echo $_SESSION['config']['mostrar_capturas'] ? 'checked' : ''; ?>> Piezas capturadas</label>
-            </div>
-          </div>
-          <div class="modal-buttons">
-            <button type="submit" name="guardar_configuracion" class="btn-guardar-config">💾 Guardar</button>
-            <button type="button" class="btn-cancelar-config">❌ Cancelar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <div class="container">
       <div class="header-juego">
-        <h1>Partida de Ajedrez</h1>
-        <button id="btnConfig" class="btn-config">⚙️</button>
+        <h1>♟️ Partida de Ajedrez</h1>
+        <div class="header-buttons">
+          <form method="post" style="display: inline;">
+            <button type="submit" name="toggle_pausa" class="btn-pausa" id="btnPausa">
+              <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? '▶️ Reanudar' : '⏸️ Pausar'; ?>
+            </button>
+          </form>
+        </div>
       </div>
 
       <div class="mensaje <?php echo $partida->estaTerminada() ? 'terminada' : ''; ?>">
-        <?php echo htmlspecialchars($mensaje); ?>
+        <?php
+        if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
+          echo "⏸️ PARTIDA EN PAUSA";
+        } else {
+          echo htmlspecialchars($mensaje);
+        }
+        ?>
       </div>
 
       <!-- RELOJES -->
@@ -407,7 +432,8 @@ if (isset($_SESSION['partida'])) {
                   $esMovimientoPosible = false;
                   $esCaptura = false;
 
-                  if ($casillaSeleccionada !== null && !$esSeleccionada) {
+                  // Solo mostrar movimientos si no está en pausa
+                  if ($casillaSeleccionada !== null && !$esSeleccionada && (!isset($_SESSION['pausa']) || !$_SESSION['pausa'])) {
                     $piezaSeleccionada = obtenerPiezaEnCasilla($casillaSeleccionada, $partida);
                     if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $turno) {
                       $piezaEnDestino = obtenerPiezaEnCasilla($posicion, $partida);
@@ -448,7 +474,8 @@ if (isset($_SESSION['partida'])) {
                     <?php if ($pieza !== null): ?>
                       <form method="post" class="formulario">
                         <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>"
-                          class="btn-pieza-casilla <?php echo ($pieza->getColor() === $turno) ? 'puede-seleccionar' : 'no-puede-seleccionar'; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>">
+                          class="btn-pieza-casilla <?php echo ($pieza->getColor() === $turno) ? 'puede-seleccionar' : 'no-puede-seleccionar'; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>"
+                          <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? 'disabled' : ''; ?>>
                           <img src="<?php echo obtenerImagenPieza($pieza); ?>" class="imagen-pieza">
                         </button>
                       </form>
@@ -491,9 +518,6 @@ if (isset($_SESSION['partida'])) {
 
           <div class="botones-control">
             <form method="post" style="display: inline;">
-              <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Reiniciar</button>
-            </form>
-            <form method="post" style="display: inline;">
               <button type="submit" name="deshacer" class="btn-deshacer">↶ Deshacer</button>
             </form>
             <form method="post" style="display: inline;">
@@ -502,34 +526,25 @@ if (isset($_SESSION['partida'])) {
             <form method="post" style="display: inline;">
               <button type="submit" name="cargar" class="btn-cargar">📁 Cargar</button>
             </form>
+            <form method="post" style="display: inline;">
+              <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Nueva Partida</button>
+            </form>
           </div>
 
           <div class="instrucciones">
             <p><strong>🎮 Cómo jugar:</strong></p>
             <ol>
-              <li>El reloj corre automáticamente para el jugador activo</li>
-              <li>Al mover, el reloj cambia al oponente</li>
-              <li>Círculos verdes = movimientos posibles</li>
-              <li>Borde rojo = capturas posibles</li>
-              <li>Tiempo 0 = derrota automática</li>
+              <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior para pausar</li>
+              <li>⏱️ Solo corre el reloj del jugador en turno</li>
+              <li>🟢 Círculos verdes = movimientos posibles</li>
+              <li>🔴 Borde rojo pulsante = capturas posibles</li>
+              <li>⏰ Si llegas a 0:00, pierdes automáticamente</li>
+              <li>💾 Puedes guardar la partida y continuarla después</li>
             </ol>
           </div>
         </div>
 
         <script>
-          // Modal
-          const modal = document.getElementById('modalConfig');
-          const btnConfig = document.getElementById('btnConfig');
-          const closeModal = document.querySelector('.close-modal');
-          const btnCancelar = document.querySelector('.btn-cancelar-config');
-
-          btnConfig.onclick = () => modal.style.display = 'block';
-          closeModal.onclick = () => modal.style.display = 'none';
-          btnCancelar.onclick = () => modal.style.display = 'none';
-          window.onclick = (e) => {
-            if (e.target == modal) modal.style.display = 'none';
-          }
-
           // Actualizar relojes con AJAX
           function actualizarRelojes() {
             fetch('?ajax=update_clocks')
