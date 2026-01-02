@@ -171,9 +171,12 @@ h1 {
 }
 
 @keyframes parpadeo-critico {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -476,10 +479,13 @@ h1 {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 0.7;
@@ -791,6 +797,7 @@ hr {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -813,6 +820,7 @@ hr {
     transform: translateY(-50px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
