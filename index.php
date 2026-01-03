@@ -2,8 +2,8 @@
 session_start();
 
 require_once 'modelo/Partida.php';
-require_once 'functions.php';
-require_once 'logic.php';
+require_once 'funciones_auxiliares.php';
+require_once 'logica.php';
 
 // ============================================
 // FUNCIONES AUXILIARES (ahora en functions.php)
