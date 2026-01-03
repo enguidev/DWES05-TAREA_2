@@ -42,10 +42,10 @@ body {
 
 /* Título */
 h1 {
-  font-size: 2.5em;
-  color: #333;
+  font-size: 3.7em;
+  color: #5568d3;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 /* Botón de configuración */
@@ -593,11 +593,12 @@ h1 {
   padding: 30px;
 }
 
-.config-intro {
+.configuracion-inicial {
   text-align: center;
-  font-size: 1.2em;
+  font-size: 2em;
   color: #555;
-  margin-bottom: 30px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .config-form {
@@ -635,10 +636,18 @@ h1 {
   color: white;
 }
 
-.config-icon {
-  font-size: 3em;
+/* Icono de configuración de jugadores */
+.icono-configuracion-nombres-jugadores {
+  font-size: 4.5em;
   text-align: center;
   margin-bottom: 10px;
+}
+
+/* Línea de separación horizontal */
+.linea-horizontal {
+  margin: 30px 0;
+  border: none;
+  border-top: 2px solid #e0e0e0;
 }
 
 .jugador-config label {
@@ -700,17 +709,6 @@ h1 {
 
 .btn-iniciar-partida:active {
   transform: translateY(0);
-}
-
-.config-nota {
-  text-align: center;
-  color: #666;
-  font-size: 0.95em;
-  margin-top: 15px;
-  padding: 15px;
-  background: #fff3cd;
-  border-radius: 8px;
-  border-left: 4px solid #ffc107;
 }
 
 /* Secciones de configuración */
@@ -1000,10 +998,6 @@ hr {
 
   .jugador-config {
     padding: 20px 15px;
-  }
-
-  .config-icon {
-    font-size: 2.5em;
   }
 
   .btn-iniciar-partida {

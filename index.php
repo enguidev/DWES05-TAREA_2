@@ -85,6 +85,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
       'reloj_activo' => $_SESSION['reloj_activo'],
       'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false
     ]);
+    session_write_close();
   }
   exit;
 }
@@ -280,19 +281,20 @@ if (isset($_SESSION['partida'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Partida de Ajedrez</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="script.js"></script>
 </head>
 
 <body>
   <?php if (!isset($_SESSION['nombres_configurados'])): ?>
     <div class="container">
-      <h1>🎮 Configurar Partida</h1>
+      <h1>Configuración de Partida</h1>
       <div class="config-wrapper">
         <form method="post" class="config-form">
-          <p class="config-intro"><strong>Nombres de los jugadores</strong></p>
+          <p class="configuracion-inicial"><strong>Nombres de los jugadores</strong></p>
 
           <div class="jugador-config blancas-config">
-            <div class="config-icon">♔</div>
-            <label><strong>⚪ Jugador Blancas:</strong></label>
+            <div class="icono-configuracion-nombres-jugadores">♔</div>
+            <label><strong>Jugador Blancas:</strong></label>
             <input type="text" name="nombre_blancas" placeholder="Nombre del jugador 1..." maxlength="20" class="input-nombre" autofocus>
             <small>Por defecto sería jugador 1</small>
           </div>
@@ -300,15 +302,15 @@ if (isset($_SESSION['partida'])) {
           <div class="vs-separator">VS</div>
 
           <div class="jugador-config negras-config">
-            <div class="config-icon">♚</div>
-            <label><strong>⚫ Jugador Negras:</strong></label>
+            <div class="icono-configuracion-nombres-jugadores">♚</div>
+            <label><strong>Jugador Negras:</strong></label>
             <input type="text" name="nombre_negras" placeholder="Nombre del jugador 2..." maxlength="20" class="input-nombre">
             <small>Por defecto sería jugador 2</small>
           </div>
 
-          <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+          <hr class="linea-horizontal">
 
-          <p class="config-intro"><strong>Configuración del tiempo</strong></p>
+          <p class="configuracion-inicial"><strong>Configuración del tiempo</strong></p>
 
           <div class="config-section-inicio">
             <div class="config-option">
@@ -337,9 +339,9 @@ if (isset($_SESSION['partida'])) {
             </div>
           </div>
 
-          <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+          <hr class="linea-horizontal">
 
-          <p class="config-intro"><strong>Opciones de interfaz</strong></p>
+          <p class="configuracion-inicial"><strong>Opciones de interfaz</strong></p>
 
           <div class="config-section-inicio">
             <div class="config-option checkbox">
@@ -348,10 +350,11 @@ if (isset($_SESSION['partida'])) {
             <div class="config-option checkbox">
               <label><input type="checkbox" name="mostrar_capturas" checked> Mostrar piezas capturadas</label>
             </div>
-          </div>
 
-          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎯 Iniciar Partida</button>
-          <p class="config-nota">💡 <em>Campos vacíos usarán nombres por defecto</em></p>
+          </div>
+          <hr class="linea-horizontal">
+
+          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">Iniciar Partida</button>
         </form>
       </div>
     </div>
@@ -366,13 +369,13 @@ if (isset($_SESSION['partida'])) {
           </div>
           <form method="post" class="modal-form">
             <div class="config-section">
-              <h3>🎨 Opciones de Interfaz</h3>
+              <h3>Opciones de Interfaz de usuario</h3>
               <p style="color: #666; margin-bottom: 15px;">Puedes mostrar u ocultar elementos visuales</p>
               <div class="config-option checkbox">
-                <label><input type="checkbox" name="mostrar_coordenadas" <?php echo $_SESSION['config']['mostrar_coordenadas'] ? 'checked' : ''; ?>> Coordenadas del tablero (A-H, 1-8)</label>
+                <label><input type="checkbox" name="mostrar_coordenadas" <?php echo $_SESSION['config']['mostrar_coordenadas'] ? 'checked' : ''; ?>> Mostrar coordenadas del tablero (A-H, 1-8)</label>
               </div>
               <div class="config-option checkbox">
-                <label><input type="checkbox" name="mostrar_capturas" <?php echo $_SESSION['config']['mostrar_capturas'] ? 'checked' : ''; ?>> Panel de piezas capturadas</label>
+                <label><input type="checkbox" name="mostrar_capturas" <?php echo $_SESSION['config']['mostrar_capturas'] ? 'checked' : ''; ?>> Mostrar panel de piezas capturadas</label>
               </div>
             </div>
             <div class="config-info">
@@ -387,7 +390,7 @@ if (isset($_SESSION['partida'])) {
                                                         : 'Sin incremento';
                                                       ?></p>
               <small style="color: #999; display: block; margin-top: 10px;">
-                ℹ️ El tiempo y el incremento no se pueden cambiar durante la partida
+                ℹ️ 🥇🥈🏅🏆⏰⏱️❌🚫⚠️▶️⏸️⏹️🔄️🔙El tiempo y el incremento no se pueden cambiar durante la partida
               </small>
             </div>
             <div class="modal-buttons">
@@ -579,72 +582,17 @@ if (isset($_SESSION['partida'])) {
           </div>
 
           <div class="instrucciones">
-            <p><strong>🎮 Cómo jugar:</strong></p>
+            <p><strong>Instrucciones:</strong></p>
             <ol>
-              <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior para pausar</li>
+              <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón de la parte superior derecha para pausar o reanudar la partida</li>
               <li>⏱️ Solo corre el reloj del jugador en turno</li>
-              <li>🟢 Círculos verdes = movimientos posibles</li>
-              <li>🔴 Borde rojo pulsante = capturas posibles</li>
               <li>⏰ Si llegas a 0:00, pierdes automáticamente</li>
-              <li>💾 Puedes guardar la partida y continuarla después</li>
+              <li>🟢 Los círculos verdes muestran los movimientos posibles</li>
+              <li>🔴 Los bordes rojos pulsantes muestran las capturas posibles de fichas del contrario</li>
+              <li>💾 Puedes guardar la partida y continuarla posteriormente cuando desees</li>
             </ol>
           </div>
         </div>
-
-        <script>
-          // Modal de configuración
-          const modal = document.getElementById('modalConfig');
-          const btnConfig = document.getElementById('btnConfig');
-          const closeModal = document.querySelector('.close-modal');
-          const btnCancelar = document.querySelector('.btn-cancelar-config');
-
-          btnConfig.onclick = () => modal.style.display = 'block';
-          closeModal.onclick = () => modal.style.display = 'none';
-          btnCancelar.onclick = () => modal.style.display = 'none';
-          window.onclick = (e) => {
-            if (e.target == modal) modal.style.display = 'none';
-          }
-
-          // Actualizar relojes con AJAX
-          function actualizarRelojes() {
-            fetch('?ajax=update_clocks')
-              .then(r => r.json())
-              .then(data => {
-                const fmt = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-
-                // Solo actualizar si los datos son válidos
-                if (data.tiempo_blancas !== undefined && data.tiempo_negras !== undefined) {
-                  document.getElementById('tiempo-blancas').textContent = fmt(data.tiempo_blancas);
-                  document.getElementById('tiempo-negras').textContent = fmt(data.tiempo_negras);
-
-                  const tb = document.getElementById('tiempo-blancas');
-                  const tn = document.getElementById('tiempo-negras');
-
-                  // Aplicar clase de tiempo crítico
-                  data.tiempo_blancas < 60 ? tb.classList.add('tiempo-critico') : tb.classList.remove('tiempo-critico');
-                  data.tiempo_negras < 60 ? tn.classList.add('tiempo-critico') : tn.classList.remove('tiempo-critico');
-
-                  // Actualizar reloj activo/inactivo
-                  document.querySelectorAll('.reloj').forEach(r => {
-                    if (r.classList.contains('reloj-blancas')) {
-                      data.reloj_activo === 'blancas' ? (r.classList.add('reloj-activo'), r.classList.remove('reloj-inactivo')) : (r.classList.remove('reloj-activo'), r.classList.add('reloj-inactivo'));
-                    } else if (r.classList.contains('reloj-negras')) {
-                      data.reloj_activo === 'negras' ? (r.classList.add('reloj-activo'), r.classList.remove('reloj-inactivo')) : (r.classList.remove('reloj-activo'), r.classList.add('reloj-inactivo'));
-                    }
-                  });
-
-                  // Verificar si el tiempo se agotó
-                  if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
-                    alert('¡Tiempo agotado para ' + (data.tiempo_blancas <= 0 ? 'blancas' : 'negras') + '!');
-                    location.reload();
-                  }
-                }
-              })
-              .catch(e => console.error('Error:', e));
-          }
-
-          setInterval(actualizarRelojes, 1000);
-        </script>
       <?php endif; ?>
 </body>
 
