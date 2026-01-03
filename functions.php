@@ -1,28 +1,37 @@
 <?php
 
-/**
- * Funciones auxiliares para la aplicación de ajedrez
- */
+// Funciones auxiliares para la aplicación de ajedrez
 
 /**
  * Obtiene la imagen correspondiente a una pieza
  */
 function obtenerImagenPieza($pieza)
 {
-  if ($pieza === null) return '';
+  if ($pieza === null) {
+    return '';
+  }
+
   $color = $pieza->getColor();
   $carpeta = ($color === 'blancas') ? 'imagenes/fichas_blancas' : 'imagenes/fichas_negras';
   $colorNombre = ($color === 'blancas') ? 'blanca' : 'negra';
 
-  if ($pieza instanceof Torre) $nombre = 'torre_' . $colorNombre;
-  elseif ($pieza instanceof Caballo) $nombre = 'caballo_' . $colorNombre;
-  elseif ($pieza instanceof Alfil) $nombre = 'alfil_' . $colorNombre;
-  elseif ($pieza instanceof Dama) $nombre = 'dama_' . $colorNombre;
-  elseif ($pieza instanceof Rey) $nombre = 'rey_' . $colorNombre;
-  elseif ($pieza instanceof Peon) $nombre = 'peon_' . $colorNombre;
-  else return '';
+  // Mapa de clases de piezas a nombres de archivos
+  $piezaNombres = [
+    'Torre' => 'torre',
+    'Caballo' => 'caballo',
+    'Alfil' => 'alfil',
+    'Dama' => 'dama',
+    'Rey' => 'rey',
+    'Peon' => 'peon'
+  ];
 
-  return $carpeta . '/' . $nombre . '.png';
+  $tipoPieza = get_class($pieza);
+  if (!isset($piezaNombres[$tipoPieza])) {
+    return '';
+  }
+
+  $nombreArchivo = $piezaNombres[$tipoPieza] . '_' . $colorNombre . '.png';
+  return $carpeta . '/' . $nombreArchivo;
 }
 
 /**
@@ -32,10 +41,11 @@ function obtenerPiezaEnCasilla($posicion, $partida)
 {
   $jugadores = $partida->getJugadores();
   $pieza = $jugadores['blancas']->getPiezaEnPosicion($posicion);
-  if ($pieza) return $pieza;
+  if ($pieza) {
+    return $pieza;
+  }
   $pieza = $jugadores['negras']->getPiezaEnPosicion($posicion);
-  if ($pieza) return $pieza;
-  return null;
+  return $pieza ?: null;
 }
 
 /**
