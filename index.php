@@ -288,13 +288,13 @@ if (isset($_SESSION['partida'])) {
       <h1>🎮 Configurar Partida</h1>
       <div class="config-wrapper">
         <form method="post" class="config-form">
-          <p class="config-intro"><strong>📋 Paso 1: Nombres de los jugadores</strong></p>
+          <p class="config-intro"><strong>Nombres de los jugadores</strong></p>
 
           <div class="jugador-config blancas-config">
             <div class="config-icon">♔</div>
             <label><strong>⚪ Jugador Blancas:</strong></label>
-            <input type="text" name="nombre_blancas" placeholder="María, Juan..." maxlength="20" class="input-nombre" autofocus>
-            <small>Las blancas empiezan primero</small>
+            <input type="text" name="nombre_blancas" placeholder="Nombre del jugador 1..." maxlength="20" class="input-nombre" autofocus>
+            <small>Por defecto sería jugador 1</small>
           </div>
 
           <div class="vs-separator">VS</div>
@@ -302,13 +302,13 @@ if (isset($_SESSION['partida'])) {
           <div class="jugador-config negras-config">
             <div class="config-icon">♚</div>
             <label><strong>⚫ Jugador Negras:</strong></label>
-            <input type="text" name="nombre_negras" placeholder="Pedro, Ana..." maxlength="20" class="input-nombre">
-            <small>Las negras juegan segundo</small>
+            <input type="text" name="nombre_negras" placeholder="Nombre del jugador 2..." maxlength="20" class="input-nombre">
+            <small>Por defecto sería jugador 2</small>
           </div>
 
           <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
 
-          <p class="config-intro"><strong>⏱️ Paso 2: Configuración del tiempo</strong></p>
+          <p class="config-intro"><strong>Configuración del tiempo</strong></p>
 
           <div class="config-section-inicio">
             <div class="config-option">
@@ -317,9 +317,9 @@ if (isset($_SESSION['partida'])) {
                 <option value="60">1 minuto (Bullet)</option>
                 <option value="180">3 minutos (Blitz)</option>
                 <option value="300">5 minutos (Blitz)</option>
-                <option value="600" selected>10 minutos (Rápidas)</option>
+                <option value="600">10 minutos (Rápidas)</option>
                 <option value="900">15 minutos (Rápidas)</option>
-                <option value="1800">30 minutos (Clásicas)</option>
+                <option value="1800" selected>30 minutos (Clásicas)</option>
                 <option value="3600">60 minutos (Clásicas)</option>
               </select>
             </div>
@@ -333,13 +333,13 @@ if (isset($_SESSION['partida'])) {
                 <option value="5">+5 segundos</option>
                 <option value="10">+10 segundos</option>
               </select>
-              <small style="display: block; margin-top: 5px;">Al mover, recuperas tiempo adicional</small>
+              <small style="display: block; margin-top: 5px;">Incrementar tiempo adicional al mover</small>
             </div>
           </div>
 
           <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
 
-          <p class="config-intro"><strong>🎨 Paso 3: Opciones de interfaz</strong></p>
+          <p class="config-intro"><strong>Opciones de interfaz</strong></p>
 
           <div class="config-section-inicio">
             <div class="config-option checkbox">
