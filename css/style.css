@@ -261,6 +261,11 @@ h1 {
   max-width: 700px;
 }
 
+.tablero-contenedor.sin-coordenadas {
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+}
+
 /* Coordenadas */
 .coordenada-esquina-superior-izquierda {
   border-top: 2px solid #333;

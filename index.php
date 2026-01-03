@@ -455,7 +455,7 @@ if (isset($_SESSION['partida'])) {
           <?php endif; ?>
 
           <div class="tablero-wrapper">
-            <div class="tablero-contenedor">
+            <div class="tablero-contenedor <?php echo $_SESSION['config']['mostrar_coordenadas'] ? '' : 'sin-coordenadas'; ?>">
               <?php
               $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
