@@ -364,7 +364,7 @@ function renderGameHeader()
       <button id="btnConfig" class="btn-config">⚙️</button>
       <form method="post" style="display: inline;">
         <button type="submit" name="toggle_pausa" class="btn-pausa" id="btnPausa">
-          <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? '▶️ Reanudar' : '⏸️ Pausar'; ?>
+          <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? '▶️' : '⏸️'; ?>
         </button>
       </form>
     </div>

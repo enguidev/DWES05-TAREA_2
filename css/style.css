@@ -38,6 +38,7 @@ body {
   display: flex;
   gap: 10px;
   align-items: center;
+  perspective: 1000px;
 }
 
 /* Título */
@@ -51,31 +52,30 @@ h1 {
 /* Botón de configuración */
 .btn-config {
   font-size: 1.5em;
-  background: #667eea;
-  color: white;
+  background: transparent;
+  color: #667eea;
   border: none;
-  padding: 10px 15px;
-  border-radius: 10px;
+  padding: 5px;
+  border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-config:hover {
-  background: #5568d3;
-  transform: rotate(90deg);
+  transform: rotate(180deg);
 }
 
 /* Botón de pausa */
 .btn-pausa {
-  font-size: 1.1em;
+  font-size: 1.5em;
   font-weight: bold;
-  padding: 12px 25px;
+  padding: 5px;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: white;
-  background: #ff9800;
+  color: #ff9800;
+  background: transparent;
 }
 
 .btn-pausa:hover {
