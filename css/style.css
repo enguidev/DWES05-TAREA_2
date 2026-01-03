@@ -566,6 +566,7 @@ h1 {
   padding: 20px;
   border-radius: 10px;
   border-left: 4px solid #667eea;
+  border-right: 4px solid #667eea;
 }
 
 .instrucciones p {
