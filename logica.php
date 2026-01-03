@@ -227,7 +227,7 @@ function cargarPartida()
  */
 function renderConfigForm()
 {
-  ?>
+?>
   <div class="container">
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
@@ -300,7 +300,7 @@ function renderConfigForm()
       </form>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**
@@ -308,7 +308,7 @@ function renderConfigForm()
  */
 function renderModalConfig()
 {
-  ?>
+?>
   <!-- MODAL CONFIGURACIÓN -->
   <div id="modalConfig" class="modal">
     <div class="modal-content">
@@ -330,14 +330,14 @@ function renderModalConfig()
         <div class="config-info">
           <h3>⏱️ Información del Tiempo</h3>
           <p><strong>Tiempo inicial:</strong> <?php
-            $mins = $_SESSION['config']['tiempo_inicial'] / 60;
-            echo $mins . ' minuto' . ($mins != 1 ? 's' : '');
-          ?></p>
+                                              $mins = $_SESSION['config']['tiempo_inicial'] / 60;
+                                              echo $mins . ' minuto' . ($mins != 1 ? 's' : '');
+                                              ?></p>
           <p><strong>Incremento Fischer:</strong> <?php
-            echo $_SESSION['config']['incremento'] > 0
-              ? '+' . $_SESSION['config']['incremento'] . ' segundo' . ($_SESSION['config']['incremento'] != 1 ? 's' : '')
-              : 'Sin incremento';
-          ?></p>
+                                                  echo $_SESSION['config']['incremento'] > 0
+                                                    ? '+' . $_SESSION['config']['incremento'] . ' segundo' . ($_SESSION['config']['incremento'] != 1 ? 's' : '')
+                                                    : 'Sin incremento';
+                                                  ?></p>
           <small style="color: #999; display: block; margin-top: 10px;">
             ℹ️ El tiempo y el incremento no se pueden cambiar durante la partida
           </small>
@@ -349,7 +349,7 @@ function renderModalConfig()
       </form>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**
@@ -357,7 +357,7 @@ function renderModalConfig()
  */
 function renderGameHeader()
 {
-  ?>
+?>
   <div class="header-juego">
     <h1>♟️ Partida de Ajedrez</h1>
     <div class="header-buttons">
@@ -369,7 +369,7 @@ function renderGameHeader()
       </form>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**
@@ -377,7 +377,7 @@ function renderGameHeader()
  */
 function renderRelojes($jugadores, $marcador)
 {
-  ?>
+?>
   <!-- RELOJES -->
   <div class="relojes-container">
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'blancas' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
@@ -396,7 +396,7 @@ function renderRelojes($jugadores, $marcador)
       <div class="reloj-puntos"><?php echo $marcador[1]; ?> pts</div>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**
@@ -404,7 +404,7 @@ function renderRelojes($jugadores, $marcador)
  */
 function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas)
 {
-  ?>
+?>
   <!-- TABLERO -->
   <?php if ($_SESSION['config']['mostrar_capturas']): ?>
     <div class="tablero-y-capturas-wrapper">
@@ -418,142 +418,142 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       </div>
     <?php else: ?>
       <div class="tablero-solo-wrapper">
-    <?php endif; ?>
+      <?php endif; ?>
 
-    <div class="tablero-wrapper">
-      <div class="tablero-contenedor <?php echo $_SESSION['config']['mostrar_coordenadas'] ? '' : 'sin-coordenadas'; ?>">
-        <?php
-        $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+      <div class="tablero-wrapper">
+        <div class="tablero-contenedor <?php echo $_SESSION['config']['mostrar_coordenadas'] ? '' : 'sin-coordenadas'; ?>">
+          <?php
+          $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-        if ($_SESSION['config']['mostrar_coordenadas']) {
-          echo '<div class="coordenada-esquina-superior-izquierda"></div>';
-          foreach ($letras as $letra) echo '<div class="coordenada-superior">' . $letra . '</div>';
-          echo '<div class="coordenada-esquina-superior-derecha"></div>';
-        }
-
-        for ($fila = 8; $fila >= 1; $fila--):
           if ($_SESSION['config']['mostrar_coordenadas']) {
-            echo '<div class="coordenada-izquierda">' . $fila . '</div>';
+            echo '<div class="coordenada-esquina-superior-izquierda"></div>';
+            foreach ($letras as $letra) echo '<div class="coordenada-superior">' . $letra . '</div>';
+            echo '<div class="coordenada-esquina-superior-derecha"></div>';
           }
 
-          for ($columna = 0; $columna < 8; $columna++):
-            $posicion = $letras[$columna] . $fila;
-            $pieza = obtenerPiezaEnCasilla($posicion, $partida);
-            $colorCasilla = (($fila + $columna) % 2 === 0) ? 'blanca' : 'negra';
-            $esSeleccionada = ($casillaSeleccionada === $posicion);
+          for ($fila = 8; $fila >= 1; $fila--):
+            if ($_SESSION['config']['mostrar_coordenadas']) {
+              echo '<div class="coordenada-izquierda">' . $fila . '</div>';
+            }
 
-            $esMovimientoPosible = false;
-            $esCaptura = false;
+            for ($columna = 0; $columna < 8; $columna++):
+              $posicion = $letras[$columna] . $fila;
+              $pieza = obtenerPiezaEnCasilla($posicion, $partida);
+              $colorCasilla = (($fila + $columna) % 2 === 0) ? 'blanca' : 'negra';
+              $esSeleccionada = ($casillaSeleccionada === $posicion);
 
-            // Solo mostrar movimientos si no está en pausa
-            if ($casillaSeleccionada !== null && !$esSeleccionada && (!isset($_SESSION['pausa']) || !$_SESSION['pausa'])) {
-              $piezaSeleccionada = obtenerPiezaEnCasilla($casillaSeleccionada, $partida);
-              if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $turno) {
-                $piezaEnDestino = obtenerPiezaEnCasilla($posicion, $partida);
-                $hayPiezaDestino = ($piezaEnDestino !== null);
+              $esMovimientoPosible = false;
+              $esCaptura = false;
 
-                if ($piezaSeleccionada instanceof Peon) {
-                  $movimientos = $piezaSeleccionada->simulaMovimiento($posicion, $hayPiezaDestino);
-                } else {
-                  $movimientos = $piezaSeleccionada->simulaMovimiento($posicion);
-                }
+              // Solo mostrar movimientos si no está en pausa
+              if ($casillaSeleccionada !== null && !$esSeleccionada && (!isset($_SESSION['pausa']) || !$_SESSION['pausa'])) {
+                $piezaSeleccionada = obtenerPiezaEnCasilla($casillaSeleccionada, $partida);
+                if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $turno) {
+                  $piezaEnDestino = obtenerPiezaEnCasilla($posicion, $partida);
+                  $hayPiezaDestino = ($piezaEnDestino !== null);
 
-                if (!empty($movimientos)) {
-                  $bloqueado = false;
-                  if (!($piezaSeleccionada instanceof Caballo)) {
-                    for ($i = 0; $i < count($movimientos) - 1; $i++) {
-                      if (obtenerPiezaEnCasilla($movimientos[$i], $partida) !== null) {
-                        $bloqueado = true;
-                        break;
-                      }
-                    }
+                  if ($piezaSeleccionada instanceof Peon) {
+                    $movimientos = $piezaSeleccionada->simulaMovimiento($posicion, $hayPiezaDestino);
+                  } else {
+                    $movimientos = $piezaSeleccionada->simulaMovimiento($posicion);
                   }
 
-                  if (!$bloqueado) {
-                    if ($piezaEnDestino !== null) {
-                      if ($piezaEnDestino->getColor() !== $turno) {
-                        $esMovimientoPosible = true;
-                        $esCaptura = true;
+                  if (!empty($movimientos)) {
+                    $bloqueado = false;
+                    if (!($piezaSeleccionada instanceof Caballo)) {
+                      for ($i = 0; $i < count($movimientos) - 1; $i++) {
+                        if (obtenerPiezaEnCasilla($movimientos[$i], $partida) !== null) {
+                          $bloqueado = true;
+                          break;
+                        }
                       }
-                    } else {
-                      $esMovimientoPosible = true;
+                    }
+
+                    if (!$bloqueado) {
+                      if ($piezaEnDestino !== null) {
+                        if ($piezaEnDestino->getColor() !== $turno) {
+                          $esMovimientoPosible = true;
+                          $esCaptura = true;
+                        }
+                      } else {
+                        $esMovimientoPosible = true;
+                      }
                     }
                   }
                 }
               }
-            }
-            ?>
-            <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
-              <?php if ($pieza !== null): ?>
-                <form method="post" class="formulario">
-                  <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>"
-                    class="btn-pieza-casilla <?php echo ($pieza->getColor() === $turno) ? 'puede-seleccionar' : 'no-puede-seleccionar'; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>"
-                    <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? 'disabled' : ''; ?>>
-                    <img src="<?php echo obtenerImagenPieza($pieza); ?>" class="imagen-pieza">
-                  </button>
-                </form>
-              <?php elseif ($esMovimientoPosible): ?>
-                <form method="post" class="formulario">
-                  <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>" class="btn-movimiento">
-                    <span class="indicador-movimiento"></span>
-                  </button>
-                </form>
-              <?php endif; ?>
-            </div>
+          ?>
+              <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
+                <?php if ($pieza !== null): ?>
+                  <form method="post" class="formulario">
+                    <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>"
+                      class="btn-pieza-casilla <?php echo ($pieza->getColor() === $turno) ? 'puede-seleccionar' : 'no-puede-seleccionar'; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>"
+                      <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? 'disabled' : ''; ?>>
+                      <img src="<?php echo obtenerImagenPieza($pieza); ?>" class="imagen-pieza">
+                    </button>
+                  </form>
+                <?php elseif ($esMovimientoPosible): ?>
+                  <form method="post" class="formulario">
+                    <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>" class="btn-movimiento">
+                      <span class="indicador-movimiento"></span>
+                    </button>
+                  </form>
+                <?php endif; ?>
+              </div>
+            <?php endfor; ?>
+
+            <?php if ($_SESSION['config']['mostrar_coordenadas']): ?>
+              <div class="coordenada-derecha"><?php echo $fila; ?></div>
+            <?php endif; ?>
           <?php endfor; ?>
 
           <?php if ($_SESSION['config']['mostrar_coordenadas']): ?>
-            <div class="coordenada-derecha"><?php echo $fila; ?></div>
+            <div class="coordenada-esquina-inferior-izquierda"></div>
+            <?php foreach ($letras as $letra): ?>
+              <div class="coordenada-inferior"><?php echo $letra; ?></div>
+            <?php endforeach; ?>
+            <div class="coordenada-esquina-inferior-derecha"></div>
           <?php endif; ?>
-        <?php endfor; ?>
-
-        <?php if ($_SESSION['config']['mostrar_coordenadas']): ?>
-          <div class="coordenada-esquina-inferior-izquierda"></div>
-          <?php foreach ($letras as $letra): ?>
-            <div class="coordenada-inferior"><?php echo $letra; ?></div>
-          <?php endforeach; ?>
-          <div class="coordenada-esquina-inferior-derecha"></div>
-        <?php endif; ?>
-      </div>
-    </div>
-
-    <?php if ($_SESSION['config']['mostrar_capturas']): ?>
-      <div class="piezas-capturadas-lado">
-        <h3>Cap. blancas:</h3>
-        <div class="capturadas-vertical">
-          <?php foreach ($piezasCapturadas['negras'] as $pieza): ?>
-            <img src="<?php echo obtenerImagenPieza($pieza); ?>" class="pieza-capturada">
-          <?php endforeach; ?>
         </div>
       </div>
-    <?php endif; ?>
-    </div>
 
-    <div class="botones-control">
-      <form method="post" style="display: inline;">
-        <button type="submit" name="deshacer" class="btn-deshacer">↶ Deshacer</button>
-      </form>
-      <form method="post" style="display: inline;">
-        <button type="submit" name="guardar" class="btn-guardar">💾 Guardar</button>
-      </form>
-      <form method="post" style="display: inline;">
-        <button type="submit" name="cargar" class="btn-cargar">📁 Cargar</button>
-      </form>
-      <form method="post" style="display: inline;">
-        <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Reiniciar</button>
-      </form>
-    </div>
+      <?php if ($_SESSION['config']['mostrar_capturas']): ?>
+        <div class="piezas-capturadas-lado">
+          <h3>Cap. blancas:</h3>
+          <div class="capturadas-vertical">
+            <?php foreach ($piezasCapturadas['negras'] as $pieza): ?>
+              <img src="<?php echo obtenerImagenPieza($pieza); ?>" class="pieza-capturada">
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
+      </div>
 
-    <div class="instrucciones">
-      <p><strong>🎮 Cómo jugar:</strong></p>
-      <ol>
-        <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior para pausar</li>
-        <li>⏱️ Solo corre el reloj del jugador en turno</li>
-        <li>🟢 Círculos verdes = movimientos posibles</li>
-        <li>🔴 Borde rojo pulsante = capturas posibles</li>
-        <li>⏰ Si llegas a 0:00, pierdes automáticamente</li>
-        <li>💾 Puedes guardar la partida y continuarla después</li>
-      </ol>
-    </div>
-  <?php
-}
+      <div class="botones-control">
+        <form method="post" style="display: inline;">
+          <button type="submit" name="deshacer" class="btn-deshacer">↶ Deshacer</button>
+        </form>
+        <form method="post" style="display: inline;">
+          <button type="submit" name="guardar" class="btn-guardar">💾 Guardar</button>
+        </form>
+        <form method="post" style="display: inline;">
+          <button type="submit" name="cargar" class="btn-cargar">📁 Cargar</button>
+        </form>
+        <form method="post" style="display: inline;">
+          <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Reiniciar</button>
+        </form>
+      </div>
+
+      <div class="instrucciones">
+        <p><strong>🎮 Cómo jugar:</strong></p>
+        <ol>
+          <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior para pausar</li>
+          <li>⏱️ Solo corre el reloj del jugador en turno</li>
+          <li>🟢 Círculos verdes = movimientos posibles</li>
+          <li>🔴 Borde rojo pulsante = capturas posibles</li>
+          <li>⏰ Si llegas a 0:00, pierdes automáticamente</li>
+          <li>💾 Puedes guardar la partida y continuarla después</li>
+        </ol>
+      </div>
+    <?php
+  }
