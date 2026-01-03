@@ -16,7 +16,10 @@ if (modal && btnConfig && closeModal && btnCancelar) {
 // Actualizar relojes con AJAX
 function actualizarRelojes() {
   // Solo actualizar si los elementos existen (es decir, hay partida activa)
-  if (!document.getElementById("tiempo-blancas") || !document.getElementById("tiempo-negras")) {
+  if (
+    !document.getElementById("tiempo-blancas") ||
+    !document.getElementById("tiempo-negras")
+  ) {
     return;
   }
   fetch("index.php?ajax=update_clocks")

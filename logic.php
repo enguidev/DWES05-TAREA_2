@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lógica de la aplicación de ajedrez
  */
@@ -220,4 +221,3 @@ function cargarPartida()
   }
   return null;
 }
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Funciones auxiliares para la aplicación de ajedrez
  */
@@ -46,4 +47,3 @@ function formatearTiempo($segundos)
   $segs = $segundos % 60;
   return sprintf("%02d:%02d", $minutos, $segs);
 }
-?>
