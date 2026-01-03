@@ -4,15 +4,21 @@ const btnConfig = document.getElementById("btnConfig");
 const closeModal = document.querySelector(".close-modal");
 const btnCancelar = document.querySelector(".btn-cancelar-config");
 
-btnConfig.onclick = () => (modal.style.display = "block");
-closeModal.onclick = () => (modal.style.display = "none");
-btnCancelar.onclick = () => (modal.style.display = "none");
-window.onclick = (e) => {
-  if (e.target == modal) modal.style.display = "none";
-};
+if (modal && btnConfig && closeModal && btnCancelar) {
+  btnConfig.onclick = () => (modal.style.display = "block");
+  closeModal.onclick = () => (modal.style.display = "none");
+  btnCancelar.onclick = () => (modal.style.display = "none");
+  window.onclick = (e) => {
+    if (e.target == modal) modal.style.display = "none";
+  };
+}
 
 // Actualizar relojes con AJAX
 function actualizarRelojes() {
+  // Solo actualizar si los elementos existen (es decir, hay partida activa)
+  if (!document.getElementById("tiempo-blancas") || !document.getElementById("tiempo-negras")) {
+    return;
+  }
   fetch("index.php?ajax=update_clocks")
     .then((r) => r.json())
     .then((data) => {

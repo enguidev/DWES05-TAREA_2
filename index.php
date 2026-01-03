@@ -2,99 +2,21 @@
 session_start();
 
 require_once 'modelo/Partida.php';
+require_once 'functions.php';
+require_once 'logic.php';
 
 // ============================================
-// FUNCIONES AUXILIARES
-// ============================================
-
-/**
- * Obtiene la imagen correspondiente a una pieza
- */
-function obtenerImagenPieza($pieza)
-{
-  if ($pieza === null) return '';
-  $color = $pieza->getColor();
-  $carpeta = ($color === 'blancas') ? 'imagenes/fichas_blancas' : 'imagenes/fichas_negras';
-  $colorNombre = ($color === 'blancas') ? 'blanca' : 'negra';
-
-  if ($pieza instanceof Torre) $nombre = 'torre_' . $colorNombre;
-  elseif ($pieza instanceof Caballo) $nombre = 'caballo_' . $colorNombre;
-  elseif ($pieza instanceof Alfil) $nombre = 'alfil_' . $colorNombre;
-  elseif ($pieza instanceof Dama) $nombre = 'dama_' . $colorNombre;
-  elseif ($pieza instanceof Rey) $nombre = 'rey_' . $colorNombre;
-  elseif ($pieza instanceof Peon) $nombre = 'peon_' . $colorNombre;
-  else return '';
-
-  return $carpeta . '/' . $nombre . '.png';
-}
-
-/**
- * Obtiene la pieza en una casilla específica
- */
-function obtenerPiezaEnCasilla($posicion, $partida)
-{
-  $jugadores = $partida->getJugadores();
-  $pieza = $jugadores['blancas']->getPiezaEnPosicion($posicion);
-  if ($pieza) return $pieza;
-  $pieza = $jugadores['negras']->getPiezaEnPosicion($posicion);
-  if ($pieza) return $pieza;
-  return null;
-}
-
-/**
- * Formatea segundos a formato MM:SS
- */
-function formatearTiempo($segundos)
-{
-  $minutos = floor($segundos / 60);
-  $segs = $segundos % 60;
-  return sprintf("%02d:%02d", $minutos, $segs);
-}
-
-// ============================================
-// FIN DE FUNCIONES AUXILIARES
+// FUNCIONES AUXILIARES (ahora en functions.php)
 // ============================================
 
 // Si es una petición AJAX para actualizar relojes
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
-  if (isset($_SESSION['tiempo_blancas']) && isset($_SESSION['tiempo_negras']) && isset($_SESSION['reloj_activo'])) {
-    $ahora = time();
-
-    // Solo actualizar si no está en pausa
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      if (isset($_SESSION['ultimo_tick'])) {
-        $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
-
-        if ($tiempoTranscurrido > 0) {
-          if ($_SESSION['reloj_activo'] === 'blancas') {
-            $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
-          } else {
-            $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
-          }
-          $_SESSION['ultimo_tick'] = $ahora;
-        }
-      } else {
-        $_SESSION['ultimo_tick'] = $ahora;
-      }
-    }
-
-    header('Content-Type: application/json');
-    echo json_encode([
-      'tiempo_blancas' => $_SESSION['tiempo_blancas'],
-      'tiempo_negras' => $_SESSION['tiempo_negras'],
-      'reloj_activo' => $_SESSION['reloj_activo'],
-      'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false
-    ]);
-    session_write_close();
-  }
-  exit;
+  procesarAjaxUpdateClocks();
 }
 
 // Procesar configuración (solo opciones visuales)
 if (isset($_POST['guardar_configuracion'])) {
-  // Solo permitir cambiar opciones visuales, no el tiempo
-  $_SESSION['config']['mostrar_coordenadas'] = isset($_POST['mostrar_coordenadas']);
-  $_SESSION['config']['mostrar_capturas'] = isset($_POST['mostrar_capturas']);
+  procesarGuardarConfiguracion();
 }
 $configDefecto = [
   'tiempo_inicial' => 600,
@@ -109,150 +31,40 @@ if (!isset($_SESSION['config'])) {
 
 // Iniciar partida con nombres Y configuración
 if (isset($_POST['iniciar_partida'])) {
-  $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
-  $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
-
-  // Guardar configuración elegida
-  $_SESSION['config'] = [
-    'tiempo_inicial' => (int)$_POST['tiempo_inicial'],
-    'incremento' => (int)$_POST['incremento'],
-    'mostrar_coordenadas' => isset($_POST['mostrar_coordenadas']),
-    'mostrar_capturas' => isset($_POST['mostrar_capturas'])
-  ];
-
-  $_SESSION['partida'] = serialize(new Partida($nombreBlancas, $nombreNegras));
-  $_SESSION['casilla_seleccionada'] = null;
-  $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
-  $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
-  $_SESSION['reloj_activo'] = 'blancas';
-  $_SESSION['ultimo_tick'] = time();
-  $_SESSION['nombres_configurados'] = true;
-  $_SESSION['pausa'] = false;
+  iniciarPartida();
 }
 
 // Pausar/Reanudar
 if (isset($_POST['toggle_pausa'])) {
-  if (isset($_SESSION['pausa'])) {
-    $_SESSION['pausa'] = !$_SESSION['pausa'];
-
-    // Si se reanuda, resetear ultimo_tick
-    if (!$_SESSION['pausa']) {
-      $_SESSION['ultimo_tick'] = time();
-    }
-  }
+  procesarTogglePausa();
 }
 
 // Reiniciar
 if (isset($_POST['reiniciar'])) {
-  unset($_SESSION['partida']);
-  unset($_SESSION['casilla_seleccionada']);
-  unset($_SESSION['tiempo_blancas']);
-  unset($_SESSION['tiempo_negras']);
-  unset($_SESSION['reloj_activo']);
-  unset($_SESSION['ultimo_tick']);
-  unset($_SESSION['nombres_configurados']);
-  unset($_SESSION['pausa']);
-  header("Location: " . $_SERVER['PHP_SELF']);
-  exit;
+  reiniciarPartida();
 }
 
 // Solo si hay partida
 if (isset($_SESSION['partida'])) {
   $partida = unserialize($_SESSION['partida']);
 
-  // Procesar jugada (solo si no está en pausa)
-  if (isset($_POST['seleccionar_casilla']) && (!isset($_SESSION['pausa']) || !$_SESSION['pausa'])) {
-    $casilla = $_POST['seleccionar_casilla'];
-
-    if ($_SESSION['casilla_seleccionada'] === null) {
-      $piezaSeleccionada = obtenerPiezaEnCasilla($casilla, $partida);
-      if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $partida->getTurno()) {
-        $_SESSION['casilla_seleccionada'] = $casilla;
-      }
-    } else {
-      $piezaClickeada = obtenerPiezaEnCasilla($casilla, $partida);
-      if ($piezaClickeada && $piezaClickeada->getColor() === $partida->getTurno()) {
-        $_SESSION['casilla_seleccionada'] = $casilla;
-      } else {
-        $origen = $_SESSION['casilla_seleccionada'];
-        $destino = $casilla;
-
-        $exito = $partida->jugada($origen, $destino);
-
-        if ($exito) {
-          // Actualizar el tiempo antes de cambiar de turno
-          $ahora = time();
-          $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
-
-          $turnoAnterior = $_SESSION['reloj_activo'];
-
-          // Restar el tiempo transcurrido al jugador que acaba de mover
-          if ($turnoAnterior === 'blancas') {
-            $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
-          } else {
-            $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
-          }
-
-          // Incremento Fischer (después de restar el tiempo transcurrido)
-          if ($_SESSION['config']['incremento'] > 0) {
-            if ($turnoAnterior === 'blancas') {
-              $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
-            } else {
-              $_SESSION['tiempo_negras'] += $_SESSION['config']['incremento'];
-            }
-          }
-
-          // Cambiar de turno y resetear el tick
-          $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
-          $_SESSION['ultimo_tick'] = time();
-        }
-
-        $_SESSION['casilla_seleccionada'] = null;
-        $_SESSION['partida'] = serialize($partida);
-      }
-    }
-  }
+  procesarJugada($partida);
 
   // Deshacer
   if (isset($_POST['deshacer'])) {
-    $partida->deshacerJugada();
-    $_SESSION['casilla_seleccionada'] = null;
-    $_SESSION['partida'] = serialize($partida);
+    deshacerJugada($partida);
   }
 
   // Guardar
   if (isset($_POST['guardar'])) {
-    $data = [
-      'partida' => serialize($partida),
-      'casilla_seleccionada' => $_SESSION['casilla_seleccionada'],
-      'tiempo_blancas' => $_SESSION['tiempo_blancas'],
-      'tiempo_negras' => $_SESSION['tiempo_negras'],
-      'reloj_activo' => $_SESSION['reloj_activo'],
-      'config' => $_SESSION['config'],
-      'pausa' => $_SESSION['pausa']
-    ];
-    file_put_contents('partida_guardada.json', json_encode($data));
+    guardarPartida($partida);
   }
 
   // Cargar
   if (isset($_POST['cargar'])) {
-    if (file_exists('partida_guardada.json')) {
-      $data = json_decode(file_get_contents('partida_guardada.json'), true);
-      $_SESSION['partida'] = $data['partida'];
-      $_SESSION['casilla_seleccionada'] = $data['casilla_seleccionada'];
-      $_SESSION['tiempo_blancas'] = $data['tiempo_blancas'];
-      $_SESSION['tiempo_negras'] = $data['tiempo_negras'];
-      $_SESSION['reloj_activo'] = $data['reloj_activo'];
-      $_SESSION['ultimo_tick'] = time();
-      if (isset($data['config'])) {
-        $_SESSION['config'] = $data['config'];
-      }
-      if (isset($data['pausa'])) {
-        $_SESSION['pausa'] = $data['pausa'];
-      } else {
-        $_SESSION['pausa'] = false;
-      }
-      $partida = unserialize($_SESSION['partida']);
+    $partidaCargada = cargarPartida();
+    if ($partidaCargada) {
+      $partida = $partidaCargada;
     }
   }
 
@@ -281,7 +93,7 @@ if (isset($_SESSION['partida'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Partida de Ajedrez</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </head>
 
 <body>
