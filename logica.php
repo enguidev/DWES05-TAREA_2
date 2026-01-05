@@ -227,4 +227,3 @@ function cargarPartida()
 /**
  * Renderiza el formulario de configuración
  */
-
