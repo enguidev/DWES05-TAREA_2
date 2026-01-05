@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Modal de configuración de la partida de ajedrez
  */
@@ -24,9 +25,9 @@
       <div class="config-info">
         <h3>⏱️ Información del Tiempo</h3>
         <p><strong>Tiempo inicial:</strong> <?php
-                                          $mins = $_SESSION['config']['tiempo_inicial'] / 60;
-                                          echo $mins . ' minuto' . ($mins != 1 ? 's' : '');
-                                          ?></p>
+                                            $mins = $_SESSION['config']['tiempo_inicial'] / 60;
+                                            echo $mins . ' minuto' . ($mins != 1 ? 's' : '');
+                                            ?></p>
         <p><strong>Incremento Fischer:</strong> <?php
                                                 echo $_SESSION['config']['incremento'] > 0
                                                   ? '+' . $_SESSION['config']['incremento'] . ' segundo' . ($_SESSION['config']['incremento'] != 1 ? 's' : '')
