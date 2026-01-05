@@ -234,5 +234,3 @@ function renderModalConfig()
 {
   include 'modal_config.php';
 }
-
-
