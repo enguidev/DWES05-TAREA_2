@@ -13,7 +13,7 @@ function renderConfigForm()
   <div class="container">
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
-      <form method="post" class="config-form">
+      <form method="post" enctype="multipart/form-data" class="config-form">
         <p class="configuracion-inicial"><strong>Nombres de los jugadores</strong></p>
 
         <div class="jugador-config blancas-config">
@@ -24,10 +24,16 @@ function renderConfigForm()
           <label>Avatar:</label>
           <select name="avatar_blancas" class="select-avatar">
             <option value="default">Sin avatar</option>
-            <option value="rey_blanca.png">Rey Blanco</option>
-            <option value="dama_blanca.png">Dama Blanca</option>
-            <option value="torre_blanca.png">Torre Blanca</option>
+            <option value="rey_blanca.png">Rey</option>
+            <option value="dama_blanca.png">Dama</option>
+            <option value="torre_blanca.png">Torre</option>
+            <option value="caballo_blanca.png">Caballo</option>
+            <option value="alfil_blanca.png">Alfil</option>
+            <option value="peon_blanca.png">Peón</option>
+            <option value="user_white.png">Usuario Blanco</option>
+            <option value="custom">Subir imagen personalizada</option>
           </select>
+          <input type="file" name="avatar_custom_blancas" id="avatar_custom_blancas" style="display: none;" accept="image/*">
         </div>
 
         <div class="vs-separator">VS</div>
@@ -40,10 +46,16 @@ function renderConfigForm()
           <label>Avatar:</label>
           <select name="avatar_negras" class="select-avatar">
             <option value="default">Sin avatar</option>
-            <option value="rey_negra.png">Rey Negro</option>
-            <option value="dama_negra.png">Dama Negra</option>
-            <option value="torre_negra.png">Torre Negra</option>
+            <option value="rey_negra.png">Rey</option>
+            <option value="dama_negra.png">Dama</option>
+            <option value="torre_negra.png">Torre</option>
+            <option value="caballo_negra.png">Caballo</option>
+            <option value="alfil_negra.png">Alfil</option>
+            <option value="peon_negra.png">Peón</option>
+            <option value="user_black.png">Usuario Negro</option>
+            <option value="custom">Subir imagen personalizada</option>
           </select>
+          <input type="file" name="avatar_custom_negras" id="avatar_custom_negras" style="display: none;" accept="image/*">
         </div>
 
         <hr class="linea-horizontal">
@@ -138,7 +150,7 @@ function renderRelojes($jugadores, $marcador)
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'blancas' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
       <div class="reloj-jugador">
         <?php if (isset($_SESSION['avatar_blancas']) && $_SESSION['avatar_blancas']): ?>
-          <img src="public/imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_blancas']); ?>" class="avatar-circular" alt="Avatar Blancas">
+          <img src="imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_blancas']); ?>" class="avatar-circular" alt="Avatar Blancas">
         <?php else: ?>
           ⚪
         <?php endif; ?>
@@ -153,7 +165,7 @@ function renderRelojes($jugadores, $marcador)
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'negras' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-negras">
       <div class="reloj-jugador">
         <?php if (isset($_SESSION['avatar_negras']) && $_SESSION['avatar_negras']): ?>
-          <img src="public/imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_negras']); ?>" class="avatar-circular" alt="Avatar Negras">
+          <img src="imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_negras']); ?>" class="avatar-circular" alt="Avatar Negras">
         <?php else: ?>
           ⚫
         <?php endif; ?>

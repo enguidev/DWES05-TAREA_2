@@ -60,8 +60,25 @@ function iniciarPartida()
   $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
   $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
 
-  $avatarBlancas = !empty($_POST['avatar_blancas']) && $_POST['avatar_blancas'] !== 'default' ? $_POST['avatar_blancas'] : null;
-  $avatarNegras = !empty($_POST['avatar_negras']) && $_POST['avatar_negras'] !== 'default' ? $_POST['avatar_negras'] : null;
+  // Manejar avatares
+  $avatarBlancas = null;
+  $avatarNegras = null;
+
+  if (!empty($_POST['avatar_blancas'])) {
+    if ($_POST['avatar_blancas'] === 'custom') {
+      $avatarBlancas = manejarSubidaAvatar('avatar_custom_blancas', 'blancas');
+    } elseif ($_POST['avatar_blancas'] !== 'default') {
+      $avatarBlancas = $_POST['avatar_blancas'];
+    }
+  }
+
+  if (!empty($_POST['avatar_negras'])) {
+    if ($_POST['avatar_negras'] === 'custom') {
+      $avatarNegras = manejarSubidaAvatar('avatar_custom_negras', 'negras');
+    } elseif ($_POST['avatar_negras'] !== 'default') {
+      $avatarNegras = $_POST['avatar_negras'];
+    }
+  }
 
   // Guardar configuración elegida
   $_SESSION['config'] = [
@@ -224,5 +241,50 @@ function cargarPartida()
     }
     return unserialize($_SESSION['partida']);
   }
+  return null;
+}
+
+/**
+ * Maneja la subida de un archivo de avatar personalizado
+ * @param string $inputName Nombre del campo de archivo
+ * @param string $color Color del jugador ('blancas' o 'negras')
+ * @return string|null Ruta relativa del archivo subido o null si no se subió
+ */
+function manejarSubidaAvatar($inputName, $color)
+{
+  if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
+    return null;
+  }
+
+  $file = $_FILES[$inputName];
+  $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  $maxSize = 2 * 1024 * 1024; // 2MB
+
+  // Validar tipo de archivo
+  if (!in_array($file['type'], $allowedTypes)) {
+    return null;
+  }
+
+  // Validar tamaño
+  if ($file['size'] > $maxSize) {
+    return null;
+  }
+
+  // Crear directorio si no existe
+  $uploadDir = __DIR__ . '/../public/imagenes/avatares/';
+  if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+  }
+
+  // Generar nombre único
+  $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+  $fileName = 'avatar_' . $color . '_' . time() . '_' . uniqid() . '.' . $extension;
+  $filePath = $uploadDir . $fileName;
+
+  // Mover archivo
+  if (move_uploaded_file($file['tmp_name'], $filePath)) {
+    return 'imagenes/avatares/' . $fileName;
+  }
+
   return null;
 }

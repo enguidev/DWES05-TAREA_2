@@ -88,3 +88,82 @@ function actualizarRelojes() {
 }
 
 setInterval(actualizarRelojes, 1000);
+
+// Manejar selección de avatar personalizado
+document.addEventListener('DOMContentLoaded', function() {
+  const selectBlancas = document.querySelector('select[name="avatar_blancas"]');
+  const selectNegras = document.querySelector('select[name="avatar_negras"]');
+  const inputBlancas = document.getElementById('avatar_custom_blancas');
+  const inputNegras = document.getElementById('avatar_custom_negras');
+
+  // Función para validar archivo
+  function validarArchivo(file) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const maxSize = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('Solo se permiten archivos de imagen (JPEG, PNG, GIF)');
+      return false;
+    }
+
+    if (file.size > maxSize) {
+      alert('El archivo es demasiado grande. Máximo 2MB.');
+      return false;
+    }
+
+    return true;
+  }
+
+  // Previsualización de imagen
+  function mostrarPrevisualizacion(input, previewId) {
+    const file = input.files[0];
+    if (file && validarArchivo(file)) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        let preview = document.getElementById(previewId);
+        if (!preview) {
+          preview = document.createElement('img');
+          preview.id = previewId;
+          preview.className = 'avatar-preview';
+          preview.style.maxWidth = '50px';
+          preview.style.maxHeight = '50px';
+          preview.style.borderRadius = '50%';
+          preview.style.marginLeft = '10px';
+          input.parentNode.appendChild(preview);
+        }
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  if (selectBlancas && inputBlancas) {
+    selectBlancas.addEventListener('change', function() {
+      if (this.value === 'custom') {
+        inputBlancas.style.display = 'block';
+        inputBlancas.addEventListener('change', function() {
+          mostrarPrevisualizacion(this, 'preview_blancas');
+        });
+      } else {
+        inputBlancas.style.display = 'none';
+        const preview = document.getElementById('preview_blancas');
+        if (preview) preview.remove();
+      }
+    });
+  }
+
+  if (selectNegras && inputNegras) {
+    selectNegras.addEventListener('change', function() {
+      if (this.value === 'custom') {
+        inputNegras.style.display = 'block';
+        inputNegras.addEventListener('change', function() {
+          mostrarPrevisualizacion(this, 'preview_negras');
+        });
+      } else {
+        inputNegras.style.display = 'none';
+        const preview = document.getElementById('preview_negras');
+        if (preview) preview.remove();
+      }
+    });
+  }
+});
