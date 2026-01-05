@@ -227,10 +227,4 @@ function cargarPartida()
 /**
  * Renderiza el formulario de configuración
  */
-/**
- * Renderiza el modal de configuración
- */
-function renderModalConfig()
-{
-  include 'modal_config.php';
-}
+
