@@ -24,7 +24,7 @@ function renderConfigForm()
           <label>Avatar:</label>
           <select name="avatar_blancas" class="select-avatar">
             <option value="default">Sin avatar</option>
-            <option value="rey_blanco.png">Rey Blanco</option>
+            <option value="rey_blanca.png">Rey Blanco</option>
             <option value="dama_blanca.png">Dama Blanca</option>
             <option value="torre_blanca.png">Torre Blanca</option>
           </select>
@@ -40,7 +40,7 @@ function renderConfigForm()
           <label>Avatar:</label>
           <select name="avatar_negras" class="select-avatar">
             <option value="default">Sin avatar</option>
-            <option value="rey_negro.png">Rey Negro</option>
+            <option value="rey_negra.png">Rey Negro</option>
             <option value="dama_negra.png">Dama Negra</option>
             <option value="torre_negra.png">Torre Negra</option>
           </select>
