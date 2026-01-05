@@ -6,5 +6,3 @@
 
 require_once 'vistas.php';
 require_once 'controladores.php';
-
-
