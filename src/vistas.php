@@ -21,6 +21,13 @@ function renderConfigForm()
           <label><strong>Jugador Blancas:</strong></label>
           <input type="text" name="nombre_blancas" placeholder="Nombre del jugador 1..." maxlength="20" class="input-nombre" autofocus>
           <small>Por defecto será jugador 1</small>
+          <label>Avatar:</label>
+          <select name="avatar_blancas" class="select-avatar">
+            <option value="default">Sin avatar</option>
+            <option value="rey_blanco.png">Rey Blanco</option>
+            <option value="dama_blanca.png">Dama Blanca</option>
+            <option value="torre_blanca.png">Torre Blanca</option>
+          </select>
         </div>
 
         <div class="vs-separator">VS</div>
@@ -30,6 +37,13 @@ function renderConfigForm()
           <label><strong>Jugador Negras:</strong></label>
           <input type="text" name="nombre_negras" placeholder="Nombre del jugador 2..." maxlength="20" class="input-nombre">
           <small>Por defecto sería jugador 2</small>
+          <label>Avatar:</label>
+          <select name="avatar_negras" class="select-avatar">
+            <option value="default">Sin avatar</option>
+            <option value="rey_negro.png">Rey Negro</option>
+            <option value="dama_negra.png">Dama Negra</option>
+            <option value="torre_negra.png">Torre Negra</option>
+          </select>
         </div>
 
         <hr class="linea-horizontal">
@@ -122,7 +136,14 @@ function renderRelojes($jugadores, $marcador)
   <!-- RELOJES -->
   <div class="relojes-container">
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'blancas' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
-      <div class="reloj-jugador">⚪ <?php echo $jugadores['blancas']->getNombre(); ?></div>
+      <div class="reloj-jugador">
+        <?php if (isset($_SESSION['avatar_blancas']) && $_SESSION['avatar_blancas']): ?>
+          <img src="public/imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_blancas']); ?>" class="avatar-circular" alt="Avatar Blancas">
+        <?php else: ?>
+          ⚪
+        <?php endif; ?>
+        <?php echo $jugadores['blancas']->getNombre(); ?>
+      </div>
       <div id="tiempo-blancas" class="reloj-tiempo <?php echo $_SESSION['tiempo_blancas'] < 60 ? 'tiempo-critico' : ''; ?>">
         <?php echo formatearTiempo($_SESSION['tiempo_blancas']); ?>
       </div>
@@ -130,7 +151,14 @@ function renderRelojes($jugadores, $marcador)
     </div>
     <div class="reloj-separador">⏱️</div>
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'negras' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-negras">
-      <div class="reloj-jugador">⚫ <?php echo $jugadores['negras']->getNombre(); ?></div>
+      <div class="reloj-jugador">
+        <?php if (isset($_SESSION['avatar_negras']) && $_SESSION['avatar_negras']): ?>
+          <img src="public/imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_negras']); ?>" class="avatar-circular" alt="Avatar Negras">
+        <?php else: ?>
+          ⚫
+        <?php endif; ?>
+        <?php echo $jugadores['negras']->getNombre(); ?>
+      </div>
       <div id="tiempo-negras" class="reloj-tiempo <?php echo $_SESSION['tiempo_negras'] < 60 ? 'tiempo-critico' : ''; ?>">
         <?php echo formatearTiempo($_SESSION['tiempo_negras']); ?>
       </div>

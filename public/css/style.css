@@ -149,6 +149,18 @@ h1 {
   font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-circular {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .reloj-tiempo {
@@ -746,6 +758,17 @@ h1 {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.select-avatar {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.9em;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  margin-top: 5px;
 }
 
 .config-option.checkbox label {

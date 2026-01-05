@@ -60,6 +60,9 @@ function iniciarPartida()
   $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
   $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
 
+  $avatarBlancas = !empty($_POST['avatar_blancas']) && $_POST['avatar_blancas'] !== 'default' ? $_POST['avatar_blancas'] : null;
+  $avatarNegras = !empty($_POST['avatar_negras']) && $_POST['avatar_negras'] !== 'default' ? $_POST['avatar_negras'] : null;
+
   // Guardar configuración elegida
   $_SESSION['config'] = [
     'tiempo_inicial' => (int)$_POST['tiempo_inicial'],
@@ -76,6 +79,8 @@ function iniciarPartida()
   $_SESSION['ultimo_tick'] = time();
   $_SESSION['nombres_configurados'] = true;
   $_SESSION['pausa'] = false;
+  $_SESSION['avatar_blancas'] = $avatarBlancas;
+  $_SESSION['avatar_negras'] = $avatarNegras;
 }
 
 /**
