@@ -90,7 +90,7 @@ function renderConfigForm()
  */
 function renderModalConfig()
 {
-  include 'modal_config.php';
+  include 'src/modal_config.php';
 }
 
 /**

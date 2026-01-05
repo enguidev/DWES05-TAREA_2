@@ -5,8 +5,9 @@ session_start();
 
 // Archivos necesarios
 require_once 'modelo/Partida.php';
-require_once 'funciones_auxiliares.php';
-require_once 'logica.php';
+require_once 'src/funciones_auxiliares.php';
+require_once 'src/vistas.php';
+require_once 'src/controladores.php';
 
 // Si es una petición AJAX para actualizar relojes
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
@@ -117,8 +118,8 @@ if (isset($_SESSION['partida'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Partida de Ajedrez</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="public/css/style.css">
+  <script src="public/script.js" defer></script>
 </head>
 
 <body>

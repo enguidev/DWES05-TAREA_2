@@ -12,7 +12,7 @@ function obtenerImagenPieza($pieza)
   }
 
   $color = $pieza->getColor();
-  $carpeta = ($color === 'blancas') ? 'imagenes/fichas_blancas' : 'imagenes/fichas_negras';
+  $carpeta = ($color === 'blancas') ? 'public/imagenes/fichas_blancas' : 'public/imagenes/fichas_negras';
   $colorNombre = ($color === 'blancas') ? 'blanca' : 'negra';
 
   // Mapa de clases de piezas a nombres de archivos

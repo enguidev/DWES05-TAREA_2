@@ -193,7 +193,7 @@ function guardarPartida($partida)
     'config' => $_SESSION['config'],
     'pausa' => $_SESSION['pausa']
   ];
-  file_put_contents('partida_guardada.json', json_encode($data));
+  file_put_contents('data/partida_guardada.json', json_encode($data));
 }
 
 /**
@@ -201,8 +201,8 @@ function guardarPartida($partida)
  */
 function cargarPartida()
 {
-  if (file_exists('partida_guardada.json')) {
-    $data = json_decode(file_get_contents('partida_guardada.json'), true);
+  if (file_exists('data/partida_guardada.json')) {
+    $data = json_decode(file_get_contents('data/partida_guardada.json'), true);
     $_SESSION['partida'] = $data['partida'];
     $_SESSION['casilla_seleccionada'] = $data['casilla_seleccionada'];
     $_SESSION['tiempo_blancas'] = $data['tiempo_blancas'];
