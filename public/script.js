@@ -24,10 +24,20 @@ function actualizarRelojes() {
   ) {
     return;
   }
+  
   fetch("index.php?ajax=update_clocks")
-    .then((r) => r.json())
+    .then((r) => {
+      if (!r.ok) {
+        throw new Error("Error en respuesta HTTP: " + r.status);
+      }
+      return r.json();
+    })
     .then((data) => {
-      console.log("Datos recibidos:", data);
+      // Si no hay partida activa, no hacer nada
+      if (data.sin_partida) {
+        return;
+      }
+
       const fmt = (s) =>
         String(Math.floor(s / 60)).padStart(2, "0") +
         ":" +
@@ -89,10 +99,12 @@ function actualizarRelojes() {
           // Recargar una sola vez para mostrar el mensaje del servidor
           location.reload();
         }
+        }
       }
     })
     .catch((e) => {
-      console.error("Error en actualizarRelojes:", e);
+      console.error("Error al actualizar relojes:", e);
+      // No detener el intervalo, seguir intentando
     });
 }
 

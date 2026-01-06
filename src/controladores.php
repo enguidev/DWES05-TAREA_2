@@ -9,43 +9,56 @@
  */
 function procesarAjaxUpdateClocks()
 {
-  if (isset($_SESSION['tiempo_blancas']) && isset($_SESSION['tiempo_negras']) && isset($_SESSION['reloj_activo'])) {
-    $ahora = time();
-
-    // Solo actualizar si no está en pausa
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      if (isset($_SESSION['ultimo_tick'])) {
-        $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
-
-        if ($tiempoTranscurrido > 0) {
-          if ($_SESSION['reloj_activo'] === 'blancas') {
-            $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
-          } else {
-            $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
-          }
-          $_SESSION['ultimo_tick'] = $ahora;
-        }
-      } else {
-        $_SESSION['ultimo_tick'] = $ahora;
-      }
-    }
-
-    // Detectar si el tiempo se agotó y terminar la partida
-    if ($_SESSION['tiempo_blancas'] <= 0) {
-      $_SESSION['partida_terminada_por_tiempo'] = 'negras';
-    } elseif ($_SESSION['tiempo_negras'] <= 0) {
-      $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
-    }
-
-    header('Content-Type: application/json');
+  header('Content-Type: application/json');
+  
+  // Si no hay sesión de partida activa, devolver estado vacío
+  if (!isset($_SESSION['tiempo_blancas']) || !isset($_SESSION['tiempo_negras']) || !isset($_SESSION['reloj_activo'])) {
     echo json_encode([
-      'tiempo_blancas' => $_SESSION['tiempo_blancas'],
-      'tiempo_negras' => $_SESSION['tiempo_negras'],
-      'reloj_activo' => $_SESSION['reloj_activo'],
-      'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false
+      'tiempo_blancas' => 0,
+      'tiempo_negras' => 0,
+      'reloj_activo' => 'blancas',
+      'pausa' => false,
+      'sin_partida' => true
     ]);
     session_write_close();
+    exit;
   }
+
+  $ahora = time();
+
+  // Solo actualizar si no está en pausa
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    if (isset($_SESSION['ultimo_tick'])) {
+      $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
+
+      if ($tiempoTranscurrido > 0) {
+        if ($_SESSION['reloj_activo'] === 'blancas') {
+          $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+        } else {
+          $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+        }
+        $_SESSION['ultimo_tick'] = $ahora;
+      }
+    } else {
+      $_SESSION['ultimo_tick'] = $ahora;
+    }
+  }
+
+  // Detectar si el tiempo se agotó y terminar la partida
+  if ($_SESSION['tiempo_blancas'] <= 0) {
+    $_SESSION['partida_terminada_por_tiempo'] = 'negras';
+  } elseif ($_SESSION['tiempo_negras'] <= 0) {
+    $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
+  }
+
+  echo json_encode([
+    'tiempo_blancas' => $_SESSION['tiempo_blancas'],
+    'tiempo_negras' => $_SESSION['tiempo_negras'],
+    'reloj_activo' => $_SESSION['reloj_activo'],
+    'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false,
+    'sin_partida' => false
+  ]);
+  session_write_close();
   exit;
 }
 
