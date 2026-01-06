@@ -175,6 +175,7 @@ C. SISTEMA DE TIEMPO (RELOJ DE AJEDREZ)
 ✓ Indicador visual del reloj activo
 ✓ Alerta de tiempo crítico (< 60 segundos)
 ✓ Fin de partida por tiempo agotado
+✓ Incremento Fischer por jugada (configurable desde ajustes)
 ✓ Pausa automática al abrir modales
 ✓ Sincronización AJAX cada 5 segundos
 ✓ Persistencia del tiempo al guardar partidas
@@ -586,6 +587,45 @@ POSIBLES MEJORAS FUTURAS
 🔮 Exportar partidas en formato PGN
 🔮 Temas de tablero personalizables
 🔮 Sonidos de movimiento y captura
+
+================================================================================
+10. MAPA DE REQUISITOS VS FUNCIONALIDADES
+================================================================================
+
+REQUISITOS DEL ENUNCIADO (DWES U5) Y COBERTURA:
+
+- Arquitectura OOP/MVC: Cumplido
+   • Clases de piezas, jugadores y partida en modelo/
+   • Separación de vistas y controladores en src/
+
+- Gestión de sesiones: Cumplido
+   • Estado completo en $_SESSION (partida, tiempos, pausa, config)
+
+- Interactividad con AJAX: Cumplido
+   • Sincronización de relojes vía endpoint update_clocks
+
+- Persistencia (JSON): Cumplido
+   • Guardar/Cargar/Eliminar partidas en data/partidas/
+
+- Sistema de tiempo: Cumplido
+   • Cuenta atrás por turno y fin por tiempo
+   • Incremento Fischer por jugada configurable
+
+- Historial y Deshacer: Cumplido
+   • Historial limitado y botón de deshacer operativo
+
+- Configuración y UI: Cumplido
+   • Ajustes visuales y avatares personalizados
+
+- Modales y confirmaciones: Cumplido
+   • Guardar, cargar, nueva partida y revancha con confirmación
+
+PENDIENTES DE MEJORA (NO CRÍTICOS):
+- Captura al paso: No implementada (viable como mejora)
+- Enroque: Validado internamente, falta UI para ejecutarlo
+- Promoción: Solo a Dama; se sugiere modal para elegir pieza
+- Validación adicional de archivos: endurecer tamaño/mime y manejo de nombres
+- UX: Sonidos, temas de tablero, notación algebraica en historial
 
 
 ================================================================================
