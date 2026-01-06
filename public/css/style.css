@@ -528,6 +528,7 @@ h1 {
 
 .btn-reiniciar,
 .btn-deshacer,
+.btn-revancha,
 .btn-guardar,
 .btn-cargar {
   font-size: 1.1em;
@@ -548,6 +549,16 @@ h1 {
   background: #c0392b;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+.btn-revancha {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.btn-revancha:hover {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
 }
 
 .btn-deshacer {
@@ -827,6 +838,40 @@ h1 {
 /* Estilos para input de archivo de avatar personalizado */
 input[type="file"][id^="avatar_custom"] {
   display: none !important;
+}
+
+/* Botón personalizado para seleccionar archivo */
+.btn-elegir-archivo {
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95em;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+  text-align: center;
+}
+
+.btn-elegir-archivo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.btn-elegir-archivo:active {
+  transform: translateY(0);
+}
+
+/* Nombre del archivo seleccionado */
+.nombre-archivo {
+  display: inline-block;
+  margin-left: 10px;
+  color: #666;
+  font-size: 0.9em;
+  font-style: italic;
 }
 
 .avatar-preview {

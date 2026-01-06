@@ -54,7 +54,13 @@ function renderConfigForm($partidasGuardadas = [])
             <option value="public/imagenes/avatares/user_white.png">Usuario Blanco</option>
             <option value="custom">Subir imagen personalizada</option>
           </select>
-          <input type="file" name="avatar_custom_blancas" id="avatar_custom_blancas" style="display: none;" accept="image/*">
+          <div id="contenedor-custom-blancas" style="display: none; margin-top: 10px;">
+            <input type="file" name="avatar_custom_blancas" id="avatar_custom_blancas" style="display: none;" accept="image/*">
+            <label for="avatar_custom_blancas" class="btn-elegir-archivo">
+              📁 Elegir imagen
+            </label>
+            <span id="nombre-archivo-blancas" class="nombre-archivo">Ningún archivo seleccionado</span>
+          </div>
         </div>
 
         <div class="vs-separator">VS</div>
@@ -76,7 +82,13 @@ function renderConfigForm($partidasGuardadas = [])
             <option value="public/imagenes/avatares/user_black.png">Usuario Negro</option>
             <option value="custom">Subir imagen personalizada</option>
           </select>
-          <input type="file" name="avatar_custom_negras" id="avatar_custom_negras" style="display: none;" accept="image/*">
+          <div id="contenedor-custom-negras" style="display: none; margin-top: 10px;">
+            <input type="file" name="avatar_custom_negras" id="avatar_custom_negras" style="display: none;" accept="image/*">
+            <label for="avatar_custom_negras" class="btn-elegir-archivo">
+              📁 Elegir imagen
+            </label>
+            <span id="nombre-archivo-negras" class="nombre-archivo">Ningún archivo seleccionado</span>
+          </div>
         </div>
 
         <hr class="linea-horizontal">
@@ -259,6 +271,9 @@ function renderBotonesControl($partida)
   <div class="botones-control">
     <form method="post" style="display: inline;">
       <button type="submit" name="deshacer" class="btn-deshacer" id="btn-deshacer" <?php echo !$partida->tieneHistorial() ? 'disabled' : ''; ?>>↶ Deshacer</button>
+    </form>
+    <form method="post" style="display: inline;">
+      <button type="submit" name="revancha" class="btn-revancha" id="btn-revancha" title="Nueva partida con la misma configuración">🔁 Revancha</button>
     </form>
     <form method="post" style="display: inline;">
       <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>

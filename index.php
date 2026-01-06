@@ -113,6 +113,12 @@ if (isset($_POST['confirmar_reiniciar'])) {
   // La función reiniciarPartida() hace exit, esta línea nunca se ejecuta
 }
 
+// Revancha (nueva partida con misma configuración)
+if (isset($_POST['revancha'])) {
+  revanchaPartida();
+  // La función revanchaPartida() hace exit, esta línea nunca se ejecuta
+}
+
 // Mostrar modal para guardar partida
 $mostrarModalGuardar = false;
 $nombrePartidaSugerido = '';
