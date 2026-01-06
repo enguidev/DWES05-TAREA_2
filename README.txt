@@ -28,10 +28,11 @@ de tiempo, persistencia de partidas y una interfaz web moderna y responsive.
 CARACTERÍSTICAS PRINCIPALES:
 ✨ Motor de ajedrez completo con validación de reglas
 🎯 Detección de jaque, jaque mate y tablas
-👑 Coronación automática de peones
+👑 Promoción de peones con elección de pieza (Dama/Torre/Alfil/Caballo)
 ⏱️ Reloj de ajedrez con tiempo por jugador
 💾 Sistema de guardado y carga de partidas
 ↶ Deshacer movimientos con historial
+🧾 Historial de movimientos en notación algebraica
 👤 Avatares personalizados para jugadores
 🎨 Interfaz moderna y responsive
 ⚙️ Panel de configuración visual
@@ -152,15 +153,15 @@ B. REGLAS AVANZADAS
   • Rey + Alfil vs Rey
   • Rey + Caballo vs Rey
 
-✓ CORONACIÓN DE PEÓN:
-  • Automática al llegar al extremo opuesto
-  • Promoción a Dama por defecto
-  • Mensaje informativo de la promoción
+✓ PROMOCIÓN DE PEÓN:
+   • Al llegar al extremo opuesto se abre un modal
+   • Elección de pieza: Dama, Torre, Alfil o Caballo
+   • La partida se pausa hasta confirmar la promoción
 
-✓ ENROQUE (Preparado pero no implementado en UI):
-   • Motor implementado: enroque corto y largo ejecutados automáticamente
-   • Validación completa: piezas sin mover, casillas libres, sin jaque intermedio
-   • UI: puede no mostrar sugerencias de casillas; se ejecuta moviendo el rey a G/C
+✓ ENROQUE:
+   • Implementado en el motor: corto (O-O) y largo (O-O-O)
+   • Validación completa: piezas sin mover, casillas libres y sin jaque intermedio
+   • Nota de UI: puede no sugerir casillas automáticamente; ejecuta moviendo el rey a G/C
 
 ✓ CAPTURA AL PASO:
    • Implementada: disponible inmediatamente tras avance doble del peón rival
@@ -212,7 +213,7 @@ D. GESTIÓN DE PARTIDAS
 E. HISTORIAL Y DESHACER
 ───────────────────────────────────────────────────────────────────────────────
 
-✓ Historial de hasta 10 movimientos
+✓ Historial persistente en notación algebraica (se guarda junto con la partida)
 ✓ Botón "Deshacer" funcional
 ✓ Restaura estado completo (piezas, turno, mensaje)
 ✓ Indicador visual cuando no hay historial
@@ -539,10 +540,10 @@ DECISIONES DE DISEÑO
 ✓ Clonación profunda para simular movimientos sin alterar estado
 ✓ Validación en dos fases: cliente (UX) y servidor (seguridad)
 
-✓ Historial limitado a 10 movimientos para optimizar memoria
+✓ Historial persistente y serializado para guardado/carga
 ✓ Sincronización de relojes cada 5 segundos (balance precisión/carga)
 ✓ Pausa automática al abrir modales para evitar pérdidas de tiempo
-✓ Promoción automática a Dama (estándar en partidas rápidas)
+✓ Promoción mediante modal con elección de pieza
 
 
 ───────────────────────────────────────────────────────────────────────────────
@@ -571,26 +572,23 @@ OPTIMIZACIONES
 LIMITACIONES CONOCIDAS
 ───────────────────────────────────────────────────────────────────────────────
 
-⚠ Enroque: el motor lo soporta; la UI puede no sugerir casillas (se ejecuta moviendo el rey a destino)
-⚠ Promoción solo a Dama (no permite elegir pieza)
+⚠ Enroque: el motor lo soporta; la UI puede no sugerir casillas (ejecuta moviendo el rey a G/C)
 ⚠ Sin validación de repetición de posiciones (tablas por repetición)
-⚠ Sin notación algebraica en historial (solo deshacer genérico)
+⚠ Mejoras de UX pendientes: animaciones avanzadas, sonidos, temas
 
 
 ───────────────────────────────────────────────────────────────────────────────
 POSIBLES MEJORAS FUTURAS
 ───────────────────────────────────────────────────────────────────────────────
 
-🔮 Implementar captura al paso completa
-🔮 UI para enroque (clic especial o doble clic en rey)
-🔮 Modal para elegir pieza en promoción
-🔮 Historial completo con notación algebraica
+🔮 UI de enroque con sugerencia visual de casillas
+🔮 Animaciones de movimiento y capturas + sonidos
+🔮 Resaltado desde historial al pasar el cursor
 🔮 Modo multijugador online (WebSockets)
 🔮 AI para jugar contra la computadora
 🔮 Análisis de partida post-juego
 🔮 Exportar partidas en formato PGN
 🔮 Temas de tablero personalizables
-🔮 Sonidos de movimiento y captura
 
 ================================================================================
 10. MAPA DE REQUISITOS VS FUNCIONALIDADES
@@ -625,11 +623,9 @@ REQUISITOS DEL ENUNCIADO (DWES U5) Y COBERTURA:
    • Guardar, cargar, nueva partida y revancha con confirmación
 
 PENDIENTES DE MEJORA (NO CRÍTICOS):
-- Captura al paso: No implementada (viable como mejora)
-- Enroque: Validado internamente, falta UI para ejecutarlo
-- Promoción: Solo a Dama; se sugiere modal para elegir pieza
+- Enroque: Motor implementado; mejorar UI para sugerir casillas
 - Validación adicional de archivos: endurecer tamaño/mime y manejo de nombres
-- UX: Sonidos, temas de tablero, notación algebraica en historial
+- UX: Sonidos, temas de tablero y animaciones
 
 
 ================================================================================
