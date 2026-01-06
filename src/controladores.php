@@ -365,6 +365,7 @@ function guardarPartida($partida, $nombrePartida = null)
     'fecha' => date('Y-m-d H:i:s', $timestamp),
     'timestamp' => $timestamp,
     'partida' => serialize($partida),
+    'historialMovimientos' => $partida->getHistorialMovimientos(),
     'casilla_seleccionada' => $_SESSION['casilla_seleccionada'],
     'tiempo_blancas' => $_SESSION['tiempo_blancas'],
     'tiempo_negras' => $_SESSION['tiempo_negras'],
@@ -463,7 +464,14 @@ function cargarPartida($nombreArchivo = null)
     $_SESSION['avatar_negras'] = $data['avatar_negras'];
   }
 
-  return unserialize($_SESSION['partida']);
+  // Restaurar historial de movimientos
+  $partidaObj = unserialize($_SESSION['partida']);
+  if (isset($data['historialMovimientos']) && is_array($data['historialMovimientos'])) {
+    $partidaObj->setHistorialMovimientos($data['historialMovimientos']);
+    $_SESSION['partida'] = serialize($partidaObj);
+  }
+
+  return $partidaObj;
 }
 
 /**

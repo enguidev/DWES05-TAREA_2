@@ -14,6 +14,7 @@ class Partida
   private $partidaTerminada; // Indica si la partida ha terminado
   private $historial;  // Historial de snapshots para deshacer jugadas
   private $ultimoMovimiento; // Meta del último movimiento realizado
+  private $historialMovimientos; // Historial en notación algebraica
 
   /**
    * Constructor de Partida
@@ -32,6 +33,7 @@ class Partida
     $this->partidaTerminada = false;
     $this->historial = [];
     $this->ultimoMovimiento = null;
+    $this->historialMovimientos = [];
   }
 
   /**
@@ -309,7 +311,104 @@ class Partida
         " (" . $this->turno . ")";
     }
 
+    // Registrar movimiento en notación algebraica
+    $this->registrarMovimientoEnNotacion($origen, $destino, $piezaOrigen, $esCaptura, $esEnroque, $tipoEnroque, $this->estaEnJaque($jugadorSiguiente), $this->esJaqueMate($jugadorSiguiente));
+
     return true;
+  }
+
+  /**
+   * Registra un movimiento en notación algebraica estándar
+   */
+  private function registrarMovimientoEnNotacion($origen, $destino, $pieza, $esCaptura, $esEnroque, $tipoEnroque, $enJaque, $jaqueMate)
+  {
+    $numero = count($this->historialMovimientos) + 1;
+
+    if ($esEnroque) {
+      $notacion = ($tipoEnroque === 'corto') ? 'O-O' : 'O-O-O';
+    } else {
+      $notacion = $this->generarNotacionAlgebraica($origen, $destino, $pieza, $esCaptura);
+    }
+
+    // Añadir indicador de jaque/jaque mate
+    if ($jaqueMate) {
+      $notacion .= '#';
+    } elseif ($enJaque) {
+      $notacion .= '+';
+    }
+
+    // Guardar en historial
+    $this->historialMovimientos[] = [
+      'numero' => $numero,
+      'color' => $this->turno === 'blancas' ? 'negras' : 'blancas', // El color que acaba de mover
+      'notacion' => $notacion,
+      'origen' => $origen,
+      'destino' => $destino,
+      'captura' => $esCaptura,
+      'jaque' => $enJaque,
+      'jaqueMate' => $jaqueMate
+    ];
+  }
+
+  /**
+   * Genera notación algebraica para un movimiento
+   */
+  private function generarNotacionAlgebraica($origen, $destino, $pieza, $esCaptura)
+  {
+    $notacion = '';
+
+    // Identificar letra de la pieza (excepto peones)
+    if ($pieza instanceof Torre) {
+      $notacion = 'T';
+    } elseif ($pieza instanceof Caballo) {
+      $notacion = 'C';
+    } elseif ($pieza instanceof Alfil) {
+      $notacion = 'A';
+    } elseif ($pieza instanceof Dama) {
+      $notacion = 'D';
+    } elseif ($pieza instanceof Rey) {
+      $notacion = 'R';
+    }
+    // Peón no lleva letra inicial
+
+    // Si hay captura
+    if ($esCaptura) {
+      // Para peones, añadir columna de origen
+      if ($pieza instanceof Peon) {
+        $notacion .= strtolower($origen[0]);
+      }
+      $notacion .= 'x';
+    }
+
+    // Destino
+    $notacion .= strtolower($destino);
+
+    // Si es peón en última fila, añadir promoción (aunque aquí asumimos ya se promovió)
+    if ($pieza instanceof Peon) {
+      $coords = $this->notacionACoordsLocal($destino);
+      if ($coords && (($pieza->getColor() === 'blancas' && $coords[0] === 0) || ($pieza->getColor() === 'negras' && $coords[0] === 7))) {
+        // Promoción realizada; por ahora, asumir Dama por defecto en notación
+        $notacion .= '=D';
+      }
+    }
+
+    return $notacion;
+  }
+
+  /**
+   * Obtiene el historial de movimientos en notación algebraica
+   */
+  public function getHistorialMovimientos()
+  {
+    return $this->historialMovimientos;
+  }
+
+  /**
+   * Establece el historial de movimientos (para cargar partidas)
+   */
+  public function setHistorialMovimientos($historial)
+  {
+    $this->historialMovimientos = $historial;
   }
 
   /**

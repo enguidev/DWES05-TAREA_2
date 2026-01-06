@@ -520,6 +520,45 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
 
       <?php renderBotonesControl($partida); ?>
 
+      <!-- HISTORIAL DE MOVIMIENTOS -->
+      <div class="historial-movimientos">
+        <div class="historial-header" onclick="toggleHistorial()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
+          <span><strong>📋 Historial de movimientos</strong></span>
+          <span id="historial-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
+        </div>
+        <div id="historial-contenido" class="historial-contenido" style="display: none; padding: 10px; background: #fafafa; border-radius: 5px; margin-top: 5px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd;">
+          <?php 
+          $historial = $partida->getHistorialMovimientos();
+          if (empty($historial)): 
+          ?>
+            <p style="color: #999; text-align: center; margin: 0;">No hay movimientos registrados</p>
+          <?php else: ?>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <?php foreach ($historial as $mov): ?>
+                <div style="padding: 5px; background: white; border-radius: 3px; border-left: 3px solid <?php echo ($mov['color'] === 'blancas') ? '#ddd' : '#333'; ?>;">
+                  <small style="color: #666; font-weight: bold;">
+                    <?php 
+                    $numeroMov = ceil($mov['numero'] / 2);
+                    if ($mov['color'] === 'blancas') {
+                      echo $numeroMov . '.';
+                    } else {
+                      echo '...';
+                    }
+                    ?>
+                  </small>
+                  <span style="font-weight: bold; font-size: 1.05em; color: <?php echo ($mov['color'] === 'blancas') ? '#333' : '#666'; ?>;">
+                    <?php echo htmlspecialchars($mov['notacion']); ?>
+                  </span>
+                  <?php if ($mov['captura']): ?>
+                    <small style="color: #c33;">✕</small>
+                  <?php endif; ?>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+
       <div class="instrucciones">
         <div class="instrucciones-header" onclick="toggleInstrucciones()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
           <span><strong>📚 Reglas y Controles</strong></span>
