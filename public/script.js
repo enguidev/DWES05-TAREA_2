@@ -129,7 +129,7 @@ function sincronizarConServidor() {
     .then((data) => {
       // Si ya estamos recargando, ignorar datos
       if (recargandoPagina) return;
-      
+
       if (data.sin_partida) return;
 
       if (
