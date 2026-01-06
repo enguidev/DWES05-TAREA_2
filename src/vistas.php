@@ -430,15 +430,37 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       </div>
 
       <div class="instrucciones">
-        <p><strong>🎮 Cómo jugar:</strong></p>
-        <ol>
-          <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior para pausar</li>
-          <li>⏱️ Solo corre el reloj del jugador en turno</li>
-          <li>🟢 Círculos verdes = movimientos posibles</li>
-          <li>🔴 Borde rojo pulsante = capturas posibles</li>
-          <li>⏰ Si llegas a 0:00, pierdes automáticamente</li>
-          <li>💾 Puedes guardar la partida y continuarla después</li>
-        </ol>
+        <div class="instrucciones-header" onclick="toggleInstrucciones()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
+          <span><strong>📚 Reglas y Controles</strong></span>
+          <span id="instrucciones-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
+        </div>
+        <div id="instrucciones-contenido" class="instrucciones-contenido" style="display: none; padding: 15px; background: #fafafa; border-radius: 5px; margin-top: 5px;">
+          <h4 style="margin-top: 0; color: #333;">🎮 Cómo jugar:</h4>
+          <ol>
+            <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior (⏸️/▶️) para pausar la partida</li>
+            <li>⏱️ <strong>Reloj</strong>: Solo corre el reloj del jugador en turno</li>
+            <li>🟢 <strong>Movimientos válidos</strong>: Se marcan con círculos verdes</li>
+            <li>🔴 <strong>Capturas</strong>: Se marcan con borde rojo pulsante</li>
+            <li>⏰ <strong>Tiempo límite</strong>: Si llegas a 0:00, pierdes automáticamente</li>
+          </ol>
+
+          <h4 style="margin-top: 15px; color: #333;">💾 Gestión de partida:</h4>
+          <ul style="list-style: none; padding-left: 0;">
+            <li>💾 <strong>Guardar</strong>: Guarda la partida actual para continuarla después</li>
+            <li>📁 <strong>Cargar</strong>: Carga una partida guardada anteriormente</li>
+            <li>🔄 <strong>Reiniciar</strong>: Inicia una nueva partida desde el principio</li>
+            <li>⚙️ <strong>Configuración</strong>: Ajusta opciones visuales y de tiempo</li>
+          </ul>
+
+          <h4 style="margin-top: 15px; color: #333;">⚙️ Configuración:</h4>
+          <ul style="list-style: none; padding-left: 0;">
+            <li>🎨 <strong>Avatares</strong>: Personaliza la imagen de los jugadores</li>
+            <li>⏱️ <strong>Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
+            <li>➕ <strong>Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
+            <li>📊 <strong>Mostrar coordenadas</strong>: Activa/desactiva las letras y números del tablero</li>
+            <li>📸 <strong>Mostrar capturas</strong>: Visualiza las piezas capturadas</li>
+          </ul>
+        </div>
       </div>
     <?php
   }

@@ -14,6 +14,8 @@ if (modal && btnConfig && closeModal && btnCancelar) {
 }
 
 // Actualizar relojes con AJAX
+let intervaloRelojes = null;
+
 function actualizarRelojes() {
   // Solo actualizar si los elementos existen (es decir, hay partida activa)
   if (
@@ -94,10 +96,13 @@ function actualizarRelojes() {
     });
 }
 
-let intervaloRelojes = setInterval(actualizarRelojes, 1000);
-
 // Manejar selección de avatar personalizado
 document.addEventListener("DOMContentLoaded", function () {
+  // Iniciar intervalo de actualización de relojes cuando el DOM está listo
+  if (!intervaloRelojes) {
+    intervaloRelojes = setInterval(actualizarRelojes, 1000);
+  }
+
   const selectBlancas = document.querySelector('select[name="avatar_blancas"]');
   const selectNegras = document.querySelector('select[name="avatar_negras"]');
   const inputBlancas = document.getElementById("avatar_custom_blancas");
@@ -300,12 +305,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
       form.appendChild(input);
       document.body.appendChild(form);
-  }
 });
 // Función para abrir modal cargar desde pantalla inicial
 function abrirModalCargarInicial() {
   const modal = document.getElementById("modalCargarInicial");
   if (modal) {
     modal.style.display = "flex";
+  }
+}
+
+// Función para desplegar/contraer las instrucciones
+function toggleInstrucciones() {
+  const contenido = document.getElementById("instrucciones-contenido");
+  const toggle = document.getElementById("instrucciones-toggle");
+
+  if (contenido && toggle) {
+    if (contenido.style.display === "none") {
+      contenido.style.display = "block";
+      toggle.style.transform = "rotate(180deg)";
+    } else {
+      contenido.style.display = "none";
+      toggle.style.transform = "rotate(0deg)";
+    }
   }
 }
