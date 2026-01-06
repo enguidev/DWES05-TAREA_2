@@ -41,6 +41,7 @@ if (modal && btnConfig && closeModal && btnCancelar) {
 
   btnConfig.onclick = () => {
     modal.style.display = "block";
+    pausaLocal = true;
 
     // Pausar partida en servidor al abrir ajustes para evitar que corra el reloj
     fetch("index.php", {
