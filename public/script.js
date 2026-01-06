@@ -13,7 +13,6 @@ if (modal && btnConfig && closeModal && btnCancelar) {
   };
 }
 
-// Actualizar relojes con AJAX
 // Actualizar relojes con contador local y sincronización periódica
 let intervaloRelojes = null;
 let tiempoLocalBlancas = 0;
@@ -76,8 +75,8 @@ function actualizarTiempoLocal() {
       tiempoLocalNegras--;
     }
     
-    // Verificar si se agotó el tiempo
-    if (tiempoLocalBlancas <= 0 || tiempoLocalNegras <= 0) {
+    // Verificar si se agotó el tiempo - solo recargar UNA VEZ
+    if ((tiempoLocalBlancas <= 0 || tiempoLocalNegras <= 0) && intervaloRelojes !== null) {
       clearInterval(intervaloRelojes);
       intervaloRelojes = null;
       location.reload();
@@ -114,7 +113,8 @@ function sincronizarConServidor() {
         
         actualizarDisplayRelojes();
         
-        if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
+        // Verificar tiempo agotado solo si el intervalo aún está activo
+        if ((data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) && intervaloRelojes !== null) {
           clearInterval(intervaloRelojes);
           intervaloRelojes = null;
           location.reload();
@@ -320,25 +320,6 @@ function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
   abrirModalConfirmacion("eliminar", { nombre, archivo, desdeInicio });
 }
 
-// Event listeners para configuración
-document.addEventListener("DOMContentLoaded", function () {
-  // Listeners para configuración
-  
-  if (false) {
-    btnGuardar.addEventListener("click", function () {
-      // Crear un formulario oculto y enviarlo
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "";
-
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "abrir_modal_guardar";
-      input.value = "1";
-
-      form.appendChild(input);
-      document.body.appendChild(form);
-});
 // Función para abrir modal cargar desde pantalla inicial
 function abrirModalCargarInicial() {
   const modal = document.getElementById("modalCargarInicial");
