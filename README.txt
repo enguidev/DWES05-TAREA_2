@@ -351,6 +351,22 @@ CONTROLES DE PARTIDA
 
 
 ───────────────────────────────────────────────────────────────────────────────
+VER HISTORIAL DE MOVIMIENTOS
+───────────────────────────────────────────────────────────────────────────────
+
+1. Bajo el tablero, haz clic en el encabezado “📋 Historial de movimientos”.
+2. Se desplegará un panel con las jugadas en notación algebraica.
+   - Ejemplo: 1. e4 e5, 2. Cf3 Cc6, 3. Ab5 O-O
+3. El historial se guarda junto con la partida y se recupera al cargar.
+
+Tecnología: el historial se genera y persiste en servidor (PHP) mediante
+`Partida::registrarMovimientoEnNotacion()` y `getHistorialMovimientos()` en
+[modelo/Partida.php](modelo/Partida.php). El desplegable del panel se gestiona
+con una pequeña función de cliente en
+[public/script.js](public/script.js) (`toggleHistorial()`), sin lógica de juego.
+
+ 
+───────────────────────────────────────────────────────────────────────────────
 SITUACIONES ESPECIALES
 ───────────────────────────────────────────────────────────────────────────────
 
