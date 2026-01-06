@@ -14,9 +14,8 @@ if (modal && btnConfig && closeModal && btnCancelar) {
     })
       .then(() => {
         pausaLocal = false;
-        // Resetear contador de sincronización para forzar AJAX inmediato
-        // y evitar que se ejecute uno pendiente con datos antiguos
-        contadorSincronizacion = 4; // Próxima llamada a actualizarTiempoLocal() hará sync
+        // Resetear contador de sincronización a 0 para evitar que haya sync pendiente
+        contadorSincronizacion = 0;
         // Sincronizar inmediatamente con servidor para traer tiempos correctos
         return fetch("index.php?ajax=update_clocks");
       })
@@ -103,6 +102,26 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
     btnGuardarConfig.disabled = !cambiado;
     btnGuardarConfig.classList.toggle("btn-disabled", !cambiado);
   };
+
+  // Prevenir submit por defecto y reanudar pausa primero
+  btnGuardarConfig.addEventListener("click", (e) => {
+    if (!btnGuardarConfig.disabled && !btnGuardarConfig.classList.contains("btn-disabled")) {
+      e.preventDefault();
+      // Reanudar pausa antes de guardar
+      fetch("index.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ reanudar_desde_config: "1" }),
+      })
+        .then(() => {
+          pausaLocal = false;
+          contadorSincronizacion = 0;
+          // Ahora enviar el formulario
+          formConfig.submit();
+        })
+        .catch((e) => console.error("Error al reanudar:", e));
+    }
+  });
 
   chkCoords.addEventListener("change", actualizarEstadoGuardar);
   chkCapturas.addEventListener("change", actualizarEstadoGuardar);
