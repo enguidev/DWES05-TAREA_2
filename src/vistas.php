@@ -32,6 +32,8 @@ function renderConfigForm($partidasGuardadas = [])
         <?php endif; ?>
       </div>
 
+      <hr class="linea-horizontal">
+
       <form method="post" enctype="multipart/form-data" class="config-form">
         <p class="configuracion-inicial"><strong>Nombres de los jugadores</strong></p>
 
@@ -262,7 +264,7 @@ function renderBotonesControl($partida)
       <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>
     </form>
     <form method="post" style="display: inline;">
-      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) && !$partida->estaTerminada() ? 'disabled' : ''; ?>>🔄 Reiniciar</button>
+      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar">🔄 Reiniciar</button>
     </form>
   </div>
 <?php
