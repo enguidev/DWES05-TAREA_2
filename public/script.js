@@ -105,7 +105,10 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
 
   // Prevenir submit por defecto y reanudar pausa primero
   btnGuardarConfig.addEventListener("click", (e) => {
-    if (!btnGuardarConfig.disabled && !btnGuardarConfig.classList.contains("btn-disabled")) {
+    if (
+      !btnGuardarConfig.disabled &&
+      !btnGuardarConfig.classList.contains("btn-disabled")
+    ) {
       e.preventDefault();
       // Reanudar pausa antes de guardar
       fetch("index.php", {
