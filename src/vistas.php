@@ -254,17 +254,17 @@ function renderGameHeader($partida)
 function renderBotonesControl($partida)
 {
 ?>
-      <div class="botones-control">
-        <form method="post" style="display: inline;">
-          <button type="submit" name="deshacer" class="btn-deshacer" id="btn-deshacer" <?php echo empty($partida->historial) ? 'disabled' : ''; ?>>↶ Deshacer</button>
-        </form>
-        <form method="post" style="display: inline;">
-          <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>
-        </form>
-        <form method="post" style="display: inline;">
-          <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>🔄 Reiniciar</button>
-        </form>
-      </div>
+  <div class="botones-control">
+    <form method="post" style="display: inline;">
+      <button type="submit" name="deshacer" class="btn-deshacer" id="btn-deshacer" <?php echo empty($partida->historial) ? 'disabled' : ''; ?>>↶ Deshacer</button>
+    </form>
+    <form method="post" style="display: inline;">
+      <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>
+    </form>
+    <form method="post" style="display: inline;">
+      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>🔄 Reiniciar</button>
+    </form>
+  </div>
 <?php
 }
 
