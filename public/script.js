@@ -374,9 +374,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (selectBlancas && inputBlancas) {
-    const contenedorBlancas = document.getElementById("contenedor-custom-blancas");
-    const nombreArchivoBlancas = document.getElementById("nombre-archivo-blancas");
-    
+    const contenedorBlancas = document.getElementById(
+      "contenedor-custom-blancas"
+    );
+    const nombreArchivoBlancas = document.getElementById(
+      "nombre-archivo-blancas"
+    );
+
     selectBlancas.addEventListener("change", function () {
       if (this.value === "custom") {
         if (contenedorBlancas) contenedorBlancas.style.display = "block";
@@ -386,19 +390,24 @@ document.addEventListener("DOMContentLoaded", function () {
         if (preview) preview.remove();
       }
     });
-    
+
     inputBlancas.addEventListener("change", function () {
       if (this.files && this.files[0]) {
-        if (nombreArchivoBlancas) nombreArchivoBlancas.textContent = this.files[0].name;
+        if (nombreArchivoBlancas)
+          nombreArchivoBlancas.textContent = this.files[0].name;
         mostrarPrevisualizacion(this, "preview_blancas");
       }
     });
   }
 
   if (selectNegras && inputNegras) {
-    const contenedorNegras = document.getElementById("contenedor-custom-negras");
-    const nombreArchivoNegras = document.getElementById("nombre-archivo-negras");
-    
+    const contenedorNegras = document.getElementById(
+      "contenedor-custom-negras"
+    );
+    const nombreArchivoNegras = document.getElementById(
+      "nombre-archivo-negras"
+    );
+
     selectNegras.addEventListener("change", function () {
       if (this.value === "custom") {
         if (contenedorNegras) contenedorNegras.style.display = "block";
@@ -408,10 +417,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (preview) preview.remove();
       }
     });
-    
+
     inputNegras.addEventListener("change", function () {
       if (this.files && this.files[0]) {
-        if (nombreArchivoNegras) nombreArchivoNegras.textContent = this.files[0].name;
+        if (nombreArchivoNegras)
+          nombreArchivoNegras.textContent = this.files[0].name;
         mostrarPrevisualizacion(this, "preview_negras");
       }
     });

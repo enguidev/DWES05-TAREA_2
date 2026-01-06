@@ -172,28 +172,28 @@ function revanchaPartida()
 
   $partidaActual = unserialize($_SESSION['partida']);
   $jugadores = $partidaActual->getJugadores();
-  
+
   // Obtener nombres de jugadores
   $nombreBlancas = $jugadores['blancas']->getNombre();
   $nombreNegras = $jugadores['negras']->getNombre();
-  
+
   // Crear nueva partida con los mismos nombres
   $_SESSION['partida'] = serialize(new Partida($nombreBlancas, $nombreNegras));
   $_SESSION['casilla_seleccionada'] = null;
-  
+
   // Resetear tiempos al valor inicial configurado
   if (isset($_SESSION['config']['tiempo_inicial'])) {
     $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
     $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
   }
-  
+
   $_SESSION['reloj_activo'] = 'blancas';
   $_SESSION['ultimo_tick'] = time();
   $_SESSION['pausa'] = false;
   unset($_SESSION['partida_terminada_por_tiempo']);
-  
+
   // Mantener avatares y configuración visual (ya están en sesión)
-  
+
   header("Location: " . $_SERVER['PHP_SELF']);
   exit;
 }
