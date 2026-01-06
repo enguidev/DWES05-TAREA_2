@@ -136,7 +136,9 @@ function sincronizarConServidor() {
 
         // DEBUG: Mostrar estado de pausa
         if (data.pausa) {
-          console.warn("⚠️ LA PARTIDA ESTÁ EN PAUSA - Los movimientos están bloqueados");
+          console.warn(
+            "⚠️ LA PARTIDA ESTÁ EN PAUSA - Los movimientos están bloqueados"
+          );
         }
 
         actualizarDisplayRelojes();
