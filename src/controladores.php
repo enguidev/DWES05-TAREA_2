@@ -51,12 +51,17 @@ function procesarAjaxUpdateClocks()
     $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
   }
 
+  // Verificar si la partida está terminada
+  $partidaObj = isset($_SESSION['partida']) ? unserialize($_SESSION['partida']) : null;
+  $partidaTerminada = ($partidaObj && $partidaObj->estaTerminada()) ? true : false;
+
   echo json_encode([
     'tiempo_blancas' => $_SESSION['tiempo_blancas'],
     'tiempo_negras' => $_SESSION['tiempo_negras'],
     'reloj_activo' => $_SESSION['reloj_activo'],
     'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false,
-    'sin_partida' => false
+    'sin_partida' => false,
+    'partida_terminada' => $partidaTerminada
   ]);
   session_write_close();
   exit;

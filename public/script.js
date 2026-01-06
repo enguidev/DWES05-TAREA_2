@@ -132,6 +132,15 @@ function sincronizarConServidor() {
 
       if (data.sin_partida) return;
 
+      // Si la partida terminó, detener todo y no recargar
+      if (data.partida_terminada) {
+        if (intervaloRelojes !== null) {
+          clearInterval(intervaloRelojes);
+          intervaloRelojes = null;
+        }
+        return;
+      }
+
       if (
         data.tiempo_blancas !== undefined &&
         data.tiempo_negras !== undefined
@@ -172,10 +181,24 @@ function sincronizarConServidor() {
 document.addEventListener("DOMContentLoaded", function () {
   // Iniciar intervalo de actualización de relojes cuando el DOM está listo
   if (!intervaloRelojes && document.getElementById("tiempo-blancas")) {
-    // Sincronizar inmediatamente con el servidor para obtener valores iniciales
-    sincronizarConServidor();
-    // Luego actualizar cada segundo
-    intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+    // Primero sincronizar para verificar si la partida está terminada
+    fetch("index.php?ajax=update_clocks")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.sin_partida || data.partida_terminada) {
+          // No iniciar relojes si no hay partida o ya terminó
+          return;
+        }
+        // Si hay partida activa, inicializar variables y relojes
+        tiempoLocalBlancas = data.tiempo_blancas;
+        tiempoLocalNegras = data.tiempo_negras;
+        relojActivoLocal = data.reloj_activo;
+        pausaLocal = data.pausa || false;
+        actualizarDisplayRelojes();
+        // Iniciar intervalo
+        intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+      })
+      .catch((e) => console.error("Error al inicializar relojes:", e));
   }
 
   const selectBlancas = document.querySelector('select[name="avatar_blancas"]');
