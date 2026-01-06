@@ -110,31 +110,19 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
       !btnGuardarConfig.classList.contains("btn-disabled")
     ) {
       e.preventDefault();
-      // Reanudar pausa antes de guardar
-      fetch("index.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ reanudar_desde_config: "1" }),
-      })
-        .then(() => {
-          pausaLocal = false;
-          contadorSincronizacion = 0;
-          // Crear FormData con los datos del formulario
-          const formData = new FormData(formConfig);
-          // Convertir a URLSearchParams (incluye todos los datos del formulario)
-          const params = new URLSearchParams(formData);
-          // Enviar POST
-          return fetch("index.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params,
-          });
-        })
-        .then(() => {
-          // Recargar para aplicar cambios
-          location.reload();
-        })
-        .catch((e) => console.error("Error al guardar config:", e));
+      
+      // Crear un campo oculto para reanudar desde config
+      let inputReanudar = formConfig.querySelector('input[name="reanudar_desde_config"]');
+      if (!inputReanudar) {
+        inputReanudar = document.createElement("input");
+        inputReanudar.type = "hidden";
+        inputReanudar.name = "reanudar_desde_config";
+        inputReanudar.value = "1";
+        formConfig.appendChild(inputReanudar);
+      }
+      
+      // Hacer submit normal con reanudar incluido
+      formConfig.submit();
     }
   });
 

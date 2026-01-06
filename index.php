@@ -41,6 +41,11 @@ if (isset($_POST['reanudar_desde_config'])) {
 // Procesar configuración (solo opciones visuales)
 if (isset($_POST['guardar_configuracion'])) {
   procesarGuardarConfiguracion();
+  // Si también viene reanudar, procesarlo después
+  if (isset($_POST['reanudar_desde_config'])) {
+    $_SESSION['pausa'] = false;
+    $_SESSION['ultimo_tick'] = time();
+  }
 }
 
 // Array asociativo con configuración por defecto
