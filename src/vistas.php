@@ -120,6 +120,72 @@ function renderModalConfig()
 }
 
 /**
+ * Renderiza el modal para guardar partida
+ */
+function renderModalGuardarPartida($nombreSugerido)
+{
+  ?>
+  <div id="modalGuardar" class="modal-overlay">
+    <div class="modal-content">
+      <h2>💾 Guardar Partida</h2>
+      <form method="post">
+        <label for="nombre_partida">Nombre de la partida:</label>
+        <input type="text" id="nombre_partida" name="nombre_partida" value="<?php echo htmlspecialchars($nombreSugerido); ?>" maxlength="100" required autofocus>
+        <div class="modal-buttons">
+          <button type="submit" name="confirmar_guardar" class="btn-confirmar">💾 Guardar</button>
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalGuardar')">✖️ Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <?php
+}
+
+/**
+ * Renderiza el modal para cargar partida
+ */
+function renderModalCargarPartida($partidas)
+{
+  ?>
+  <div id="modalCargar" class="modal-overlay">
+    <div class="modal-content modal-lista">
+      <h2>📁 Cargar Partida</h2>
+      <?php if (empty($partidas)): ?>
+        <p class="mensaje-vacio">No hay partidas guardadas</p>
+        <div class="modal-buttons">
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalCargar')">✖️ Cerrar</button>
+        </div>
+      <?php else: ?>
+        <div class="lista-partidas">
+          <?php foreach ($partidas as $partida): ?>
+            <div class="item-partida">
+              <div class="info-partida">
+                <div class="nombre-partida"><?php echo htmlspecialchars($partida['nombre']); ?></div>
+                <div class="fecha-partida"><?php echo htmlspecialchars($partida['fecha']); ?></div>
+              </div>
+              <div class="acciones-partida">
+                <form method="post" style="display: inline;">
+                  <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
+                  <button type="submit" name="cargar_partida" class="btn-cargar-item">📂 Cargar</button>
+                </form>
+                <form method="post" style="display: inline;">
+                  <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
+                  <button type="submit" name="eliminar_partida" class="btn-eliminar-item" onclick="return confirm('¿Eliminar esta partida?')">🗑️</button>
+                </form>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalCargar')">✖️ Cerrar</button>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+  <?php
+}
+
+/**
  * Renderiza el header del juego
  */
 function renderGameHeader()
@@ -128,9 +194,11 @@ function renderGameHeader()
   <div class="header-juego">
     <h1>♟️ Partida de Ajedrez</h1>
     <div class="header-buttons">
-      <button id="btnConfig" class="btn-config">⚙️</button>
+      <button id="btnGuardar" class="btn-guardar" title="Guardar partida">💾</button>
+      <button id="btnCargar" class="btn-cargar-header" title="Cargar partida">📁</button>
+      <button id="btnConfig" class="btn-config" title="Configuración">⚙️</button>
       <form method="post" style="display: inline;">
-        <button type="submit" name="toggle_pausa" class="btn-pausa" id="btnPausa">
+        <button type="submit" name="toggle_pausa" class="btn-pausa" id="btnPausa" title="Pausar/Reanudar">
           <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? '▶️' : '⏸️'; ?>
         </button>
       </form>

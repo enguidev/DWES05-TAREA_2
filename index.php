@@ -48,6 +48,49 @@ if (isset($_POST['reiniciar'])) {
   reiniciarPartida();
 }
 
+// Mostrar modal para guardar partida
+$mostrarModalGuardar = false;
+$nombrePartidaSugerido = '';
+
+if (isset($_POST['abrir_modal_guardar']) && isset($_SESSION['partida'])) {
+  $partida = unserialize($_SESSION['partida']);
+  $jugadores = $partida->getJugadores();
+  $nombrePartidaSugerido = $jugadores['blancas']->getNombre() . ' vs ' . $jugadores['negras']->getNombre() . ' - ' . date('d/m/Y H:i');
+  $mostrarModalGuardar = true;
+}
+
+// Confirmar guardado con nombre
+if (isset($_POST['confirmar_guardar']) && isset($_POST['nombre_partida']) && isset($_SESSION['partida'])) {
+  $partida = unserialize($_SESSION['partida']);
+  guardarPartida($partida, $_POST['nombre_partida']);
+  $mostrarModalGuardar = false;
+}
+
+// Mostrar modal para cargar partida
+$mostrarModalCargar = false;
+$partidasGuardadas = [];
+
+if (isset($_POST['abrir_modal_cargar'])) {
+  $partidasGuardadas = listarPartidas();
+  $mostrarModalCargar = true;
+}
+
+// Cargar partida específica
+if (isset($_POST['cargar_partida']) && isset($_POST['archivo_partida'])) {
+  $partidaCargada = cargarPartida($_POST['archivo_partida']);
+  if ($partidaCargada) {
+    $partida = $partidaCargada;
+    $_SESSION['partida'] = serialize($partida);
+  }
+}
+
+// Eliminar partida
+if (isset($_POST['eliminar_partida']) && isset($_POST['archivo_partida'])) {
+  eliminarPartida($_POST['archivo_partida']);
+  $partidasGuardadas = listarPartidas();
+  $mostrarModalCargar = true;
+}
+
 // Solo si hay partida
 if (isset($_SESSION['partida'])) {
   $partida = unserialize($_SESSION['partida']);
@@ -133,6 +176,15 @@ if (isset($_SESSION['partida'])) {
     <div class="container">
       <!-- Modal de configuración de jugadores -->
       <?php renderModalConfig(); ?>
+
+      <!-- Modales de guardar/cargar -->
+      <?php if ($mostrarModalGuardar): ?>
+        <?php renderModalGuardarPartida($nombrePartidaSugerido); ?>
+      <?php endif; ?>
+      
+      <?php if ($mostrarModalCargar): ?>
+        <?php renderModalCargarPartida($partidasGuardadas); ?>
+      <?php endif; ?>
 
       <!-- Cabecera del juego -->
       <?php renderGameHeader(); ?>
