@@ -10,7 +10,7 @@
 function procesarAjaxUpdateClocks()
 {
   header('Content-Type: application/json');
-  
+
   // Si no hay sesión de partida activa, devolver estado vacío
   if (!isset($_SESSION['tiempo_blancas']) || !isset($_SESSION['tiempo_negras']) || !isset($_SESSION['reloj_activo'])) {
     echo json_encode([
