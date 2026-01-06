@@ -147,6 +147,21 @@ if (isset($_POST['confirmar_guardar']) && isset($_POST['nombre_partida']) && iss
   $mostrarModalGuardar = false;
 }
 
+// Mostrar modal de promoción si está en curso (PHP puro)
+$mostrarModalPromocion = false;
+if (isset($_SESSION['promocion_en_curso'])) {
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    $_SESSION['pausa'] = true; // Pausar mientras se elige pieza
+  }
+  $mostrarModalPromocion = true;
+}
+
+// Confirmar promoción desde modal
+if (isset($_POST['confirmar_promocion']) && isset($_POST['tipo_promocion'])) {
+  procesarConfirmarPromocion();
+  $mostrarModalPromocion = false;
+}
+
 // Mostrar modal para cargar partida
 $mostrarModalCargar = false;
 $partidasGuardadas = [];
@@ -299,6 +314,10 @@ $partidasGuardadasInicio = listarPartidas();
 
       <?php if ($mostrarModalRevancha): ?>
         <?php renderModalConfirmarRevancha(); ?>
+      <?php endif; ?>
+
+      <?php if ($mostrarModalPromocion): ?>
+        <?php renderModalPromocion(); ?>
       <?php endif; ?>
       <!-- Cabecera del juego -->
       <?php renderGameHeader($partida); ?>

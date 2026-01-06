@@ -279,21 +279,8 @@ class Partida
       }
     }
 
-    // 6.5. Verificar promoción de peón
-    $huboPromocion = false;
-    $mensajePromocion = "";
-    if ($piezaOrigen instanceof Peon && $piezaOrigen->puedePromoverse()) {
-      // Guardar info y posponer elección (por ahora Dama por defecto)
-      $jugadorQuePromueve = $this->jugadores[$this->turno]->getNombre();
-      $colorQuePromueve = $this->turno;
-      $posicionPromocion = $destino;
-
-      $this->jugadores[$this->turno]->promoverPeon($piezaOrigen, 'Dama');
-      $huboPromocion = true;
-
-      $mensajePromocion = "¡" . $jugadorQuePromueve . " (" . $colorQuePromueve . ") promocionó su peón de " .
-        $posicionPromocion . " a Dama!";
-    }
+    // 6.5. Verificar promoción de peón (deferida al controlador mediante modal)
+    // Si el peón puede promoverse, no realizar aquí la promoción automática.
 
     // Registrar último movimiento (para captura al paso)
     $this->ultimoMovimiento = [
@@ -314,23 +301,12 @@ class Partida
         $ganadorColor = ($jugadorSiguiente === 'blancas') ? 'negras' : 'blancas';
         $nombreGanador = $this->jugadores[$ganadorColor]->getNombre();
         $this->mensaje = "¡Jaque mate! " . $nombreGanador . " ha ganado la partida";
-        if ($huboPromocion) {
-          $this->mensaje = $mensajePromocion . " " . $this->mensaje;
-        }
       } else {
         $this->mensaje = "Jaque a " . $this->jugadores[$jugadorSiguiente]->getNombre();
-        if ($huboPromocion) {
-          $this->mensaje = $mensajePromocion . " " . $this->mensaje;
-        }
       }
     } else {
-      if ($huboPromocion) {
-        $this->mensaje = $mensajePromocion . " Turno de " . $this->jugadores[$this->turno]->getNombre() .
-          " (" . $this->turno . ")";
-      } else {
-        $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
-          " (" . $this->turno . ")";
-      }
+      $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
+        " (" . $this->turno . ")";
     }
 
     return true;

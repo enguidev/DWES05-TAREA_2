@@ -270,6 +270,38 @@ function renderModalConfirmarRevancha()
 }
 
 /**
+ * Renderiza el modal para elegir pieza de promoción (PHP puro)
+ */
+function renderModalPromocion()
+{
+  $color = isset($_SESSION['promocion_en_curso']['color']) ? $_SESSION['promocion_en_curso']['color'] : null;
+  $pos = isset($_SESSION['promocion_en_curso']['posicion']) ? $_SESSION['promocion_en_curso']['posicion'] : null;
+  if (!$color || !$pos) return;
+?>
+  <div id="modalPromocion" class="modal-overlay">
+    <div class="modal-content">
+      <h2>👑 Elegir pieza de promoción</h2>
+      <p>El peón de <?php echo htmlspecialchars($color); ?> en <?php echo htmlspecialchars($pos); ?> puede promoverse. Elige la pieza:</p>
+      <form method="post" class="form-promocion">
+        <div class="opciones-promocion" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="submit" name="confirmar_promocion" value="1" class="btn-confirmar" onclick="this.form.tipo_promocion.value='Dama'">♛ Dama</button>
+          <button type="submit" name="confirmar_promocion" value="1" class="btn-confirmar" onclick="this.form.tipo_promocion.value='Torre'">♜ Torre</button>
+          <button type="submit" name="confirmar_promocion" value="1" class="btn-confirmar" onclick="this.form.tipo_promocion.value='Alfil'">♝ Alfil</button>
+          <button type="submit" name="confirmar_promocion" value="1" class="btn-confirmar" onclick="this.form.tipo_promocion.value='Caballo'">♞ Caballo</button>
+        </div>
+        <input type="hidden" name="tipo_promocion" value="">
+        <div class="modal-buttons" style="margin-top:12px;">
+          <form method="post" style="display:inline;">
+            <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cancelar</button>
+          </form>
+        </div>
+      </form>
+    </div>
+  </div>
+<?php
+}
+
+/**
  * Renderiza el header del juego
  */
 function renderGameHeader($partida)

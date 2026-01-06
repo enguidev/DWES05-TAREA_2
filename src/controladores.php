@@ -255,6 +255,18 @@ function procesarJugada($partida)
           // Cambiar de turno y resetear el tick
           $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
           $_SESSION['ultimo_tick'] = time();
+
+          // Promoción elegible (PHP puro): si la pieza en destino es peón y puede promoverse
+          $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida);
+          if ($piezaEnDestino instanceof Peon && $piezaEnDestino->puedePromoverse()) {
+            // Guardar contexto de promoción en sesión
+            $_SESSION['promocion_en_curso'] = [
+              'color' => $turnoAnterior,
+              'posicion' => $destino
+            ];
+            // Pausar partida para elegir pieza
+            $_SESSION['pausa'] = true;
+          }
         }
 
         $_SESSION['casilla_seleccionada'] = null;
@@ -262,6 +274,37 @@ function procesarJugada($partida)
       }
     }
   }
+}
+
+/**
+ * Confirma una promoción de peón eligiendo la pieza destino (PHP puro)
+ */
+function procesarConfirmarPromocion()
+{
+  if (!isset($_SESSION['promocion_en_curso']) || !isset($_SESSION['partida'])) {
+    return;
+  }
+
+  $tipo = isset($_POST['tipo_promocion']) ? $_POST['tipo_promocion'] : null;
+  $validos = ['Dama', 'Torre', 'Alfil', 'Caballo'];
+  if (!$tipo || !in_array($tipo, $validos)) {
+    return;
+  }
+
+  $partida = unserialize($_SESSION['partida']);
+  $color = $_SESSION['promocion_en_curso']['color'];
+  $pos = $_SESSION['promocion_en_curso']['posicion'];
+
+  $jugadores = $partida->getJugadores();
+  $peon = $jugadores[$color]->getPiezaEnPosicion($pos);
+  if ($peon instanceof Peon && $peon->puedePromoverse()) {
+    $jugadores[$color]->promoverPeon($peon, $tipo);
+    // Mensaje y limpieza
+    $partida->setMensaje('¡Promoción a ' . $tipo . '! Turno de ' . $jugadores[$partida->getTurno()]->getNombre() . ' (' . $partida->getTurno() . ')');
+  }
+
+  $_SESSION['partida'] = serialize($partida);
+  unset($_SESSION['promocion_en_curso']);
 }
 
 /**
