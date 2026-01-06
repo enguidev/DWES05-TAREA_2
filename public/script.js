@@ -188,12 +188,21 @@ function cerrarModal(modalId) {
     modal.style.display = "none";
   }
 
-  // Si se cierra un modal de confirmación de reinicio, cargar o el modal de cargar, reanudar pausa
-  if (
-    modalId === "modalConfirmarReiniciar" ||
-    modalId === "modalConfirmarCargar" ||
-    modalId === "modalCargar"
-  ) {
+  // Si se cierra un modal de confirmación de reinicio, reanudar pausa sin recargar
+  if (modalId === "modalConfirmarReiniciar") {
+    // Reanudar con AJAX sin recargar la página
+    fetch("index.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "toggle_pausa=1"
+    }).then(() => {
+      // Recargar para actualizar el estado
+      location.reload();
+    });
+  }
+
+  // Si se cierra el modal de cargar, reanudar pausa
+  if (modalId === "modalConfirmarCargar" || modalId === "modalCargar") {
     // Crear formulario para reanudar pausa
     const formPausa = document.createElement("form");
     formPausa.method = "POST";
@@ -286,16 +295,14 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     newModal.style.display = "flex";
   }
 
-  // Si es reiniciar o cargar, pausar la partida automáticamente
-  if (tipo === "reiniciar" || tipo === "cargar") {
-    // Pausar la partida mediante AJAX
-    const formPausa = document.createElement("form");
-    formPausa.method = "POST";
-    formPausa.style.display = "none";
-    formPausa.innerHTML = '<input type="hidden" name="toggle_pausa">';
-    document.body.appendChild(formPausa);
-    formPausa.submit();
-    document.body.removeChild(formPausa);
+  // Si es reiniciar, pausar la partida automáticamente sin recargar
+  if (tipo === "reiniciar") {
+    // Pausar con AJAX sin recargar la página
+    fetch("index.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "toggle_pausa=1"
+    });
   }
 }
 
