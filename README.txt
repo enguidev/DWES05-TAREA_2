@@ -1,181 +1,604 @@
-==================================================================
-TAREA DWES05 - SIMULADOR DE PARTIDAS DE AJEDREZ
-==================================================================
+================================================================================
+                    JUEGO DE AJEDREZ COMPLETO - DWES05
+                     Simulador Avanzado de Partidas de Ajedrez
+================================================================================
 
-ESTRUCTURA DE ARCHIVOS:
------------------------
-
-Tu proyecto debe tener la siguiente estructura:
-
-DWES05/
-├── index.php           (Interfaz principal)
-├── css/
-│   └── style.css
-├── modelo/
-│   ├── Pieza.php       (Clase base)
-│   ├── Torre.php
-│   ├── Caballo.php
-│   ├── Alfil.php
-│   ├── Dama.php
-│   ├── Rey.php
-│   ├── Peon.php
-│   ├── Jugador.php
-│   └── Partida.php
-└── imagenes/
-    ├── fichas_blancas/
-    │   ├── torre_blanca.png
-    │   ├── caballo_blanca.png
-    │   ├── alfil_blanca.png
-    │   ├── dama_blanca.png
-    │   ├── rey_blanca.png
-    │   └── peon_blanca.png
-    └── fichas_negras/
-        ├── torre_negra.png
-        ├── caballo_negra.png
-        ├── alfil_negra.png
-        ├── dama_negra.png
-        ├── rey_negra.png
-        └── peon_negra.png
+ÍNDICE:
+-------
+1. Descripción General
+2. Estructura del Proyecto
+3. Requisitos del Sistema
+4. Instalación y Configuración
+5. Funcionalidades Implementadas
+6. Guía de Uso
+7. Arquitectura del Código
+8. Tecnologías Utilizadas
+9. Notas Técnicas
 
 
-SOBRE LAS IMÁGENES:
--------------------
+================================================================================
+1. DESCRIPCIÓN GENERAL
+================================================================================
 
-IMPORTANTE: Los nombres de archivos deben usar género MASCULINO:
-- torre_blanco.png (no torre_blanca.png)
-- caballo_blanco.png (no caballo_blanca.png)
-- alfil_blanco.png (no alfil_blanca.png)
-- dama_blanco.png (no dama_blanca.png)
-- rey_blanco.png (no rey_blanca.png)
-- peon_blanco.png (no peon_blanca.png)
+Este proyecto es un simulador completo de ajedrez desarrollado en PHP con 
+programación orientada a objetos. Implementa las reglas oficiales del ajedrez,
+incluyendo movimientos especiales, validación de jaque y jaque mate, sistema
+de tiempo, persistencia de partidas y una interfaz web moderna y responsive.
 
-Y para las negras:
-- torre_negro.png
-- caballo_negro.png
-- alfil_negro.png
-- dama_negro.png
-- rey_negro.png
-- peon_negro.png
-
-Todas dentro de:
-- imagenes/fichas_blancas/
-- imagenes/fichas_negras/
-
-Aunque haya 2 torres, 2 caballos, 2 alfiles y 8 peones de cada color,
-el código usa la misma imagen para todas las piezas del mismo tipo.
+CARACTERÍSTICAS PRINCIPALES:
+✨ Motor de ajedrez completo con validación de reglas
+🎯 Detección de jaque, jaque mate y tablas
+👑 Coronación automática de peones
+⏱️ Reloj de ajedrez con tiempo por jugador
+💾 Sistema de guardado y carga de partidas
+↶ Deshacer movimientos con historial
+👤 Avatares personalizados para jugadores
+🎨 Interfaz moderna y responsive
+⚙️ Panel de configuración visual
 
 
-CÓMO FUNCIONA EL JUEGO:
------------------------
+================================================================================
+2. ESTRUCTURA DEL PROYECTO
+================================================================================
 
-1. Al iniciar, se crea una partida con todas las piezas en sus posiciones iniciales
-2. El turno es de las blancas
-3. Para mover una pieza:
-   a) Haz clic en una pieza del color del turno actual
-   b) La casilla se iluminará en amarillo
-   c) Aparecerán círculos verdes en las casillas donde puede moverse
-   d) Haz clic en una de esas casillas para mover
-
-4. CAPTURAS:
-   - Si hay una pieza enemiga en el destino, se capturará automáticamente
-   - Las piezas capturadas aparecen en el panel lateral
-   - Si capturas el rey enemigo, ganas la partida
-
-5. MARCADOR:
-   - Se muestra la suma de puntos de las piezas activas de cada jugador
-   - Torre = 5, Dama = 9, Alfil = 3, Caballo = 3, Peón = 1, Rey = 0
-   - El jugador en turno tiene un borde dorado en su marcador
-
-6. VALIDACIONES IMPLEMENTADAS:
-   ✓ Movimientos según las reglas de cada pieza
-   ✓ No puedes mover piezas del rival
-   ✓ No puedes mover si hay piezas bloqueando (excepto caballo)
-   ✓ No puedes capturar tus propias piezas
-   ✓ El peón captura en diagonal
-   ✓ El peón puede avanzar 2 casillas en su primer movimiento
-   ✓ Fin de partida cuando se captura el rey
-   ✓ Visualización de piezas capturadas
-   ✓ Indicadores visuales de movimientos posibles y capturas
-
-
-FUNCIONALIDADES NO IMPLEMENTADAS:
-----------------------------------
-(Como indica el enunciado)
-
-- Enroque
-- Captura al paso
-- Coronación de peón
-- Jaque (advertencia de que el rey está en peligro)
-- Jaque mate (el juego termina al capturar el rey directamente)
+DWES05-TAREA_2/
+│
+├── index.php                    # Controlador principal y punto de entrada
+├── README.txt                   # Este archivo
+│
+├── modelo/                      # Clases del modelo (POO)
+│   ├── Pieza.php               # Clase base abstracta
+│   ├── Torre.php               # Implementación Torre
+│   ├── Caballo.php             # Implementación Caballo
+│   ├── Alfil.php               # Implementación Alfil
+│   ├── Dama.php                # Implementación Dama
+│   ├── Rey.php                 # Implementación Rey
+│   ├── Peon.php                # Implementación Peón (con promoción)
+│   ├── Jugador.php             # Gestión de jugadores y sus piezas
+│   └── Partida.php             # Motor principal del juego
+│
+├── src/                         # Lógica de negocio y vistas
+│   ├── controladores.php       # Funciones de control del juego
+│   ├── funciones_auxiliares.php # Utilidades (tiempo, archivos)
+│   ├── vistas.php              # Funciones de renderizado HTML
+│   └── modal_config.php        # Modal de configuración
+│
+├── public/                      # Recursos públicos
+│   ├── script.js               # JavaScript (AJAX, relojes, UI)
+│   ├── css/
+│   │   └── style.css           # Estilos CSS completos
+│   └── imagenes/
+│       ├── fichas_blancas/     # Imágenes piezas blancas
+│       ├── fichas_negras/      # Imágenes piezas negras
+│       └── avatares/           # Avatares predefinidos
+│
+└── data/                        # Datos persistentes
+    ├── partidas/               # Partidas guardadas (JSON)
+    │   └── avatares/           # Avatares subidos por usuarios
+    └── partida_guardada.json   # (Archivo legacy)
 
 
-CARACTERÍSTICAS DEL CÓDIGO:
----------------------------
+================================================================================
+3. REQUISITOS DEL SISTEMA
+================================================================================
 
-1. POO completa con herencia
-2. Cada pieza en su propia clase
-3. Métodos movimiento() y simulaMovimiento() en todas las piezas
-4. Clase Jugador con 16 piezas
-5. Clase Partida que gestiona el juego completo
-6. Sistema de turnos con indicador visual
-7. Validación completa de movimientos
-8. Sistema de capturas con panel de piezas capturadas
-9. Marcador automático
-10. Interfaz visual moderna con efectos y animaciones
-11. CSS separado en archivo externo (css/style.css)
-12. Código limpio con comentarios explicativos
+SERVIDOR:
+- PHP 7.4 o superior
+- Apache/Nginx con mod_rewrite
+- Soporte para sesiones PHP
+- Permisos de escritura en carpeta data/
 
-
-MEJORAS VISUALES IMPLEMENTADAS:
---------------------------------
-
-✨ Tablero con coordenadas (A-H, 1-8)
-✨ Indicadores visuales de turno activo
-✨ Panel de piezas capturadas
-✨ Círculos verdes para movimientos posibles
-✨ Borde rojo pulsante para capturas
-✨ Casilla seleccionada resaltada en amarillo
-✨ Efectos hover en las piezas
-✨ Diseño responsive para móviles
-✨ Gradiente de fondo moderno
-✨ Animaciones suaves
-✨ Instrucciones claras de juego
+CLIENTE:
+- Navegador moderno (Chrome, Firefox, Edge, Safari)
+- JavaScript habilitado
+- Resolución mínima: 360px (móviles)
 
 
-NOTAS IMPORTANTES:
-------------------
+================================================================================
+4. INSTALACIÓN Y CONFIGURACIÓN
+================================================================================
 
-- El juego usa sesiones PHP para mantener el estado de la partida
-- Todas las clases están en archivos separados (buena práctica POO)
-- Los comentarios explican cada método
-- El código sigue la estructura del enunciado exactamente
-- El CSS está separado en un archivo externo
+PASO 1: Copiar archivos
+   - Descomprime el proyecto en la carpeta htdocs (XAMPP) o www (WAMP)
+   - Asegúrate de mantener la estructura de carpetas
 
+PASO 2: Configurar permisos
+   - La carpeta data/ debe tener permisos de escritura (777 en Linux/Mac)
+   - Crear carpetas si no existen:
+     * data/partidas/
+     * data/partidas/avatares/
 
-EVALUACIÓN (10 puntos):
------------------------
+PASO 3: Iniciar servidor
+   - Inicia Apache desde el panel de control de XAMPP/WAMP
+   - Accede a: http://localhost/DWES05-TAREA_2/
 
-✓ Métodos movimiento() de las subclases de Pieza (2 puntos)
-✓ Métodos simulaMovimiento() (2 puntos)
-✓ Método jugada() de la clase Partida (2 puntos)
-✓ Métodos muestraTablero() y marcador() (2 puntos)
-✓ Programa de prueba con interfaz (2 puntos)
-
-
-PARA PROBAR:
-------------
-
-1. Coloca todos los archivos en tu servidor web (XAMPP, WAMP, etc.)
-2. Asegúrate de que las imágenes están en las carpetas correctas
-3. Verifica que los nombres de las imágenes sean correctos (género masculino)
-4. Abre index.php en tu navegador
-5. ¡Juega al ajedrez!
+PASO 4: ¡Jugar!
+   - Configura los nombres de los jugadores
+   - Selecciona avatares (opcional)
+   - Haz clic en "Iniciar Partida"
 
 
-¡IMPORTANTE! NOMENCLATURA DEL ARCHIVO:
---------------------------------------
+================================================================================
+5. FUNCIONALIDADES IMPLEMENTADAS
+================================================================================
 
-Al comprimir tu trabajo, nómbralo como:
-Apellido1_Apellido2_Nombre_DWES05-TAREA.zip
+───────────────────────────────────────────────────────────────────────────────
+A. MOTOR DE AJEDREZ COMPLETO
+───────────────────────────────────────────────────────────────────────────────
 
-==================================================================
+✓ Movimientos válidos según reglas oficiales:
+  • Torre: Horizontal y vertical ilimitado
+  • Alfil: Diagonal ilimitado
+  • Dama: Horizontal, vertical y diagonal ilimitado
+  • Rey: Una casilla en cualquier dirección
+  • Caballo: Movimiento en "L" (salta piezas)
+  • Peón: Avance de 1-2 casillas inicial, captura diagonal
+
+✓ Detección de piezas bloqueando caminos
+✓ Validación de capturas (no puedes capturar tus propias piezas)
+✓ Control de turnos alternados
+✓ Detección de movimientos ilegales
+
+
+───────────────────────────────────────────────────────────────────────────────
+B. REGLAS AVANZADAS
+───────────────────────────────────────────────────────────────────────────────
+
+✓ JAQUE: Detecta cuando el rey está amenazado
+✓ JAQUE MATE: Detecta cuando no hay movimientos legales para salir del jaque
+✓ TABLAS (EMPATE):
+  • Stalemate: No hay movimientos legales pero no hay jaque
+  • Material insuficiente: Solo quedan reyes
+  • Rey + Alfil vs Rey
+  • Rey + Caballo vs Rey
+
+✓ CORONACIÓN DE PEÓN:
+  • Automática al llegar al extremo opuesto
+  • Promoción a Dama por defecto
+  • Mensaje informativo de la promoción
+
+✓ ENROQUE (Preparado pero no implementado en UI):
+  • Métodos puedeEnrocarCorto() y puedeEnrocarLargo()
+  • Validación de condiciones (rey y torre sin mover, no estar en jaque)
+
+✓ PREVENCIÓN DE MOVIMIENTOS ILEGALES:
+  • No puedes moverte si dejas a tu rey en jaque
+  • Validación en tiempo real
+
+
+───────────────────────────────────────────────────────────────────────────────
+C. SISTEMA DE TIEMPO (RELOJ DE AJEDREZ)
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Tiempo individual por jugador (10 minutos por defecto)
+✓ Cuenta atrás automática durante el turno activo
+✓ Indicador visual del reloj activo
+✓ Alerta de tiempo crítico (< 60 segundos)
+✓ Fin de partida por tiempo agotado
+✓ Pausa automática al abrir modales
+✓ Sincronización AJAX cada 5 segundos
+✓ Persistencia del tiempo al guardar partidas
+
+
+───────────────────────────────────────────────────────────────────────────────
+D. GESTIÓN DE PARTIDAS
+───────────────────────────────────────────────────────────────────────────────
+
+✓ GUARDAR PARTIDA:
+  • Guardar con nombre personalizado
+  • Almacenamiento en formato JSON
+  • Incluye estado completo (piezas, tiempo, turno, historial)
+  • Solo disponible en pausa
+
+✓ CARGAR PARTIDA:
+  • Cargar desde pantalla inicial o durante juego
+  • Lista de partidas guardadas con fecha
+  • Vista previa de jugadores
+  • Continuar desde el punto exacto guardado
+
+✓ REINICIAR PARTIDA:
+  • Confirmación antes de reiniciar
+  • Mantiene jugadores y configuración
+  • Resetea tablero y tiempos
+
+
+───────────────────────────────────────────────────────────────────────────────
+E. HISTORIAL Y DESHACER
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Historial de hasta 10 movimientos
+✓ Botón "Deshacer" funcional
+✓ Restaura estado completo (piezas, turno, mensaje)
+✓ Indicador visual cuando no hay historial
+
+
+───────────────────────────────────────────────────────────────────────────────
+F. PERSONALIZACIÓN Y AVATARES
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Nombres personalizados para jugadores
+✓ Avatares predefinidos (8 opciones)
+✓ Subida de avatares personalizados
+✓ Validación de imágenes (PNG, JPG, GIF)
+✓ Límite de tamaño (5MB)
+✓ Visualización en relojes y marcadores
+
+
+───────────────────────────────────────────────────────────────────────────────
+G. CONFIGURACIÓN VISUAL
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Panel de ajustes accesible durante partida
+✓ Mostrar/Ocultar coordenadas del tablero (A-H, 1-8)
+✓ Mostrar/Ocultar panel de piezas capturadas
+✓ Cambios aplicados en tiempo real
+✓ Configuración persistente entre sesiones
+
+
+───────────────────────────────────────────────────────────────────────────────
+H. INTERFAZ DE USUARIO AVANZADA
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Tablero 8x8 con patrón ajedrezado
+✓ Coordenadas opcionales (A-H, 1-8)
+✓ Indicadores visuales de movimientos posibles:
+  • Círculos verdes para movimientos válidos
+  • Borde rojo pulsante para capturas
+  • Resaltado amarillo de casilla seleccionada
+
+✓ Panel lateral de piezas capturadas
+✓ Marcador de puntos en tiempo real:
+  • Torre = 5 pts
+  • Dama = 9 pts
+  • Alfil = 3 pts
+  • Caballo = 3 pts
+  • Peón = 1 pt
+  • Rey = 0 pts (su pérdida = derrota)
+
+✓ Mensajes de estado contextuales:
+  • Turno actual
+  • Jaque / Jaque Mate
+  • Errores de movimiento
+  • Promoción de peón
+  • Fin de partida
+
+✓ Efectos visuales:
+  • Hover en piezas movibles
+  • Animaciones suaves
+  • Transiciones CSS
+  • Responsive design
+
+
+───────────────────────────────────────────────────────────────────────────────
+I. DISEÑO RESPONSIVE
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Adaptación automática a diferentes pantallas:
+  • Desktop (> 768px): Tablero grande, panel lateral
+  • Tablet (480px - 768px): Tablero medio, panel adaptado
+  • Móvil (< 480px): Tablero compacto, panel debajo
+
+✓ Imágenes de piezas escalables
+✓ Botones táctiles optimizados
+✓ Texto legible en todas las resoluciones
+
+
+================================================================================
+6. GUÍA DE USO
+================================================================================
+
+───────────────────────────────────────────────────────────────────────────────
+INICIO DE PARTIDA
+───────────────────────────────────────────────────────────────────────────────
+
+1. Accede a la aplicación desde tu navegador
+2. En la pantalla inicial:
+   - Opción A: Cargar partida guardada
+   - Opción B: Configurar nueva partida
+3. Para nueva partida:
+   - Introduce nombres de los jugadores
+   - Selecciona avatares (opcional)
+   - Configura tiempo (10 min por defecto)
+   - Haz clic en "Iniciar Partida"
+
+
+───────────────────────────────────────────────────────────────────────────────
+JUGANDO UNA PARTIDA
+───────────────────────────────────────────────────────────────────────────────
+
+PASO 1: Seleccionar pieza
+   - Haz clic en una pieza de tu color
+   - Verás círculos verdes en movimientos válidos
+   - Bordes rojos indican capturas posibles
+
+PASO 2: Mover pieza
+   - Haz clic en una casilla marcada en verde
+   - La pieza se moverá automáticamente
+   - El turno pasará al oponente
+
+DESELECCIONAR:
+   - Haz clic en otra pieza tuya
+   - O haz clic en una casilla vacía sin marca
+
+CAPTURAS:
+   - Haz clic en una casilla con borde rojo
+   - La pieza enemiga será capturada
+   - Aparecerá en el panel de capturas
+
+PROMOCIÓN:
+   - Si tu peón llega al extremo opuesto
+   - Se convierte automáticamente en Dama
+   - Verás un mensaje de confirmación
+
+
+───────────────────────────────────────────────────────────────────────────────
+CONTROLES DE PARTIDA
+───────────────────────────────────────────────────────────────────────────────
+
+↶ DESHACER: Retrocede un movimiento (máximo 10)
+💾 GUARDAR: Guarda la partida actual (solo en pausa)
+📁 CARGAR: Carga una partida guardada
+🔄 REINICIAR: Comienza una nueva partida
+⚙️ AJUSTES: Configuración visual
+❌ SALIR: Abandona la partida
+
+
+───────────────────────────────────────────────────────────────────────────────
+SITUACIONES ESPECIALES
+───────────────────────────────────────────────────────────────────────────────
+
+JAQUE:
+   - Mensaje: "Jaque a [Jugador]"
+   - DEBES mover el rey o bloquear la amenaza
+   - No puedes hacer movimientos que te dejen en jaque
+
+JAQUE MATE:
+   - Mensaje: "¡Jaque mate! [Ganador] ha ganado"
+   - Partida finalizada
+   - Puedes reiniciar o ver el tablero final
+
+TABLAS:
+   - Stalemate: No hay movimientos legales disponibles
+   - Material insuficiente: Imposible dar jaque mate
+   - Partida terminada en empate
+
+TIEMPO AGOTADO:
+   - Si tu tiempo llega a 0:00
+   - Pierdes automáticamente
+   - El oponente gana
+
+
+================================================================================
+7. ARQUITECTURA DEL CÓDIGO
+================================================================================
+
+───────────────────────────────────────────────────────────────────────────────
+PARADIGMA: PROGRAMACIÓN ORIENTADA A OBJETOS
+───────────────────────────────────────────────────────────────────────────────
+
+JERARQUÍA DE CLASES:
+
+Pieza (Abstracta)
+│
+├── Torre
+├── Caballo
+├── Alfil
+├── Dama
+├── Rey
+└── Peon
+
+Jugador
+│
+└── contiene 16 Piezas (array)
+
+Partida
+│
+├── contiene 2 Jugadores
+├── gestiona turnos
+├── valida movimientos
+├── detecta jaque/jaque mate
+└── mantiene historial
+
+
+───────────────────────────────────────────────────────────────────────────────
+CLASE PIEZA (BASE ABSTRACTA)
+───────────────────────────────────────────────────────────────────────────────
+
+ATRIBUTOS:
+- posicion: String (notación ajedrez: "A1"-"H8")
+- color: String ("blancas" / "negras")
+- valor: Int (puntuación)
+- haMovido: Bool (para enroque y peón)
+
+MÉTODOS ABSTRACTOS:
+- movimiento($nuevaPosicion): Bool
+- simulaMovimiento($nuevaPosicion): Array
+
+MÉTODOS COMUNES:
+- getPosicion(), setPosicion()
+- getColor(), getValor()
+- estCapturada(), capturar()
+- haMovido(), setHaMovido()
+- notacionACoords(), coordsANotacion()
+
+
+───────────────────────────────────────────────────────────────────────────────
+CLASE JUGADOR
+───────────────────────────────────────────────────────────────────────────────
+
+RESPONSABILIDADES:
+- Inicializar las 16 piezas en posiciones correctas
+- Gestionar piezas activas y capturadas
+- Proporcionar acceso a piezas específicas
+- Implementar promoción de peones
+- Calcular puntuación total
+
+MÉTODOS PRINCIPALES:
+- getPiezas(): Array
+- getPiezaEnPosicion($pos): Pieza|null
+- getRey(): Rey|null
+- promoverPeon($peon, $tipo): Bool
+- haPerdido(): Bool
+
+
+───────────────────────────────────────────────────────────────────────────────
+CLASE PARTIDA (MOTOR PRINCIPAL)
+───────────────────────────────────────────────────────────────────────────────
+
+RESPONSABILIDADES:
+- Gestionar el flujo completo del juego
+- Validar todas las jugadas
+- Detectar jaque, jaque mate y tablas
+- Cambiar turnos automáticamente
+- Mantener historial de movimientos
+- Generar mensajes de estado
+
+MÉTODOS PRINCIPALES:
+- jugada($origen, $destino): Bool
+- estaEnJaque($color): Bool
+- esJaqueMate($color): Bool
+- esTablas(): Bool
+- deshacerJugada(): Bool
+- tieneHistorial(): Bool
+- muestraTablero(): String (HTML)
+- marcador(): Array
+
+
+───────────────────────────────────────────────────────────────────────────────
+SEPARACIÓN DE RESPONSABILIDADES
+───────────────────────────────────────────────────────────────────────────────
+
+index.php:
+   - Punto de entrada
+   - Gestión de sesiones
+   - Enrutamiento de acciones
+   - Renderizado final
+
+src/controladores.php:
+   - Lógica de negocio
+   - Procesamiento de formularios
+   - Guardado/Carga de partidas
+   - Control de tiempo
+
+src/vistas.php:
+   - Renderizado HTML
+   - Formularios y modales
+   - Tablero y componentes visuales
+
+src/funciones_auxiliares.php:
+   - Utilidades de tiempo
+   - Gestión de archivos
+   - Helpers generales
+
+public/script.js:
+   - Interactividad cliente
+   - AJAX para relojes
+   - Validación de formularios
+   - Efectos visuales
+
+
+================================================================================
+8. TECNOLOGÍAS UTILIZADAS
+================================================================================
+
+BACKEND:
+- PHP 7.4+ (POO, Sesiones, Serialización)
+- Almacenamiento JSON para persistencia
+- Sistema de archivos para avatares
+
+FRONTEND:
+- HTML5 semántico
+- CSS3 (Flexbox, Grid, Animaciones, Media Queries)
+- JavaScript Vanilla (ES6+)
+- AJAX con Fetch API
+
+ARQUITECTURA:
+- MVC adaptado (Modelo-Vista-Controlador)
+- POO con herencia y abstracción
+- Separación de responsabilidades
+- DRY (Don't Repeat Yourself)
+
+
+================================================================================
+9. NOTAS TÉCNICAS
+================================================================================
+
+───────────────────────────────────────────────────────────────────────────────
+DECISIONES DE DISEÑO
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Notación de ajedrez estándar (A1-H8)
+✓ Sistema de coordenadas interno [fila, columna] (0-7)
+✓ Serialización de objetos para historial y guardado
+✓ Clonación profunda para simular movimientos sin alterar estado
+✓ Validación en dos fases: cliente (UX) y servidor (seguridad)
+
+✓ Historial limitado a 10 movimientos para optimizar memoria
+✓ Sincronización de relojes cada 5 segundos (balance precisión/carga)
+✓ Pausa automática al abrir modales para evitar pérdidas de tiempo
+✓ Promoción automática a Dama (estándar en partidas rápidas)
+
+
+───────────────────────────────────────────────────────────────────────────────
+SEGURIDAD
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Validación de subida de imágenes (tipo, tamaño)
+✓ Sanitización de nombres de archivo
+✓ htmlspecialchars() en todos los inputs de usuario
+✓ Validación de existencia de archivos antes de cargar
+✓ Sesiones PHP para mantener estado del servidor
+
+
+───────────────────────────────────────────────────────────────────────────────
+OPTIMIZACIONES
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Caché de movimientos posibles en cliente
+✓ AJAX solo para actualizaciones críticas (relojes)
+✓ Lazy loading conceptual (solo carga partida cuando necesario)
+✓ CSS minificado en producción
+✓ Imágenes optimizadas (PNG transparente, tamaño reducido)
+
+
+───────────────────────────────────────────────────────────────────────────────
+LIMITACIONES CONOCIDAS
+───────────────────────────────────────────────────────────────────────────────
+
+⚠ Captura al paso no implementada (complejidad vs beneficio)
+⚠ Enroque preparado pero no accesible desde UI
+⚠ Promoción solo a Dama (no permite elegir pieza)
+⚠ Sin validación de repetición de posiciones (tablas por repetición)
+⚠ Sin notación algebraica en historial (solo deshacer genérico)
+
+
+───────────────────────────────────────────────────────────────────────────────
+POSIBLES MEJORAS FUTURAS
+───────────────────────────────────────────────────────────────────────────────
+
+🔮 Implementar captura al paso completa
+🔮 UI para enroque (clic especial o doble clic en rey)
+🔮 Modal para elegir pieza en promoción
+🔮 Historial completo con notación algebraica
+🔮 Modo multijugador online (WebSockets)
+🔮 AI para jugar contra la computadora
+🔮 Análisis de partida post-juego
+🔮 Exportar partidas en formato PGN
+🔮 Temas de tablero personalizables
+🔮 Sonidos de movimiento y captura
+
+
+================================================================================
+CRÉDITOS Y CONTACTO
+================================================================================
+
+Proyecto desarrollado como parte de la Tarea DWES05
+Grado Superior DAW 2025-26
+Desarrollo Web en Entorno Servidor
+
+Fecha: Enero 2026
+Versión: 2.0
+
+================================================================================
+                            FIN DEL DOCUMENTO
+================================================================================
