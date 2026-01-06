@@ -20,6 +20,7 @@ let tiempoLocalNegras = 0;
 let relojActivoLocal = "blancas";
 let pausaLocal = false;
 let contadorSincronizacion = 0;
+let recargandoPagina = false; // Flag para evitar múltiples recargas
 
 // Función para formatear tiempo
 function formatearTiempo(segundos) {
@@ -91,11 +92,14 @@ function actualizarTiempoLocal() {
     // Verificar si se agotó el tiempo - solo recargar UNA VEZ
     if (
       (tiempoLocalBlancas <= 0 || tiempoLocalNegras <= 0) &&
-      intervaloRelojes !== null
+      !recargandoPagina
     ) {
-      clearInterval(intervaloRelojes);
-      intervaloRelojes = null;
-      location.reload();
+      recargandoPagina = true;
+      if (intervaloRelojes !== null) {
+        clearInterval(intervaloRelojes);
+        intervaloRelojes = null;
+      }
+      setTimeout(() => location.reload(), 100);
       return;
     }
   }
@@ -130,16 +134,24 @@ function sincronizarConServidor() {
         relojActivoLocal = data.reloj_activo;
         pausaLocal = data.pausa || false;
 
+        // DEBUG: Mostrar estado de pausa
+        if (data.pausa) {
+          console.warn("⚠️ LA PARTIDA ESTÁ EN PAUSA - Los movimientos están bloqueados");
+        }
+
         actualizarDisplayRelojes();
 
         // Verificar tiempo agotado solo si el intervalo aún está activo
         if (
           (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) &&
-          intervaloRelojes !== null
+          !recargandoPagina
         ) {
-          clearInterval(intervaloRelojes);
-          intervaloRelojes = null;
-          location.reload();
+          recargandoPagina = true;
+          if (intervaloRelojes !== null) {
+            clearInterval(intervaloRelojes);
+            intervaloRelojes = null;
+          }
+          setTimeout(() => location.reload(), 100);
         }
       }
     })

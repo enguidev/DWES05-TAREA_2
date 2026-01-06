@@ -33,6 +33,11 @@ if (!isset($_SESSION['config'])) {
   $_SESSION['config'] = $configDefecto;
 }
 
+// Asegurar que pausa esté inicializada si hay partida
+if (isset($_SESSION['partida']) && !isset($_SESSION['pausa'])) {
+  $_SESSION['pausa'] = false;
+}
+
 // Iniciar partida con nombres y configuración
 if (isset($_POST['iniciar_partida'])) {
   iniciarPartida();
