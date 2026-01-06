@@ -83,12 +83,7 @@ function actualizarRelojes() {
         // Verificar si el tiempo se agotó
         if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
           clearInterval(intervaloRelojes);
-          alert(
-            "¡Tiempo agotado para " +
-              (data.tiempo_blancas <= 0 ? "blancas" : "negras") +
-              "! La partida ha terminado."
-          );
-          // Recargar después de un pequeño delay para que se muestre el estado final
+          // Recargar para mostrar el mensaje del servidor
           setTimeout(() => location.reload(), 500);
         }
       }
@@ -181,36 +176,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// Funciones para modales de guardar/cargar partidas
+// Funciones para modales
 function cerrarModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.style.display = "none";
-  }
-
-  // Si se cierra un modal de confirmación de reinicio, reanudar pausa sin recargar
-  if (modalId === "modalConfirmarReiniciar") {
-    // Reanudar con AJAX sin recargar la página
-    fetch("index.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "toggle_pausa=1",
-    }).then(() => {
-      // Recargar para actualizar el estado
-      location.reload();
-    });
-  }
-
-  // Si se cierra el modal de cargar, reanudar pausa
-  if (modalId === "modalConfirmarCargar" || modalId === "modalCargar") {
-    // Crear formulario para reanudar pausa
-    const formPausa = document.createElement("form");
-    formPausa.method = "POST";
-    formPausa.style.display = "none";
-    formPausa.innerHTML = '<input type="hidden" name="toggle_pausa">';
-    document.body.appendChild(formPausa);
-    formPausa.submit();
-    document.body.removeChild(formPausa);
   }
 }
 
@@ -336,14 +306,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (btnCargar) {
     btnCargar.addEventListener("click", function () {
-      // Pausar la partida primero y luego abrir modal de cargar
-      const formCombinado = document.createElement("form");
-      formCombinado.method = "POST";
-      formCombinado.style.display = "none";
-      formCombinado.innerHTML =
-        '<input type="hidden" name="toggle_pausa"><input type="hidden" name="abrir_modal_cargar" value="1">';
-      document.body.appendChild(formCombinado);
-      formCombinado.submit();
+      // Crear formulario para abrir modal de cargar
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "";
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "abrir_modal_cargar";
+      input.value = "1";
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
     });
   }
 });

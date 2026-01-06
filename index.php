@@ -57,6 +57,23 @@ if (isset($_POST['toggle_pausa'])) {
   procesarTogglePausa();
 }
 
+// Mostrar modal para confirmar reinicio
+$mostrarModalReiniciar = false;
+if (isset($_POST['abrir_modal_reiniciar'])) {
+  // Pausar la partida al abrir modal de reiniciar
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    $_SESSION['pausa'] = true;
+  }
+  $mostrarModalReiniciar = true;
+}
+
+// Cancelar modal (reanudar pausa)
+if (isset($_POST['cancelar_modal'])) {
+  if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
+    $_SESSION['pausa'] = false;
+  }
+}
+
 // Confirmar reinicio de partida
 if (isset($_POST['confirmar_reiniciar'])) {
   reiniciarPartida();
@@ -86,6 +103,10 @@ $mostrarModalCargar = false;
 $partidasGuardadas = [];
 
 if (isset($_POST['abrir_modal_cargar'])) {
+  // Pausar la partida al abrir modal de cargar
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    $_SESSION['pausa'] = true;
+  }
   $partidasGuardadas = listarPartidas();
   $mostrarModalCargar = true;
 }
@@ -214,13 +235,17 @@ $partidasGuardadasInicio = listarPartidas();
       <!-- Modal de configuración de jugadores -->
       <?php renderModalConfig(); ?>
 
-      <!-- Modales de guardar/cargar -->
+      <!-- Modales de guardar/cargar/reiniciar -->
       <?php if ($mostrarModalGuardar): ?>
         <?php renderModalGuardarPartida($nombrePartidaSugerido); ?>
       <?php endif; ?>
 
       <?php if ($mostrarModalCargar): ?>
         <?php renderModalCargarPartida($partidasGuardadas); ?>
+      <?php endif; ?>
+
+      <?php if ($mostrarModalReiniciar): ?>
+        <?php renderModalConfirmarReiniciar(); ?>
       <?php endif; ?>
 
       <!-- Cabecera del juego -->

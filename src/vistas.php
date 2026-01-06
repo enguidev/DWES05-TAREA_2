@@ -156,7 +156,9 @@ function renderModalCargarPartida($partidas)
       <?php if (empty($partidas)): ?>
         <p class="mensaje-vacio">No hay partidas guardadas</p>
         <div class="modal-buttons">
-          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalCargar')">✖️ Cerrar</button>
+          <form method="post" style="display: inline;">
+            <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cerrar</button>
+          </form>
         </div>
       <?php else: ?>
         <div class="lista-partidas">
@@ -177,12 +179,38 @@ function renderModalCargarPartida($partidas)
           <?php endforeach; ?>
         </div>
         <div class="modal-buttons">
-          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalCargar')">✖️ Cerrar</button>
+          <form method="post" style="display: inline;">
+            <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cerrar</button>
+          </form>
         </div>
       <?php endif; ?>
     </div>
   </div>
 <?php
+}
+
+/**
+ * Renderiza modal de confirmación para reiniciar partida
+ */
+function renderModalConfirmarReiniciar()
+{
+  ?>
+  <div id="modalConfirmarReiniciar" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🔄 Confirmar reinicio</h2>
+      <p>¿Deseas reiniciar la partida? Perderás todo el progreso.</p>
+      <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
+      <div class="modal-buttons">
+        <form method="post" style="display: inline;">
+          <button type="submit" name="confirmar_reiniciar" class="btn-confirmar btn-reiniciar-confirm">🔄 Reiniciar</button>
+        </form>
+        <form method="post" style="display: inline;">
+          <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <?php
 }
 
 /**
@@ -388,7 +416,9 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
         <form method="post" style="display: inline;">
           <button type="submit" name="abrir_modal_cargar" class="btn-cargar">📁 Cargar</button>
         </form>
-        <button type="button" class="btn-reiniciar" onclick="abrirModalConfirmacion('reiniciar')">🔄 Reiniciar</button>
+        <form method="post" style="display: inline;">
+          <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar">🔄 Reiniciar</button>
+        </form>
       </div>
 
       <div class="instrucciones">
