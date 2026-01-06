@@ -74,6 +74,9 @@ function actualizarDisplayRelojes() {
 
 // Decrementar tiempo local cada segundo
 function actualizarTiempoLocal() {
+  // Si ya estamos recargando, no hacer nada
+  if (recargandoPagina) return;
+
   if (
     !document.getElementById("tiempo-blancas") ||
     !document.getElementById("tiempo-negras")
@@ -95,11 +98,10 @@ function actualizarTiempoLocal() {
       !recargandoPagina
     ) {
       recargandoPagina = true;
-      if (intervaloRelojes !== null) {
-        clearInterval(intervaloRelojes);
-        intervaloRelojes = null;
-      }
-      setTimeout(() => location.reload(), 100);
+      clearInterval(intervaloRelojes);
+      intervaloRelojes = null;
+      // Recargar sin timeout para evitar que se ejecute otra vez
+      location.reload();
       return;
     }
   }
@@ -116,12 +118,18 @@ function actualizarTiempoLocal() {
 
 // Sincronizar con el servidor
 function sincronizarConServidor() {
+  // Si ya estamos recargando, no sincronizar
+  if (recargandoPagina) return;
+
   fetch("index.php?ajax=update_clocks")
     .then((r) => {
       if (!r.ok) throw new Error("Error en respuesta HTTP: " + r.status);
       return r.json();
     })
     .then((data) => {
+      // Si ya estamos recargando, ignorar datos
+      if (recargandoPagina) return;
+      
       if (data.sin_partida) return;
 
       if (
@@ -143,17 +151,15 @@ function sincronizarConServidor() {
 
         actualizarDisplayRelojes();
 
-        // Verificar tiempo agotado solo si el intervalo aún está activo
+        // Verificar tiempo agotado solo si no estamos ya recargando
         if (
           (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) &&
           !recargandoPagina
         ) {
           recargandoPagina = true;
-          if (intervaloRelojes !== null) {
-            clearInterval(intervaloRelojes);
-            intervaloRelojes = null;
-          }
-          setTimeout(() => location.reload(), 100);
+          clearInterval(intervaloRelojes);
+          intervaloRelojes = null;
+          location.reload();
         }
       }
     })
