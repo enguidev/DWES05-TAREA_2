@@ -559,7 +559,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
         </div>
       </div>
 
-      <div class="instrucciones">
+      <div class="instrucciones" style="margin-top: 25px;">
         <div class="instrucciones-header" onclick="toggleInstrucciones()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
           <span><strong>📚 Reglas y Controles</strong></span>
           <span id="instrucciones-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>

@@ -538,6 +538,22 @@ function abrirModalCargarInicial() {
   }
 }
 
+// Función para desplegar/contraer el historial
+function toggleHistorial() {
+  const contenido = document.getElementById("historial-contenido");
+  const toggle = document.getElementById("historial-toggle");
+
+  if (contenido && toggle) {
+    if (contenido.style.display === "none") {
+      contenido.style.display = "block";
+      toggle.style.transform = "rotate(180deg)";
+    } else {
+      contenido.style.display = "none";
+      toggle.style.transform = "rotate(0deg)";
+    }
+  }
+}
+
 // Función para desplegar/contraer las instrucciones
 function toggleInstrucciones() {
   const contenido = document.getElementById("instrucciones-contenido");
