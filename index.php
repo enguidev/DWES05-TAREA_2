@@ -32,7 +32,7 @@ if (isset($_POST['pausar_desde_config'])) {
 // Petición para reanudar al cerrar ajustes (modal de configuración)
 if (isset($_POST['reanudar_desde_config'])) {
   $_SESSION['pausa'] = false;
-  // NO resetear ultimo_tick aquí, mantener el tiempo coherente
+  $_SESSION['ultimo_tick'] = time(); // Resetear para no contar tiempo de pausa
   header('Content-Type: application/json');
   echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
   exit;
