@@ -527,9 +527,9 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
           <span id="historial-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
         </div>
         <div id="historial-contenido" class="historial-contenido" style="display: none; padding: 10px; background: #fafafa; border-radius: 5px; margin-top: 5px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd;">
-          <?php 
+          <?php
           $historial = $partida->getHistorialMovimientos();
-          if (empty($historial)): 
+          if (empty($historial)):
           ?>
             <p style="color: #999; text-align: center; margin: 0;">No hay movimientos registrados</p>
           <?php else: ?>
@@ -537,7 +537,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
               <?php foreach ($historial as $mov): ?>
                 <div style="padding: 5px; background: white; border-radius: 3px; border-left: 3px solid <?php echo ($mov['color'] === 'blancas') ? '#ddd' : '#333'; ?>;">
                   <small style="color: #666; font-weight: bold;">
-                    <?php 
+                    <?php
                     $numeroMov = ceil($mov['numero'] / 2);
                     if ($mov['color'] === 'blancas') {
                       echo $numeroMov . '.';
