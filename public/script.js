@@ -194,7 +194,7 @@ function cerrarModal(modalId) {
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "toggle_pausa=1"
+      body: "toggle_pausa=1",
     }).then(() => {
       // Recargar para actualizar el estado
       location.reload();
@@ -301,7 +301,7 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "toggle_pausa=1"
+      body: "toggle_pausa=1",
     });
   }
 }
