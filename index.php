@@ -16,6 +16,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
   procesarAjaxUpdateClocks();
 }
 
+// Petición para pausar al abrir ajustes (modal de configuración)
+if (isset($_POST['pausar_desde_config'])) {
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    $_SESSION['pausa'] = true;
+  }
+  if (isset($_SESSION['ultimo_tick'])) {
+    $_SESSION['ultimo_tick'] = time();
+  }
+  header('Content-Type: application/json');
+  echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
+  exit;
+}
+
 // Procesar configuración (solo opciones visuales)
 if (isset($_POST['guardar_configuracion'])) {
   procesarGuardarConfiguracion();

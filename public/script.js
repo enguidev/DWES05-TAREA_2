@@ -5,12 +5,51 @@ const closeModal = document.querySelector(".close-modal");
 const btnCancelar = document.querySelector(".btn-cancelar-config");
 
 if (modal && btnConfig && closeModal && btnCancelar) {
-  btnConfig.onclick = () => (modal.style.display = "block");
+  btnConfig.onclick = () => {
+    modal.style.display = "block";
+
+    // Pausar partida en servidor al abrir ajustes para evitar que corra el reloj
+    fetch("index.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ pausar_desde_config: "1" }),
+    })
+      .then(() => {
+        pausaLocal = true;
+        actualizarDisplayRelojes();
+      })
+      .catch((e) => console.error("No se pudo pausar al abrir ajustes:", e));
+  };
   closeModal.onclick = () => (modal.style.display = "none");
   btnCancelar.onclick = () => (modal.style.display = "none");
   window.onclick = (e) => {
     if (e.target == modal) modal.style.display = "none";
   };
+}
+
+// Deshabilitar "Guardar Cambios" hasta que haya modificaciones en la config
+const formConfig = modal ? modal.querySelector("form") : null;
+const btnGuardarConfig = modal ? modal.querySelector(".btn-guardar-config") : null;
+const chkCoords = modal ? modal.querySelector('input[name="mostrar_coordenadas"]') : null;
+const chkCapturas = modal ? modal.querySelector('input[name="mostrar_capturas"]') : null;
+
+if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
+  const estadoInicial = {
+    coords: chkCoords.checked,
+    capturas: chkCapturas.checked,
+  };
+
+  const actualizarEstadoGuardar = () => {
+    const cambiado =
+      chkCoords.checked !== estadoInicial.coords ||
+      chkCapturas.checked !== estadoInicial.capturas;
+    btnGuardarConfig.disabled = !cambiado;
+    btnGuardarConfig.classList.toggle("btn-disabled", !cambiado);
+  };
+
+  chkCoords.addEventListener("change", actualizarEstadoGuardar);
+  chkCapturas.addEventListener("change", actualizarEstadoGuardar);
+  actualizarEstadoGuardar();
 }
 
 // Actualizar relojes con contador local y sincronización periódica
