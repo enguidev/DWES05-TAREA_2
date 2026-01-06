@@ -232,8 +232,6 @@ function renderGameHeader()
   <div class="header-juego">
     <h1>♟️ Partida de Ajedrez</h1>
     <div class="header-buttons">
-      <button id="btnGuardar" class="btn-guardar" title="Guardar partida">💾</button>
-      <button id="btnCargar" class="btn-cargar-header" title="Cargar partida">📁</button>
       <button id="btnConfig" class="btn-config" title="Configuración">⚙️</button>
       <form method="post" style="display: inline;">
         <button type="submit" name="toggle_pausa" class="btn-pausa" id="btnPausa" title="Pausar/Reanudar">

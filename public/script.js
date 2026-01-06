@@ -282,12 +282,11 @@ function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
   abrirModalConfirmacion("eliminar", { nombre, archivo, desdeInicio });
 }
 
-// Event listeners para botones de guardar/cargar
+// Event listeners para configuración
 document.addEventListener("DOMContentLoaded", function () {
-  const btnGuardar = document.getElementById("btnGuardar");
-  const btnCargar = document.getElementById("btnCargar");
-
-  if (btnGuardar) {
+  // Listeners para configuración
+  
+  if (false) {
     btnGuardar.addEventListener("click", function () {
       // Crear un formulario oculto y enviarlo
       const form = document.createElement("form");
@@ -301,26 +300,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       form.appendChild(input);
       document.body.appendChild(form);
-      form.submit();
-    });
-  }
-
-  if (btnCargar) {
-    btnCargar.addEventListener("click", function () {
-      // Crear formulario para abrir modal de cargar
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "";
-
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "abrir_modal_cargar";
-      input.value = "1";
-
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
-    });
   }
 });
 // Función para abrir modal cargar desde pantalla inicial
