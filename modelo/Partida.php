@@ -479,6 +479,15 @@ class Partida
   }
 
   /**
+   * Verifica si hay historial de jugadas disponible para deshacer
+   * @return bool True si hay jugadas en el historial, false en caso contrario
+   */
+  public function tieneHistorial()
+  {
+    return !empty($this->historial);
+  }
+
+  /**
    * Deshace la última jugada realizada
    * @return bool True si se pudo deshacer, false si no hay jugadas para deshacer
    */
