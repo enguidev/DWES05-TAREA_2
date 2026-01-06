@@ -110,9 +110,11 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
       !btnGuardarConfig.classList.contains("btn-disabled")
     ) {
       e.preventDefault();
-      
+
       // Crear un campo oculto para reanudar desde config
-      let inputReanudar = formConfig.querySelector('input[name="reanudar_desde_config"]');
+      let inputReanudar = formConfig.querySelector(
+        'input[name="reanudar_desde_config"]'
+      );
       if (!inputReanudar) {
         inputReanudar = document.createElement("input");
         inputReanudar.type = "hidden";
@@ -120,7 +122,7 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
         inputReanudar.value = "1";
         formConfig.appendChild(inputReanudar);
       }
-      
+
       // Hacer submit normal con reanudar incluido
       formConfig.submit();
     }
