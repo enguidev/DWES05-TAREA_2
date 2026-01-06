@@ -26,29 +26,36 @@ function procesarAjaxUpdateClocks()
 
   $ahora = time();
 
-  // Solo actualizar si no está en pausa
+  // Actualizar tiempo solo si la partida no está en pausa y no ha terminado por tiempo
   if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-    if (isset($_SESSION['ultimo_tick'])) {
-      $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
+    // Si ya se detectó tiempo agotado, no actualizar más
+    if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
+      if (isset($_SESSION['ultimo_tick'])) {
+        $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
 
-      if ($tiempoTranscurrido > 0) {
-        if ($_SESSION['reloj_activo'] === 'blancas') {
-          $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
-        } else {
-          $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+        if ($tiempoTranscurrido > 0) {
+          if ($_SESSION['reloj_activo'] === 'blancas') {
+            $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+          } else {
+            $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+          }
+          $_SESSION['ultimo_tick'] = $ahora;
         }
+      } else {
         $_SESSION['ultimo_tick'] = $ahora;
       }
-    } else {
-      $_SESSION['ultimo_tick'] = $ahora;
     }
   }
 
-  // Detectar si el tiempo se agotó y terminar la partida
-  if ($_SESSION['tiempo_blancas'] <= 0) {
-    $_SESSION['partida_terminada_por_tiempo'] = 'negras';
-  } elseif ($_SESSION['tiempo_negras'] <= 0) {
-    $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
+  // Detectar si el tiempo se agotó y terminar la partida (solo una vez)
+  if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
+    if ($_SESSION['tiempo_blancas'] <= 0) {
+      $_SESSION['partida_terminada_por_tiempo'] = 'negras';
+      $_SESSION['tiempo_blancas'] = 0; // Asegurar que esté en 0
+    } elseif ($_SESSION['tiempo_negras'] <= 0) {
+      $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
+      $_SESSION['tiempo_negras'] = 0; // Asegurar que esté en 0
+    }
   }
 
   // Verificar si la partida está terminada

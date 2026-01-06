@@ -246,6 +246,30 @@ function renderModalConfirmarReiniciar()
 }
 
 /**
+ * Renderiza modal de confirmación para revancha
+ */
+function renderModalConfirmarRevancha()
+{
+?>
+  <div id="modalConfirmarRevancha" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🔁 Confirmar revancha</h2>
+      <p>¿Deseas iniciar una revancha? Se mantendrán los jugadores y la configuración.</p>
+      <p style="color: #667eea; font-weight: 600; margin-top: 10px;">ℹ️ El tablero se reiniciará a la posición inicial.</p>
+      <div class="modal-buttons">
+        <form method="post" style="display: inline;">
+          <button type="submit" name="confirmar_revancha" class="btn-confirmar btn-revancha-confirm">🔁 Revancha</button>
+        </form>
+        <form method="post" style="display: inline;">
+          <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+<?php
+}
+
+/**
  * Renderiza el header del juego
  */
 function renderGameHeader($partida)
