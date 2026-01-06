@@ -14,6 +14,9 @@ if (modal && btnConfig && closeModal && btnCancelar) {
     })
       .then(() => {
         pausaLocal = false;
+        // Resetear contador de sincronización para forzar AJAX inmediato
+        // y evitar que se ejecute uno pendiente con datos antiguos
+        contadorSincronizacion = 4; // Próxima llamada a actualizarTiempoLocal() hará sync
         // Sincronizar inmediatamente con servidor para traer tiempos correctos
         return fetch("index.php?ajax=update_clocks");
       })
