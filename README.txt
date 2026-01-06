@@ -158,8 +158,13 @@ B. REGLAS AVANZADAS
   • Mensaje informativo de la promoción
 
 ✓ ENROQUE (Preparado pero no implementado en UI):
-  • Métodos puedeEnrocarCorto() y puedeEnrocarLargo()
-  • Validación de condiciones (rey y torre sin mover, no estar en jaque)
+   • Motor implementado: enroque corto y largo ejecutados automáticamente
+   • Validación completa: piezas sin mover, casillas libres, sin jaque intermedio
+   • UI: puede no mostrar sugerencias de casillas; se ejecuta moviendo el rey a G/C
+
+✓ CAPTURA AL PASO:
+   • Implementada: disponible inmediatamente tras avance doble del peón rival
+   • Detección por último movimiento y posición adyacente
 
 ✓ PREVENCIÓN DE MOVIMIENTOS ILEGALES:
   • No puedes moverte si dejas a tu rey en jaque
@@ -566,8 +571,7 @@ OPTIMIZACIONES
 LIMITACIONES CONOCIDAS
 ───────────────────────────────────────────────────────────────────────────────
 
-⚠ Captura al paso no implementada (complejidad vs beneficio)
-⚠ Enroque preparado pero no accesible desde UI
+⚠ Enroque: el motor lo soporta; la UI puede no sugerir casillas (se ejecuta moviendo el rey a destino)
 ⚠ Promoción solo a Dama (no permite elegir pieza)
 ⚠ Sin validación de repetición de posiciones (tablas por repetición)
 ⚠ Sin notación algebraica en historial (solo deshacer genérico)

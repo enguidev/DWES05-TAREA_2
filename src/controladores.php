@@ -473,10 +473,13 @@ function manejarSubidaAvatar($inputName, $color)
 
   $file = $_FILES[$inputName];
   $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  $maxSize = 2 * 1024 * 1024; // 2MB
+  $maxSize = 5 * 1024 * 1024; // 5MB
 
   // Validar tipo de archivo
-  if (!in_array($file['type'], $allowedTypes)) {
+  // Revisar MIME real con finfo para evitar suplantación
+  $finfo = new finfo(FILEINFO_MIME_TYPE);
+  $realType = $finfo->file($file['tmp_name']);
+  if (!in_array($realType, $allowedTypes)) {
     return null;
   }
 

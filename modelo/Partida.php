@@ -13,6 +13,7 @@ class Partida
   private $mensaje;    // Mensaje de estado de la partida
   private $partidaTerminada; // Indica si la partida ha terminado
   private $historial;  // Historial de snapshots para deshacer jugadas
+  private $ultimoMovimiento; // Meta del último movimiento realizado
 
   /**
    * Constructor de Partida
@@ -30,6 +31,7 @@ class Partida
     $this->mensaje = "Turno de " . $this->jugadores['blancas']->getNombre() . " (blancas)";
     $this->partidaTerminada = false;
     $this->historial = [];
+    $this->ultimoMovimiento = null;
   }
 
   /**
@@ -69,6 +71,75 @@ class Partida
     $piezaDestino = $this->obtenerPiezaEnPosicion($destino);
     $esCaptura = ($piezaDestino !== null);
 
+    // 2.1 Detectar posibles movimientos especiales antes del cálculo estándar
+    $esEnroque = false;
+    $tipoEnroque = null; // 'corto' | 'largo'
+    $esEnPassant = false;
+    $posCapturaEnPassant = null;
+
+    // Coordenadas para cálculos especiales
+    $coordsOrigen = $this->notacionACoordsLocal($origen);
+    $coordsDestino = $this->notacionACoordsLocal($destino);
+    if (!$coordsOrigen || !$coordsDestino) {
+      $this->mensaje = "Coordenadas inválidas";
+      return false;
+    }
+    list($filaOrig, $colOrig) = $coordsOrigen;
+    list($filaDest, $colDest) = $coordsDestino;
+
+    // Enroque: el rey se desplaza 2 columnas en la misma fila
+    if ($piezaOrigen instanceof Rey && !$piezaOrigen->haMovido()) {
+      if ($filaOrig === $filaDest && abs($colDest - $colOrig) === 2) {
+        // Determinar corto/largo por dirección de columna
+        if ($colDest > $colOrig) {
+          // Corto (E -> G)
+          if ($this->puedeEnrocarCorto($this->turno)) {
+            $esEnroque = true;
+            $tipoEnroque = 'corto';
+          } else {
+            $this->mensaje = "Enroque corto no permitido";
+            return false;
+          }
+        } else {
+          // Largo (E -> C)
+          if ($this->puedeEnrocarLargo($this->turno)) {
+            $esEnroque = true;
+            $tipoEnroque = 'largo';
+          } else {
+            $this->mensaje = "Enroque largo no permitido";
+            return false;
+          }
+        }
+      }
+    }
+
+    // Captura al paso: peón se mueve diagonal a casilla vacía en el turno inmediatamente posterior
+    if (!$esEnroque && $piezaOrigen instanceof Peon && !$esCaptura) {
+      $direccion = ($this->turno === 'blancas') ? -1 : 1;
+      $difFilas = $filaDest - $filaOrig;
+      $difCols = abs($colDest - $colOrig);
+      if ($difFilas === $direccion && $difCols === 1) {
+        // Casilla del peón que sería capturado al paso (misma fila de origen, columna destino)
+        $posCapturaEnPassant = $this->coordsANotacionLocal($filaOrig, $colDest);
+        $piezaPosibleCapturada = $this->obtenerPiezaEnPosicion($posCapturaEnPassant);
+        // Validar último movimiento del contrario
+        if ($this->ultimoMovimiento && $piezaPosibleCapturada instanceof Peon) {
+          $um = $this->ultimoMovimiento;
+          // Debe ser peón del oponente que avanzó 2 casillas y acabó en la posición a capturar
+          $coordsUMOrig = $this->notacionACoordsLocal($um['origen']);
+          $coordsUMDest = $this->notacionACoordsLocal($um['destino']);
+          if ($coordsUMOrig && $coordsUMDest && $um['pieza'] === 'Peon' && $um['color'] !== $this->turno) {
+            $salto = abs($coordsUMDest[0] - $coordsUMOrig[0]);
+            if ($salto === 2 && $um['destino'] === $posCapturaEnPassant) {
+              $esEnPassant = true;
+              // Se trata como captura especial
+              $esCaptura = true;
+            }
+          }
+        }
+      }
+    }
+
     // 3. Verificar que la pieza puede moverse a ese destino
     // Para peones, debemos indicar si es captura
     if ($piezaOrigen instanceof Peon) {
@@ -77,7 +148,7 @@ class Partida
       $casillasRecorridas = $piezaOrigen->simulaMovimiento($destino);
     }
 
-    if (empty($casillasRecorridas)) {
+    if (!$esEnroque && !$esEnPassant && empty($casillasRecorridas)) {
       $this->mensaje = "Movimiento inválido para esta pieza";
       return false;
     }
@@ -109,16 +180,41 @@ class Partida
     $piezaOrigenTemp = $tempJugadores[$this->turno]->getPiezaEnPosicion($origen);
     $piezaDestinoTemp = $this->obtenerPiezaEnPosicion($destino, $tempJugadores);
 
-    if ($piezaDestinoTemp) {
+    if ($esEnPassant) {
+      // Captura al paso: capturar la pieza en posCapturaEnPassant
+      $piezaAlPasoTemp = $this->obtenerPiezaEnPosicion($posCapturaEnPassant, $tempJugadores);
+      if ($piezaAlPasoTemp && $piezaAlPasoTemp instanceof Peon) {
+        $piezaAlPasoTemp->capturar();
+      }
+    } elseif ($piezaDestinoTemp) {
       $piezaDestinoTemp->capturar();
     }
 
-    if ($piezaOrigenTemp) {
+    if ($piezaOrigenTemp && !$esEnroque) {
       $piezaOrigenTemp->setPosicion($destino);
       $piezaOrigenTemp->setHaMovido();
       if ($piezaOrigenTemp instanceof Peon) {
         $piezaOrigenTemp->setEsPrimerMovimiento(false);
       }
+    }
+
+    // Simular enroque moviendo rey y torre en temp si aplica
+    if ($esEnroque) {
+      $color = $this->turno;
+      $filaInicial = ($color === 'blancas') ? 1 : 8;
+      $posReyOrigen = ($color === 'blancas') ? 'E1' : 'E8';
+      $posReyDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'G1' : 'C1') : (($tipoEnroque === 'corto') ? 'G8' : 'C8');
+      $posTorreOrigen = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'H1' : 'A1') : (($tipoEnroque === 'corto') ? 'H8' : 'A8');
+      $posTorreDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'F1' : 'D1') : (($tipoEnroque === 'corto') ? 'F8' : 'D8');
+
+      $reyTemp = $tempJugadores[$color]->getRey();
+      $torreTemp = $tempJugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
+      if (!$reyTemp || !$torreTemp) {
+        $this->mensaje = 'Enroque no válido';
+        return false;
+      }
+      $reyTemp->setPosicion($posReyDestino);
+      $torreTemp->setPosicion($posTorreDestino);
     }
 
     $miColor = $this->turno;
@@ -130,7 +226,7 @@ class Partida
     }
 
     // 5. Verificar la casilla de destino
-    if ($piezaDestino !== null) {
+    if (!$esEnroque && !$esEnPassant && $piezaDestino !== null) {
       // Hay una pieza en el destino
       if ($piezaDestino->getColor() === $this->turno) {
         // Es una pieza propia, no se puede mover ahí
@@ -150,19 +246,44 @@ class Partida
       }
     }
 
-    // 6. Realizar el movimiento
-    // Para peones, necesitamos indicar si es captura
-    if ($piezaOrigen instanceof Peon) {
-      $piezaOrigen->movimiento($destino, $esCaptura);
+    // 6. Realizar el movimiento (incluye especiales)
+    if ($esEnroque) {
+      $color = $this->turno;
+      $posReyDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'G1' : 'C1') : (($tipoEnroque === 'corto') ? 'G8' : 'C8');
+      $posTorreOrigen = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'H1' : 'A1') : (($tipoEnroque === 'corto') ? 'H8' : 'A8');
+      $posTorreDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'F1' : 'D1') : (($tipoEnroque === 'corto') ? 'F8' : 'D8');
+
+      $torre = $this->jugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
+      if (!$torre || !($torre instanceof Torre)) {
+        $this->mensaje = 'No se encontró la torre para enroque';
+        return false;
+      }
+      // Mover rey y torre
+      $piezaOrigen->setPosicion($posReyDestino);
+      $piezaOrigen->setHaMovido();
+      $torre->setPosicion($posTorreDestino);
+      $torre->setHaMovido();
     } else {
-      $piezaOrigen->movimiento($destino);
+      // Para peones, necesitamos indicar si es captura
+      if ($piezaOrigen instanceof Peon) {
+        // Captura al paso: capturar pieza intermedia
+        if ($esEnPassant && $posCapturaEnPassant) {
+          $piezaAlPaso = $this->obtenerPiezaEnPosicion($posCapturaEnPassant);
+          if ($piezaAlPaso && $piezaAlPaso instanceof Peon) {
+            $piezaAlPaso->capturar();
+          }
+        }
+        $piezaOrigen->movimiento($destino, $esCaptura);
+      } else {
+        $piezaOrigen->movimiento($destino);
+      }
     }
 
     // 6.5. Verificar promoción de peón
     $huboPromocion = false;
     $mensajePromocion = "";
     if ($piezaOrigen instanceof Peon && $piezaOrigen->puedePromoverse()) {
-      // Guardar info antes de promocionar
+      // Guardar info y posponer elección (por ahora Dama por defecto)
       $jugadorQuePromueve = $this->jugadores[$this->turno]->getNombre();
       $colorQuePromueve = $this->turno;
       $posicionPromocion = $destino;
@@ -170,10 +291,17 @@ class Partida
       $this->jugadores[$this->turno]->promoverPeon($piezaOrigen, 'Dama');
       $huboPromocion = true;
 
-      // Crear mensaje detallado
       $mensajePromocion = "¡" . $jugadorQuePromueve . " (" . $colorQuePromueve . ") promocionó su peón de " .
         $posicionPromocion . " a Dama!";
     }
+
+    // Registrar último movimiento (para captura al paso)
+    $this->ultimoMovimiento = [
+      'pieza' => ($piezaOrigen instanceof Peon) ? 'Peon' : (($piezaOrigen instanceof Rey) ? 'Rey' : get_class($piezaOrigen)),
+      'color' => $this->turno,
+      'origen' => $origen,
+      'destino' => $destino
+    ];
 
     // 7. Cambiar el turno
     $this->turno = ($this->turno === 'blancas') ? 'negras' : 'blancas';
@@ -227,6 +355,8 @@ class Partida
 
     return null;
   }
+
+  
 
   /**
    * Comprueba si el rey del color dado está en jaque
@@ -521,17 +651,15 @@ class Partida
     $torre = $this->jugadores[$color]->getPiezaEnPosicion($color === 'blancas' ? 'H1' : 'H8');
     if (!$torre || !($torre instanceof Torre) || $torre->haMovido()) return false;
 
-    // Verificar casillas libres y no en jaque
     $casillas = $color === 'blancas' ? ['F1', 'G1'] : ['F8', 'G8'];
     foreach ($casillas as $casilla) {
-      if ($this->jugadores[$color]->getPiezaEnPosicion($casilla) || $this->jugadores[$this->oponente($color)]->getPiezaEnPosicion($casilla)) return false;
+      if ($this->obtenerPiezaEnPosicion($casilla) !== null) return false;
       // Simular movimiento del rey a esa casilla y verificar jaque
+      $posOriginal = $rey->getPosicion();
       $rey->setPosicion($casilla);
-      if ($this->estaEnJaque($color)) {
-        $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
-        return false;
-      }
-      $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
+      $enJaque = $this->estaEnJaque($color);
+      $rey->setPosicion($posOriginal); // Restaurar
+      if ($enJaque) return false;
     }
     return true;
   }
@@ -549,18 +677,17 @@ class Partida
     $torre = $this->jugadores[$color]->getPiezaEnPosicion($color === 'blancas' ? 'A1' : 'A8');
     if (!$torre || !($torre instanceof Torre) || $torre->haMovido()) return false;
 
-    // Verificar casillas libres y no en jaque
     $casillas = $color === 'blancas' ? ['B1', 'C1', 'D1'] : ['B8', 'C8', 'D8'];
     foreach ($casillas as $casilla) {
-      if ($this->jugadores[$color]->getPiezaEnPosicion($casilla) || $this->jugadores[$this->oponente($color)]->getPiezaEnPosicion($casilla)) return false;
-      if ($casilla === ($color === 'blancas' ? 'D1' : 'D8')) continue; // D1/D8 no necesita check de jaque para rey
-      // Simular movimiento del rey a esa casilla y verificar jaque
-      $rey->setPosicion($casilla);
-      if ($this->estaEnJaque($color)) {
-        $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
-        return false;
+      if ($this->obtenerPiezaEnPosicion($casilla) !== null) return false;
+      // Para largo, comprobar jaque en C y D; B puede estar fuera del trayecto del rey
+      if ($casilla === ($color === 'blancas' ? 'C1' : 'C8') || $casilla === ($color === 'blancas' ? 'D1' : 'D8')) {
+        $posOriginal = $rey->getPosicion();
+        $rey->setPosicion($casilla);
+        $enJaque = $this->estaEnJaque($color);
+        $rey->setPosicion($posOriginal);
+        if ($enJaque) return false;
       }
-      $rey->setPosicion($color === 'blancas' ? 'E1' : 'E8'); // Restaurar
     }
     return true;
   }
@@ -572,10 +699,33 @@ class Partida
    */
   public function capturaAlPasoDisponible($color)
   {
-    // Implementación simplificada: verificar si el último movimiento fue un peón avanzando 2 casillas
-    // Asumir que se guarda el último movimiento
-    // Por simplicidad, devolver null por ahora (no implementado completamente)
+    // Ahora gestionado dentro de jugada() mediante $this->ultimoMovimiento
     return null;
+  }
+
+  /**
+   * Conversión local de notación (A1..H8) a coordenadas [fila, col]
+   */
+  private function notacionACoordsLocal($pos)
+  {
+    if (!is_string($pos) || strlen($pos) < 2) return null;
+    $colLetra = strtoupper($pos[0]);
+    $filaNum = (int)substr($pos, 1);
+    if ($colLetra < 'A' || $colLetra > 'H' || $filaNum < 1 || $filaNum > 8) return null;
+    $col = ord($colLetra) - ord('A');
+    $fila = 8 - $filaNum; // 8->0, 1->7
+    return [$fila, $col];
+  }
+
+  /**
+   * Conversión local de coordenadas [fila, col] a notación A1..H8
+   */
+  private function coordsANotacionLocal($fila, $col)
+  {
+    if ($fila < 0 || $fila > 7 || $col < 0 || $col > 7) return null;
+    $colLetra = chr(ord('A') + $col);
+    $filaNum = 8 - $fila;
+    return $colLetra . $filaNum;
   }
 
   /**
