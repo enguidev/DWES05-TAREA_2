@@ -180,7 +180,11 @@ function cerrarModal(modalId) {
   }
 
   // Si se cierra un modal de confirmación de reinicio, cargar o el modal de cargar, reanudar pausa
-  if (modalId === "modalConfirmarReiniciar" || modalId === "modalConfirmarCargar" || modalId === "modalCargar") {
+  if (
+    modalId === "modalConfirmarReiniciar" ||
+    modalId === "modalConfirmarCargar" ||
+    modalId === "modalCargar"
+  ) {
     // Crear formulario para reanudar pausa
     const formPausa = document.createElement("form");
     formPausa.method = "POST";
@@ -207,7 +211,9 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     mensaje = `¿Deseas eliminar la partida "<strong>${opciones.nombre}</strong>"?`;
     bottonClass = "btn-eliminar";
     const desdeInicio = opciones.desdeInicio ? true : false;
-    const nombreAction = desdeInicio ? "eliminar_partida_inicial" : "eliminar_partida";
+    const nombreAction = desdeInicio
+      ? "eliminar_partida_inicial"
+      : "eliminar_partida";
     accionHTML = `
       <form method="post" style="display: inline;">
         <input type="hidden" name="archivo_partida" value="${opciones.archivo}">
@@ -229,7 +235,8 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
   } else if (tipo === "cargar") {
     titulo = "📁 Confirmar carga";
     icono = "📁";
-    mensaje = "Si cargas una partida guardada, la actual se perderá. ¿Deseas continuar?";
+    mensaje =
+      "Si cargas una partida guardada, la actual se perderá. ¿Deseas continuar?";
     bottonClass = "btn-cargar-confirm";
     accionHTML = `
       <form method="post" style="display: inline;">
@@ -317,7 +324,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const formCombinado = document.createElement("form");
       formCombinado.method = "POST";
       formCombinado.style.display = "none";
-      formCombinado.innerHTML = '<input type="hidden" name="toggle_pausa"><input type="hidden" name="abrir_modal_cargar" value="1">';
+      formCombinado.innerHTML =
+        '<input type="hidden" name="toggle_pausa"><input type="hidden" name="abrir_modal_cargar" value="1">';
       document.body.appendChild(formCombinado);
       formCombinado.submit();
     });
