@@ -125,10 +125,12 @@ document.addEventListener("DOMContentLoaded", function () {
           preview = document.createElement("img");
           preview.id = previewId;
           preview.className = "avatar-preview";
-          preview.style.maxWidth = "50px";
-          preview.style.maxHeight = "50px";
+          preview.style.maxWidth = "120px";
+          preview.style.maxHeight = "120px";
           preview.style.borderRadius = "50%";
           preview.style.marginLeft = "10px";
+          preview.style.border = "3px solid #5568d3";
+          preview.style.boxShadow = "0 4px 10px rgba(85, 104, 211, 0.3)";
           input.parentNode.appendChild(preview);
         }
         preview.src = e.target.result;
