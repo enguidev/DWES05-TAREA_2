@@ -376,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (selectBlancas && inputBlancas) {
     selectBlancas.addEventListener("change", function () {
       if (this.value === "custom") {
-        inputBlancas.style.display = "block";
+        inputBlancas.click();
         inputBlancas.addEventListener("change", function () {
           mostrarPrevisualizacion(this, "preview_blancas");
         });
@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (selectNegras && inputNegras) {
     selectNegras.addEventListener("change", function () {
       if (this.value === "custom") {
-        inputNegras.style.display = "block";
+        inputNegras.click();
         inputNegras.addEventListener("change", function () {
           mostrarPrevisualizacion(this, "preview_negras");
         });

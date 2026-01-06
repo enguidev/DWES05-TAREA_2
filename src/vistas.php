@@ -262,7 +262,7 @@ function renderBotonesControl($partida)
       <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>
     </form>
     <form method="post" style="display: inline;">
-      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>🔄 Reiniciar</button>
+      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) && !$partida->estaTerminada() ? 'disabled' : ''; ?>>🔄 Reiniciar</button>
     </form>
   </div>
 <?php
