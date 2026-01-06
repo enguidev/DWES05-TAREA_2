@@ -386,11 +386,9 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
           <button type="submit" name="guardar" class="btn-guardar">💾 Guardar</button>
         </form>
         <form method="post" style="display: inline;">
-          <button type="submit" name="cargar" class="btn-cargar">📁 Cargar</button>
+          <button type="submit" name="abrir_modal_cargar" class="btn-cargar">📁 Cargar</button>
         </form>
-        <form method="post" style="display: inline;">
-          <button type="submit" name="reiniciar" class="btn-reiniciar">🔄 Reiniciar</button>
-        </form>
+        <button type="button" class="btn-reiniciar" onclick="abrirModalConfirmacion('reiniciar')">🔄 Reiniciar</button>
       </div>
 
       <div class="instrucciones">

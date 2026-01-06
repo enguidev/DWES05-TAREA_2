@@ -57,9 +57,10 @@ if (isset($_POST['toggle_pausa'])) {
   procesarTogglePausa();
 }
 
-// Reiniciar partida
-if (isset($_POST['reiniciar'])) {
+// Confirmar reinicio de partida
+if (isset($_POST['confirmar_reiniciar'])) {
   reiniciarPartida();
+  $_SESSION['pausa'] = false; // Reanudar la partida tras reiniciar
 }
 
 // Mostrar modal para guardar partida

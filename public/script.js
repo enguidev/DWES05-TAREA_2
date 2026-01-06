@@ -178,32 +178,85 @@ function cerrarModal(modalId) {
   if (modal) {
     modal.style.display = "none";
   }
+
+  // Si se cierra un modal de confirmación de reinicio, cargar o el modal de cargar, reanudar pausa
+  if (modalId === "modalConfirmarReiniciar" || modalId === "modalConfirmarCargar" || modalId === "modalCargar") {
+    // Crear formulario para reanudar pausa
+    const formPausa = document.createElement("form");
+    formPausa.method = "POST";
+    formPausa.style.display = "none";
+    formPausa.innerHTML = '<input type="hidden" name="toggle_pausa">';
+    document.body.appendChild(formPausa);
+    formPausa.submit();
+    document.body.removeChild(formPausa);
+  }
 }
 
-// Función para abrir modal de confirmación de eliminación
-function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
+// Función genérica para mostrar modales de confirmación
+function abrirModalConfirmacion(tipo, opciones = {}) {
+  let titulo = "";
+  let icono = "";
+  let mensaje = "";
+  let bottonClass = "";
+  let accionHTML = "";
+  let modeloId = "modalConfirmacion";
+
+  if (tipo === "eliminar") {
+    titulo = "⚠️ Confirmar eliminación";
+    icono = "🗑️";
+    mensaje = `¿Deseas eliminar la partida "<strong>${opciones.nombre}</strong>"?`;
+    bottonClass = "btn-eliminar";
+    const desdeInicio = opciones.desdeInicio ? true : false;
+    const nombreAction = desdeInicio ? "eliminar_partida_inicial" : "eliminar_partida";
+    accionHTML = `
+      <form method="post" style="display: inline;">
+        <input type="hidden" name="archivo_partida" value="${opciones.archivo}">
+        <button type="submit" name="${nombreAction}" class="btn-confirmar ${bottonClass}">${icono} Eliminar</button>
+      </form>
+    `;
+    modeloId = "modalConfirmarEliminar";
+  } else if (tipo === "reiniciar") {
+    titulo = "🔄 Confirmar reinicio";
+    icono = "🔄";
+    mensaje = "¿Deseas reiniciar la partida? Perderás todo el progreso.";
+    bottonClass = "btn-reiniciar-confirm";
+    accionHTML = `
+      <form method="post" style="display: inline;">
+        <button type="submit" name="confirmar_reiniciar" class="btn-confirmar ${bottonClass}">${icono} Reiniciar</button>
+      </form>
+    `;
+    modeloId = "modalConfirmarReiniciar";
+  } else if (tipo === "cargar") {
+    titulo = "📁 Confirmar carga";
+    icono = "📁";
+    mensaje = "Si cargas una partida guardada, la actual se perderá. ¿Deseas continuar?";
+    bottonClass = "btn-cargar-confirm";
+    accionHTML = `
+      <form method="post" style="display: inline;">
+        <input type="hidden" name="archivo_partida" value="${opciones.archivo}">
+        <button type="submit" name="cargar_partida" class="btn-confirmar ${bottonClass}">${icono} Cargar</button>
+      </form>
+    `;
+    modeloId = "modalConfirmarCargar";
+  }
+
   // Crear el HTML del modal
   const modalHTML = `
-    <div id="modalConfirmarEliminar" class="modal-overlay">
+    <div id="${modeloId}" class="modal-overlay">
       <div class="modal-content">
-        <h2>⚠️ Confirmar eliminación</h2>
-        <p>¿Deseas eliminar la partida "<strong>${nombre}</strong>"?</p>
+        <h2>${titulo}</h2>
+        <p>${mensaje}</p>
         <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
         <div class="modal-buttons">
-          <form method="post" style="display: inline;">
-            <input type="hidden" name="archivo_partida" value="${archivo}">
-            <button type="submit" name="${
-              desdeInicio ? "eliminar_partida_inicial" : "eliminar_partida"
-            }" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
-          </form>
-          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
+          ${accionHTML}
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('${modeloId}')">✖️ Cancelar</button>
         </div>
       </div>
     </div>
   `;
 
   // Eliminar modal anterior si existe
-  const modalAnterior = document.getElementById("modalConfirmarEliminar");
+  const modalAnterior = document.getElementById(modeloId);
   if (modalAnterior) {
     modalAnterior.remove();
   }
@@ -212,10 +265,27 @@ function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
   document.body.insertAdjacentHTML("beforeend", modalHTML);
 
   // Mostrar modal
-  const newModal = document.getElementById("modalConfirmarEliminar");
+  const newModal = document.getElementById(modeloId);
   if (newModal) {
     newModal.style.display = "flex";
   }
+
+  // Si es reiniciar o cargar, pausar la partida automáticamente
+  if (tipo === "reiniciar" || tipo === "cargar") {
+    // Pausar la partida mediante AJAX
+    const formPausa = document.createElement("form");
+    formPausa.method = "POST";
+    formPausa.style.display = "none";
+    formPausa.innerHTML = '<input type="hidden" name="toggle_pausa">';
+    document.body.appendChild(formPausa);
+    formPausa.submit();
+    document.body.removeChild(formPausa);
+  }
+}
+
+// Mantener compatibilidad con función anterior
+function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
+  abrirModalConfirmacion("eliminar", { nombre, archivo, desdeInicio });
 }
 
 // Event listeners para botones de guardar/cargar
@@ -243,19 +313,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (btnCargar) {
     btnCargar.addEventListener("click", function () {
-      // Crear un formulario oculto y enviarlo
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "";
-
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "abrir_modal_cargar";
-      input.value = "1";
-
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
+      // Pausar la partida primero y luego abrir modal de cargar
+      const formCombinado = document.createElement("form");
+      formCombinado.method = "POST";
+      formCombinado.style.display = "none";
+      formCombinado.innerHTML = '<input type="hidden" name="toggle_pausa"><input type="hidden" name="abrir_modal_cargar" value="1">';
+      document.body.appendChild(formCombinado);
+      formCombinado.submit();
     });
   }
 });
