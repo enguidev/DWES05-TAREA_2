@@ -82,7 +82,7 @@ if (isset($_POST['cancelar_modal'])) {
 // Confirmar reinicio de partida
 if (isset($_POST['confirmar_reiniciar'])) {
   reiniciarPartida();
-  $_SESSION['pausa'] = false; // Reanudar la partida tras reiniciar
+  // La función reiniciarPartida() hace exit, esta línea nunca se ejecuta
 }
 
 // Mostrar modal para guardar partida

@@ -153,6 +153,9 @@ function reiniciarPartida()
   unset($_SESSION['ultimo_tick']);
   unset($_SESSION['nombres_configurados']);
   unset($_SESSION['pausa']);
+  unset($_SESSION['partida_terminada_por_tiempo']); // Limpiar mensaje de tiempo agotado
+  unset($_SESSION['avatar_blancas']);
+  unset($_SESSION['avatar_negras']);
   header("Location: " . $_SERVER['PHP_SELF']);
   exit;
 }
