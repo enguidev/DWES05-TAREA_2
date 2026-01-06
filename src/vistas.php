@@ -194,7 +194,7 @@ function renderModalCargarPartida($partidas)
  */
 function renderModalConfirmarReiniciar()
 {
-  ?>
+?>
   <div id="modalConfirmarReiniciar" class="modal-overlay">
     <div class="modal-content">
       <h2>🔄 Confirmar reinicio</h2>
@@ -210,7 +210,7 @@ function renderModalConfirmarReiniciar()
       </div>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**
