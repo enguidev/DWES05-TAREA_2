@@ -14,6 +14,17 @@ if (modal && btnConfig && closeModal && btnCancelar) {
     })
       .then(() => {
         pausaLocal = false;
+        // Sincronizar inmediatamente con servidor para traer tiempos correctos
+        return fetch("index.php?ajax=update_clocks");
+      })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.sin_partida && !data.partida_terminada) {
+          // Actualizar tiempos locales con datos del servidor
+          tiempoLocalBlancas = data.tiempo_blancas;
+          tiempoLocalNegras = data.tiempo_negras;
+          relojActivoLocal = data.reloj_activo;
+        }
         actualizarDisplayRelojes();
         // Actualizar mensaje en el DOM (quitar naranja)
         const msgDiv = document.querySelector(".mensaje");
