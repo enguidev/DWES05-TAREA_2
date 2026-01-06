@@ -124,7 +124,7 @@ function renderModalConfig()
  */
 function renderModalGuardarPartida($nombreSugerido)
 {
-  ?>
+?>
   <div id="modalGuardar" class="modal-overlay">
     <div class="modal-content">
       <h2>💾 Guardar Partida</h2>
@@ -138,7 +138,7 @@ function renderModalGuardarPartida($nombreSugerido)
       </form>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**
@@ -146,7 +146,7 @@ function renderModalGuardarPartida($nombreSugerido)
  */
 function renderModalCargarPartida($partidas)
 {
-  ?>
+?>
   <div id="modalCargar" class="modal-overlay">
     <div class="modal-content modal-lista">
       <h2>📁 Cargar Partida</h2>
@@ -182,7 +182,7 @@ function renderModalCargarPartida($partidas)
       <?php endif; ?>
     </div>
   </div>
-  <?php
+<?php
 }
 
 /**

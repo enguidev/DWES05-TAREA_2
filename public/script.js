@@ -172,45 +172,45 @@ document.addEventListener("DOMContentLoaded", function () {
 function cerrarModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    modal.style.display = 'none';
+    modal.style.display = "none";
   }
 }
 
 // Event listeners para botones de guardar/cargar
-document.addEventListener('DOMContentLoaded', function() {
-  const btnGuardar = document.getElementById('btnGuardar');
-  const btnCargar = document.getElementById('btnCargar');
-  
+document.addEventListener("DOMContentLoaded", function () {
+  const btnGuardar = document.getElementById("btnGuardar");
+  const btnCargar = document.getElementById("btnCargar");
+
   if (btnGuardar) {
-    btnGuardar.addEventListener('click', function() {
+    btnGuardar.addEventListener("click", function () {
       // Crear un formulario oculto y enviarlo
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '';
-      
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'abrir_modal_guardar';
-      input.value = '1';
-      
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "";
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "abrir_modal_guardar";
+      input.value = "1";
+
       form.appendChild(input);
       document.body.appendChild(form);
       form.submit();
     });
   }
-  
+
   if (btnCargar) {
-    btnCargar.addEventListener('click', function() {
+    btnCargar.addEventListener("click", function () {
       // Crear un formulario oculto y enviarlo
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '';
-      
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'abrir_modal_cargar';
-      input.value = '1';
-      
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "";
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "abrir_modal_cargar";
+      input.value = "1";
+
       form.appendChild(input);
       document.body.appendChild(form);
       form.submit();

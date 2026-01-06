@@ -181,7 +181,7 @@ if (isset($_SESSION['partida'])) {
       <?php if ($mostrarModalGuardar): ?>
         <?php renderModalGuardarPartida($nombrePartidaSugerido); ?>
       <?php endif; ?>
-      
+
       <?php if ($mostrarModalCargar): ?>
         <?php renderModalCargarPartida($partidasGuardadas); ?>
       <?php endif; ?>

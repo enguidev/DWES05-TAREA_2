@@ -214,14 +214,14 @@ function guardarPartida($partida, $nombrePartida = null)
     $jugadores = $partida->getJugadores();
     $nombrePartida = $jugadores['blancas']->getNombre() . ' vs ' . $jugadores['negras']->getNombre();
   }
-  
+
   $timestamp = time();
   $nombreArchivo = preg_replace('/[^a-zA-Z0-9_-]/', '_', $nombrePartida) . '_' . $timestamp;
-  
+
   // Copiar avatares personalizados si existen
   $avatarBlancasGuardado = null;
   $avatarNegrasGuardado = null;
-  
+
   if (isset($_SESSION['avatar_blancas']) && strpos($_SESSION['avatar_blancas'], 'avatar_blancas_') !== false) {
     $rutaOrigen = __DIR__ . '/../public/' . $_SESSION['avatar_blancas'];
     if (file_exists($rutaOrigen)) {
@@ -232,7 +232,7 @@ function guardarPartida($partida, $nombrePartida = null)
       $avatarBlancasGuardado = $nombreAvatar;
     }
   }
-  
+
   if (isset($_SESSION['avatar_negras']) && strpos($_SESSION['avatar_negras'], 'avatar_negras_') !== false) {
     $rutaOrigen = __DIR__ . '/../public/' . $_SESSION['avatar_negras'];
     if (file_exists($rutaOrigen)) {
@@ -243,7 +243,7 @@ function guardarPartida($partida, $nombrePartida = null)
       $avatarNegrasGuardado = $nombreAvatar;
     }
   }
-  
+
   $data = [
     'nombre' => $nombrePartida,
     'fecha' => date('Y-m-d H:i:s', $timestamp),
@@ -260,7 +260,7 @@ function guardarPartida($partida, $nombrePartida = null)
     'avatar_blancas_guardado' => $avatarBlancasGuardado,
     'avatar_negras_guardado' => $avatarNegrasGuardado
   ];
-  
+
   file_put_contents(__DIR__ . '/../data/partidas/' . $nombreArchivo . '.json', json_encode($data, JSON_PRETTY_PRINT));
   return $nombreArchivo;
 }
@@ -273,7 +273,7 @@ function listarPartidas()
 {
   $partidas = [];
   $archivos = glob(__DIR__ . '/../data/partidas/*.json');
-  
+
   foreach ($archivos as $archivo) {
     $data = json_decode(file_get_contents($archivo), true);
     if ($data) {
@@ -285,12 +285,12 @@ function listarPartidas()
       ];
     }
   }
-  
+
   // Ordenar por timestamp descendente (más recientes primero)
   usort($partidas, function ($a, $b) {
     return $b['timestamp'] - $a['timestamp'];
   });
-  
+
   return $partidas;
 }
 
@@ -313,18 +313,18 @@ function cargarPartida($nombreArchivo = null)
   } else {
     return null;
   }
-  
+
   if (!$data) {
     return null;
   }
-  
+
   $_SESSION['partida'] = $data['partida'];
   $_SESSION['casilla_seleccionada'] = $data['casilla_seleccionada'];
   $_SESSION['tiempo_blancas'] = $data['tiempo_blancas'];
   $_SESSION['tiempo_negras'] = $data['tiempo_negras'];
   $_SESSION['reloj_activo'] = $data['reloj_activo'];
   $_SESSION['ultimo_tick'] = time();
-  
+
   if (isset($data['config'])) {
     $_SESSION['config'] = $data['config'];
   }
@@ -333,20 +333,20 @@ function cargarPartida($nombreArchivo = null)
   } else {
     $_SESSION['pausa'] = false;
   }
-  
+
   // Restaurar avatares
   if (isset($data['avatar_blancas_guardado']) && $data['avatar_blancas_guardado']) {
     $_SESSION['avatar_blancas'] = 'data/partidas/avatares/' . $data['avatar_blancas_guardado'];
   } else if (isset($data['avatar_blancas'])) {
     $_SESSION['avatar_blancas'] = $data['avatar_blancas'];
   }
-  
+
   if (isset($data['avatar_negras_guardado']) && $data['avatar_negras_guardado']) {
     $_SESSION['avatar_negras'] = 'data/partidas/avatares/' . $data['avatar_negras_guardado'];
   } else if (isset($data['avatar_negras'])) {
     $_SESSION['avatar_negras'] = $data['avatar_negras'];
   }
-  
+
   return unserialize($_SESSION['partida']);
 }
 
@@ -358,14 +358,14 @@ function cargarPartida($nombreArchivo = null)
 function eliminarPartida($nombreArchivo)
 {
   $rutaArchivo = __DIR__ . '/../data/partidas/' . $nombreArchivo . '.json';
-  
+
   if (!file_exists($rutaArchivo)) {
     return false;
   }
-  
+
   // Cargar datos para obtener avatares
   $data = json_decode(file_get_contents($rutaArchivo), true);
-  
+
   // Eliminar avatares guardados
   if (isset($data['avatar_blancas_guardado']) && $data['avatar_blancas_guardado']) {
     $rutaAvatar = __DIR__ . '/../data/partidas/avatares/' . $data['avatar_blancas_guardado'];
@@ -373,14 +373,14 @@ function eliminarPartida($nombreArchivo)
       unlink($rutaAvatar);
     }
   }
-  
+
   if (isset($data['avatar_negras_guardado']) && $data['avatar_negras_guardado']) {
     $rutaAvatar = __DIR__ . '/../data/partidas/avatares/' . $data['avatar_negras_guardado'];
     if (file_exists($rutaAvatar)) {
       unlink($rutaAvatar);
     }
   }
-  
+
   // Eliminar archivo de partida
   unlink($rutaArchivo);
   return true;
