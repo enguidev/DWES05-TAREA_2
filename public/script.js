@@ -119,11 +119,11 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
         .then(() => {
           pausaLocal = false;
           contadorSincronizacion = 0;
-          // Crear FormData con los datos del formulario + el botón de guardar
+          // Crear FormData con los datos del formulario
           const formData = new FormData(formConfig);
-          formData.set("guardar_configuracion", "1"); // Simular que se presionó el botón
-          // Enviar manual con POST
+          // Convertir a URLSearchParams (incluye todos los datos del formulario)
           const params = new URLSearchParams(formData);
+          // Enviar POST
           return fetch("index.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },

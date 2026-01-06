@@ -12,6 +12,7 @@
       <span class="close-modal">&times;</span>
     </div>
     <form method="post" class="modal-form">
+      <input type="hidden" name="guardar_configuracion" value="1">
       <div class="config-section">
         <h3>🎨 Opciones de Interfaz</h3>
         <p style="color: #666; margin-bottom: 15px;">Puedes mostrar u ocultar elementos visuales</p>
