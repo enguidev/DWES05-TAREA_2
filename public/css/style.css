@@ -1301,3 +1301,30 @@ hr {
     opacity: 1;
   }
 }
+
+/* Estilos para botones en modales de confirmación */
+.btn-eliminar {
+  background: linear-gradient(135deg, #ff6b6b 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-eliminar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.btn-confirmar {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.texto-advertencia {
+  color: #f5576c;
+  font-size: 0.95em;
+  margin-top: 10px;
+}

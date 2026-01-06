@@ -180,6 +180,43 @@ function cerrarModal(modalId) {
   }
 }
 
+// Función para abrir modal de confirmación de eliminación
+function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
+  // Crear el HTML del modal
+  const modalHTML = `
+    <div id="modalConfirmarEliminar" class="modal-overlay">
+      <div class="modal-content">
+        <h2>⚠️ Confirmar eliminación</h2>
+        <p>¿Deseas eliminar la partida "<strong>${nombre}</strong>"?</p>
+        <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
+        <div class="modal-buttons">
+          <form method="post" style="display: inline;">
+            <input type="hidden" name="archivo_partida" value="${archivo}">
+            <button type="submit" name="${desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'}" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
+          </form>
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Eliminar modal anterior si existe
+  const modalAnterior = document.getElementById('modalConfirmarEliminar');
+  if (modalAnterior) {
+    modalAnterior.remove();
+  }
+
+  // Agregar modal al DOM
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+  // Mostrar modal
+  const newModal = document.getElementById('modalConfirmarEliminar');
+  if (newModal) {
+    newModal.style.display = 'flex';
+  }
+}
+
+
 // Event listeners para botones de guardar/cargar
 document.addEventListener("DOMContentLoaded", function () {
   const btnGuardar = document.getElementById("btnGuardar");

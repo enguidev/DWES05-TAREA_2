@@ -105,8 +105,8 @@ function renderConfigForm($partidasGuardadas = [])
         <hr class="linea-horizontal">
 
         <div class="botones-inicio">
-          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎮 Iniciar Partida</button>
-          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()">📁 Cargar Partida Guardada</button>
+          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()" <?php echo empty($partidasGuardadas) ? 'disabled title="No hay partidas guardadas"' : ''; ?>>📁 Cargar Partida Guardada</button>
+          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎮 Iniciar Partida Nueva</button>
         </div>
       </form>
     </div>
@@ -171,10 +171,7 @@ function renderModalCargarPartida($partidas)
                   <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
                   <button type="submit" name="cargar_partida" class="btn-cargar-item">📂 Cargar</button>
                 </form>
-                <form method="post" style="display: inline;">
-                  <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
-                  <button type="submit" name="eliminar_partida" class="btn-eliminar-item" onclick="return confirm('¿Eliminar esta partida?')">🗑️</button>
-                </form>
+                <button type="button" class="btn-eliminar-item" onclick="abrirModalConfirmarEliminar('<?php echo htmlspecialchars(addslashes($partida['nombre'])); ?>', '<?php echo htmlspecialchars($partida['archivo']); ?>', false)">🗑️</button>
               </div>
             </div>
           <?php endforeach; ?>
@@ -438,7 +435,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
                     </form>
                     <form method="post" style="display: inline;">
                       <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
-                      <button type="submit" name="eliminar_partida_inicial" class="btn-eliminar-item" onclick="return confirm('¿Eliminar esta partida?')">🗑️</button>
+                      <button type="button" class="btn-eliminar-item" onclick="abrirModalConfirmarEliminar('<?php echo htmlspecialchars(addslashes($partida['nombre'])); ?>', '<?php echo htmlspecialchars($partida['archivo']); ?>', true)">🗑️</button>
                     </form>
                   </div>
                 </div>
@@ -452,3 +449,26 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       </div>
     <?php
   }
+
+/**
+ * Renderiza modal de confirmación para eliminar partida
+ */
+function renderModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
+{
+  ?>
+  <div id="modalConfirmarEliminar" class="modal-overlay">
+    <div class="modal-content">
+      <h2>⚠️ Confirmar eliminación</h2>
+      <p>¿Deseas eliminar la partida "<strong><?php echo htmlspecialchars($nombrePartida); ?></strong>"?</p>
+      <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
+      <div class="modal-buttons">
+        <form method="post" style="display: inline;">
+          <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($archivoPartida); ?>">
+          <button type="submit" name="<?php echo $desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'; ?>" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
+        </form>
+        <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
+      </div>
+    </div>
+  </div>
+  <?php
+}
