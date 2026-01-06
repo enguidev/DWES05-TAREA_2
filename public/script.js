@@ -46,13 +46,22 @@ function actualizarRelojes() {
         const tb = document.getElementById("tiempo-blancas");
         const tn = document.getElementById("tiempo-negras");
 
-        // Aplicar clase de tiempo crítico
-        data.tiempo_blancas < 60
-          ? tb.classList.add("tiempo-critico")
-          : tb.classList.remove("tiempo-critico");
-        data.tiempo_negras < 60
-          ? tn.classList.add("tiempo-critico")
-          : tn.classList.remove("tiempo-critico");
+        // Aplicar clase de tiempo crítico SOLO al reloj activo
+        if (data.reloj_activo === "blancas") {
+          // Blancas activo
+          data.tiempo_blancas < 60
+            ? tb.classList.add("tiempo-critico")
+            : tb.classList.remove("tiempo-critico");
+          // Negras inactivo: siempre sin parpadeo
+          tn.classList.remove("tiempo-critico");
+        } else {
+          // Negras activo
+          data.tiempo_negras < 60
+            ? tn.classList.add("tiempo-critico")
+            : tn.classList.remove("tiempo-critico");
+          // Blancas inactivo: siempre sin parpadeo
+          tb.classList.remove("tiempo-critico");
+        }
 
         // Actualizar reloj activo/inactivo
         document.querySelectorAll(".reloj").forEach((r) => {
