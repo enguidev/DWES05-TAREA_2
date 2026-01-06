@@ -29,9 +29,15 @@ if (modal && btnConfig && closeModal && btnCancelar) {
 
 // Deshabilitar "Guardar Cambios" hasta que haya modificaciones en la config
 const formConfig = modal ? modal.querySelector("form") : null;
-const btnGuardarConfig = modal ? modal.querySelector(".btn-guardar-config") : null;
-const chkCoords = modal ? modal.querySelector('input[name="mostrar_coordenadas"]') : null;
-const chkCapturas = modal ? modal.querySelector('input[name="mostrar_capturas"]') : null;
+const btnGuardarConfig = modal
+  ? modal.querySelector(".btn-guardar-config")
+  : null;
+const chkCoords = modal
+  ? modal.querySelector('input[name="mostrar_coordenadas"]')
+  : null;
+const chkCapturas = modal
+  ? modal.querySelector('input[name="mostrar_capturas"]')
+  : null;
 
 if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
   const estadoInicial = {
