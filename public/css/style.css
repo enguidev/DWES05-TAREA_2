@@ -990,6 +990,12 @@ hr {
   color: white;
 }
 
+.btn-guardar-config:hover:not(:disabled):not(.btn-disabled) {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
 .btn-guardar-config:disabled,
 .btn-guardar-config.btn-disabled {
   background: #b5b5b5;
@@ -997,12 +1003,6 @@ hr {
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
-}
-
-.btn-guardar-config:hover {
-  background: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
 }
 
 .btn-cancelar-config {
