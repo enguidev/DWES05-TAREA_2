@@ -201,7 +201,7 @@ $partidasGuardadasInicio = listarPartidas();
   <?php if (!isset($_SESSION['nombres_configurados'])): ?>
     <!-- ...mostramos el formulario -->
     <?php renderConfigForm($partidasGuardadasInicio); ?>
-    
+
     <!-- Modal para cargar partida desde pantalla inicial -->
     <?php if (!empty($partidasGuardadasInicio)): ?>
       <?php renderModalCargarInicial($partidasGuardadasInicio); ?>

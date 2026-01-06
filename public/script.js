@@ -223,8 +223,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 // Función para abrir modal cargar desde pantalla inicial
 function abrirModalCargarInicial() {
-  const modal = document.getElementById('modalCargarInicial');
+  const modal = document.getElementById("modalCargarInicial");
   if (modal) {
-    modal.style.display = 'flex';
+    modal.style.display = "flex";
   }
 }
