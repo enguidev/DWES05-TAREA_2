@@ -276,6 +276,14 @@ function manejarSubidaAvatar($inputName, $color)
     mkdir($uploadDir, 0755, true);
   }
 
+  // Eliminar avatares personalizados previos del mismo color
+  $pattern = $uploadDir . 'avatar_' . $color . '_*';
+  foreach (glob($pattern) as $oldFile) {
+    if (is_file($oldFile)) {
+      unlink($oldFile);
+    }
+  }
+
   // Generar nombre único
   $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
   $fileName = 'avatar_' . $color . '_' . time() . '_' . uniqid() . '.' . $extension;
