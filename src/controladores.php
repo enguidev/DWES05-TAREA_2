@@ -433,7 +433,7 @@ function manejarSubidaAvatar($inputName, $color)
 
   // Mover archivo
   if (move_uploaded_file($file['tmp_name'], $filePath)) {
-    return 'imagenes/avatares/' . $fileName;
+    return 'public/imagenes/avatares/' . $fileName;
   }
 
   return null;
