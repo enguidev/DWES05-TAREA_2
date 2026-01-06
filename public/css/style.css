@@ -102,6 +102,14 @@ h1 {
   font-size: 1.3em;
 }
 
+.mensaje.pausa {
+  background: linear-gradient(135deg, #ff9500 0%, #ff6f00 100%);
+  border-left: 4px solid #ff6f00;
+  color: white;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
 /* Relojes de ajedrez */
 .relojes-container {
   display: flex;
@@ -898,10 +906,13 @@ hr {
 .modal-header h2 {
   margin: 0;
   font-size: 1.8em;
-  font-weight: 800;
-  color: #f7f9ff;
-  letter-spacing: 0.5px;
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.35), 0 0 10px rgba(255, 255, 255, 0.35);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 8px 16px;
+  border-radius: 8px;
 }
 
 .close-modal {

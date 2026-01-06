@@ -270,7 +270,13 @@ $partidasGuardadasInicio = listarPartidas();
       <?php renderGameHeader(); ?>
 
       <!-- Mensaje de estado -->
-      <div class="mensaje <?php echo $partida->estaTerminada() ? 'terminada' : ''; ?>">
+      <div class="mensaje <?php 
+        if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
+          echo 'pausa';
+        } elseif ($partida->estaTerminada()) {
+          echo 'terminada';
+        }
+      ?>">
         <?php
         // Si la partida está en pausa...
         if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {

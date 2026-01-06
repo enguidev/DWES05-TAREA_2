@@ -17,6 +17,13 @@ if (modal && btnConfig && closeModal && btnCancelar) {
       .then(() => {
         pausaLocal = true;
         actualizarDisplayRelojes();
+        // Actualizar mensaje en el DOM a naranja
+        const msgDiv = document.querySelector(".mensaje");
+        if (msgDiv) {
+          msgDiv.textContent = "\u23F8\uFE0F PARTIDA EN PAUSA";
+          msgDiv.classList.remove("terminada");
+          msgDiv.classList.add("pausa");
+        }
       })
       .catch((e) => console.error("No se pudo pausar al abrir ajustes:", e));
   };
@@ -224,6 +231,9 @@ function sincronizarConServidor() {
 
 // Manejar selección de avatar personalizado
 document.addEventListener("DOMContentLoaded", function () {
+  // Resetear flag de recarga al cargar la página
+  recargandoPagina = false;
+
   // Iniciar intervalo de actualización de relojes cuando el DOM está listo
   if (!intervaloRelojes && document.getElementById("tiempo-blancas")) {
     // Primero sincronizar para verificar si la partida está terminada
