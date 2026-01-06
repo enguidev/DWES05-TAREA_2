@@ -356,7 +356,7 @@ class Partida
     return null;
   }
 
-  
+
 
   /**
    * Comprueba si el rey del color dado está en jaque
