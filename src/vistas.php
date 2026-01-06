@@ -450,25 +450,25 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
     <?php
   }
 
-/**
- * Renderiza modal de confirmación para eliminar partida
- */
-function renderModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
-{
-  ?>
-  <div id="modalConfirmarEliminar" class="modal-overlay">
-    <div class="modal-content">
-      <h2>⚠️ Confirmar eliminación</h2>
-      <p>¿Deseas eliminar la partida "<strong><?php echo htmlspecialchars($nombrePartida); ?></strong>"?</p>
-      <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
-      <div class="modal-buttons">
-        <form method="post" style="display: inline;">
-          <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($archivoPartida); ?>">
-          <button type="submit" name="<?php echo $desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'; ?>" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
-        </form>
-        <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
+  /**
+   * Renderiza modal de confirmación para eliminar partida
+   */
+  function renderModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
+  {
+    ?>
+      <div id="modalConfirmarEliminar" class="modal-overlay">
+        <div class="modal-content">
+          <h2>⚠️ Confirmar eliminación</h2>
+          <p>¿Deseas eliminar la partida "<strong><?php echo htmlspecialchars($nombrePartida); ?></strong>"?</p>
+          <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
+          <div class="modal-buttons">
+            <form method="post" style="display: inline;">
+              <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($archivoPartida); ?>">
+              <button type="submit" name="<?php echo $desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'; ?>" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
+            </form>
+            <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-  <?php
-}
+    <?php
+  }

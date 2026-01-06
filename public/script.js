@@ -192,7 +192,9 @@ function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
         <div class="modal-buttons">
           <form method="post" style="display: inline;">
             <input type="hidden" name="archivo_partida" value="${archivo}">
-            <button type="submit" name="${desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'}" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
+            <button type="submit" name="${
+              desdeInicio ? "eliminar_partida_inicial" : "eliminar_partida"
+            }" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
           </form>
           <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
         </div>
@@ -201,21 +203,20 @@ function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
   `;
 
   // Eliminar modal anterior si existe
-  const modalAnterior = document.getElementById('modalConfirmarEliminar');
+  const modalAnterior = document.getElementById("modalConfirmarEliminar");
   if (modalAnterior) {
     modalAnterior.remove();
   }
 
   // Agregar modal al DOM
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
 
   // Mostrar modal
-  const newModal = document.getElementById('modalConfirmarEliminar');
+  const newModal = document.getElementById("modalConfirmarEliminar");
   if (newModal) {
-    newModal.style.display = 'flex';
+    newModal.style.display = "flex";
   }
 }
-
 
 // Event listeners para botones de guardar/cargar
 document.addEventListener("DOMContentLoaded", function () {
