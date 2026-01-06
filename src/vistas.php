@@ -4,6 +4,14 @@
  * Funciones de renderizado para la aplicación de ajedrez
  */
 
+// Normaliza rutas de avatares para que carguen desde el raíz del proyecto
+function normalizarRutaAvatar($ruta)
+{
+  if (!$ruta) return null;
+  if (preg_match('/^https?:\/\//', $ruta)) return $ruta;
+  return './' . ltrim($ruta, '/');
+}
+
 /**
  * Renderiza el formulario de configuración inicial
  */
@@ -253,8 +261,11 @@ function renderRelojes($jugadores, $marcador)
   <div class="relojes-container">
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'blancas' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
       <div class="reloj-jugador">
-        <?php if (isset($_SESSION['avatar_blancas']) && $_SESSION['avatar_blancas']): ?>
-          <img src="<?php echo htmlspecialchars($_SESSION['avatar_blancas']); ?>" class="avatar-circular" alt="Avatar Blancas">
+        <?php
+        $avatarBlancasSrc = normalizarRutaAvatar(isset($_SESSION['avatar_blancas']) ? $_SESSION['avatar_blancas'] : null);
+        ?>
+        <?php if ($avatarBlancasSrc): ?>
+          <img src="<?php echo htmlspecialchars($avatarBlancasSrc); ?>" class="avatar-circular" alt="Avatar Blancas">
         <?php else: ?>
           ⚪
         <?php endif; ?>
@@ -268,8 +279,11 @@ function renderRelojes($jugadores, $marcador)
     <div class="reloj-separador">⏱️</div>
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'negras' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-negras">
       <div class="reloj-jugador">
-        <?php if (isset($_SESSION['avatar_negras']) && $_SESSION['avatar_negras']): ?>
-          <img src="<?php echo htmlspecialchars($_SESSION['avatar_negras']); ?>" class="avatar-circular" alt="Avatar Negras">
+        <?php
+        $avatarNegrasSrc = normalizarRutaAvatar(isset($_SESSION['avatar_negras']) ? $_SESSION['avatar_negras'] : null);
+        ?>
+        <?php if ($avatarNegrasSrc): ?>
+          <img src="<?php echo htmlspecialchars($avatarNegrasSrc); ?>" class="avatar-circular" alt="Avatar Negras">
         <?php else: ?>
           ⚫
         <?php endif; ?>
