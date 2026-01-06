@@ -282,7 +282,7 @@ $partidasGuardadasInicio = listarPartidas();
       <?php endif; ?>
 
       <!-- Cabecera del juego -->
-      <?php renderGameHeader(); ?>
+      <?php renderGameHeader($partida); ?>
 
       <!-- Mensaje de estado -->
       <div class="mensaje <?php
