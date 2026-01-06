@@ -24,13 +24,13 @@ function renderConfigForm()
           <label>Avatar:</label>
           <select name="avatar_blancas" class="select-avatar">
             <option value="default">Sin avatar</option>
-            <option value="rey_blanca.png">Rey</option>
-            <option value="dama_blanca.png">Dama</option>
-            <option value="torre_blanca.png">Torre</option>
-            <option value="caballo_blanca.png">Caballo</option>
-            <option value="alfil_blanca.png">Alfil</option>
-            <option value="peon_blanca.png">Peón</option>
-            <option value="user_white.png">Usuario Blanco</option>
+            <option value="imagenes/fichas_blancas/rey_blanca.png">Rey</option>
+            <option value="imagenes/fichas_blancas/dama_blanca.png">Dama</option>
+            <option value="imagenes/fichas_blancas/torre_blanca.png">Torre</option>
+            <option value="imagenes/fichas_blancas/caballo_blanca.png">Caballo</option>
+            <option value="imagenes/fichas_blancas/alfil_blanca.png">Alfil</option>
+            <option value="imagenes/fichas_blancas/peon_blanca.png">Peón</option>
+            <option value="imagenes/avatares/user_white.png">Usuario Blanco</option>
             <option value="custom">Subir imagen personalizada</option>
           </select>
           <input type="file" name="avatar_custom_blancas" id="avatar_custom_blancas" style="display: none;" accept="image/*">
@@ -46,13 +46,13 @@ function renderConfigForm()
           <label>Avatar:</label>
           <select name="avatar_negras" class="select-avatar">
             <option value="default">Sin avatar</option>
-            <option value="rey_negra.png">Rey</option>
-            <option value="dama_negra.png">Dama</option>
-            <option value="torre_negra.png">Torre</option>
-            <option value="caballo_negra.png">Caballo</option>
-            <option value="alfil_negra.png">Alfil</option>
-            <option value="peon_negra.png">Peón</option>
-            <option value="user_black.png">Usuario Negro</option>
+            <option value="imagenes/fichas_negras/rey_negra.png">Rey</option>
+            <option value="imagenes/fichas_negras/dama_negra.png">Dama</option>
+            <option value="imagenes/fichas_negras/torre_negra.png">Torre</option>
+            <option value="imagenes/fichas_negras/caballo_negra.png">Caballo</option>
+            <option value="imagenes/fichas_negras/alfil_negra.png">Alfil</option>
+            <option value="imagenes/fichas_negras/peon_negra.png">Peón</option>
+            <option value="imagenes/avatares/user_black.png">Usuario Negro</option>
             <option value="custom">Subir imagen personalizada</option>
           </select>
           <input type="file" name="avatar_custom_negras" id="avatar_custom_negras" style="display: none;" accept="image/*">
@@ -150,7 +150,7 @@ function renderRelojes($jugadores, $marcador)
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'blancas' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
       <div class="reloj-jugador">
         <?php if (isset($_SESSION['avatar_blancas']) && $_SESSION['avatar_blancas']): ?>
-          <img src="imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_blancas']); ?>" class="avatar-circular" alt="Avatar Blancas">
+          <img src="<?php echo htmlspecialchars($_SESSION['avatar_blancas']); ?>" class="avatar-circular" alt="Avatar Blancas">
         <?php else: ?>
           ⚪
         <?php endif; ?>
@@ -165,7 +165,7 @@ function renderRelojes($jugadores, $marcador)
     <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'negras' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-negras">
       <div class="reloj-jugador">
         <?php if (isset($_SESSION['avatar_negras']) && $_SESSION['avatar_negras']): ?>
-          <img src="imagenes/avatares/<?php echo htmlspecialchars($_SESSION['avatar_negras']); ?>" class="avatar-circular" alt="Avatar Negras">
+          <img src="<?php echo htmlspecialchars($_SESSION['avatar_negras']); ?>" class="avatar-circular" alt="Avatar Negras">
         <?php else: ?>
           ⚫
         <?php endif; ?>
