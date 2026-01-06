@@ -100,6 +100,16 @@ if (isset($_POST['abrir_modal_reiniciar'])) {
   $mostrarModalReiniciar = true;
 }
 
+// Mostrar modal para confirmar revancha
+$mostrarModalRevancha = false;
+if (isset($_POST['abrir_modal_revancha'])) {
+  // Pausar la partida al abrir modal de revancha
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    $_SESSION['pausa'] = true;
+  }
+  $mostrarModalRevancha = true;
+}
+
 // Cancelar modal (reanudar pausa)
 if (isset($_POST['cancelar_modal'])) {
   if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
@@ -113,8 +123,8 @@ if (isset($_POST['confirmar_reiniciar'])) {
   // La función reiniciarPartida() hace exit, esta línea nunca se ejecuta
 }
 
-// Revancha (nueva partida con misma configuración)
-if (isset($_POST['revancha'])) {
+// Confirmar revancha
+if (isset($_POST['confirmar_revancha'])) {
   revanchaPartida();
   // La función revanchaPartida() hace exit, esta línea nunca se ejecuta
 }
@@ -287,6 +297,12 @@ $partidasGuardadasInicio = listarPartidas();
         <?php renderModalConfirmarReiniciar(); ?>
       <?php endif; ?>
 
+      <?php if ($mostrarModalRevancha): ?>
+        <?php renderModalConfirmarRevancha(); ?>
+      <?php endif; ?>
+      <?php if ($mostrarModalRevancha): ?>
+        <?php renderModalConfirmarRevancha(); ?>
+      <?php endif; ?>
       <!-- Cabecera del juego -->
       <?php renderGameHeader($partida); ?>
 

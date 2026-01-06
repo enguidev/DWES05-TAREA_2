@@ -1422,6 +1422,16 @@ hr {
   box-shadow: 0 4px 12px rgba(255, 165, 2, 0.4);
 }
 
+.btn-revancha-confirm {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.btn-revancha-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+}
+
 .btn-cargar-confirm {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
