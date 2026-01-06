@@ -30,7 +30,8 @@ if (isset($_POST['pausar_desde_config'])) {
 }
 
 // Petición para reanudar al cerrar ajustes (modal de configuración)
-if (isset($_POST['reanudar_desde_config'])) {
+// PERO: si viene con guardar_configuracion, no hacer exit aquí
+if (isset($_POST['reanudar_desde_config']) && !isset($_POST['guardar_configuracion'])) {
   $_SESSION['pausa'] = false;
   $_SESSION['ultimo_tick'] = time(); // Resetear para no contar tiempo de pausa
   header('Content-Type: application/json');
@@ -41,7 +42,7 @@ if (isset($_POST['reanudar_desde_config'])) {
 // Procesar configuración (solo opciones visuales)
 if (isset($_POST['guardar_configuracion'])) {
   procesarGuardarConfiguracion();
-  // Si también viene reanudar, procesarlo después
+  // Si también viene reanudar, procesarlo
   if (isset($_POST['reanudar_desde_config'])) {
     $_SESSION['pausa'] = false;
     $_SESSION['ultimo_tick'] = time();
