@@ -83,8 +83,9 @@ function actualizarRelojes() {
         // Verificar si el tiempo se agotó
         if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
           clearInterval(intervaloRelojes);
-          // Recargar para mostrar el mensaje del servidor
-          setTimeout(() => location.reload(), 500);
+          intervaloRelojes = null; // Marcar como nulo para evitar seguir actualizando
+          // Recargar una sola vez para mostrar el mensaje del servidor
+          location.reload();
         }
       }
     })
