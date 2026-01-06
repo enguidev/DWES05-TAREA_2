@@ -29,6 +29,15 @@ if (isset($_POST['pausar_desde_config'])) {
   exit;
 }
 
+// Petición para reanudar al cerrar ajustes (modal de configuración)
+if (isset($_POST['reanudar_desde_config'])) {
+  $_SESSION['pausa'] = false;
+  $_SESSION['ultimo_tick'] = time();
+  header('Content-Type: application/json');
+  echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
+  exit;
+}
+
 // Procesar configuración (solo opciones visuales)
 if (isset($_POST['guardar_configuracion'])) {
   procesarGuardarConfiguracion();

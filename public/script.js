@@ -5,6 +5,27 @@ const closeModal = document.querySelector(".close-modal");
 const btnCancelar = document.querySelector(".btn-cancelar-config");
 
 if (modal && btnConfig && closeModal && btnCancelar) {
+  // Función para reanudar la partida (quitar pausa)
+  function reanudarDesdeModal() {
+    fetch("index.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ reanudar_desde_config: "1" }),
+    })
+      .then(() => {
+        pausaLocal = false;
+        actualizarDisplayRelojes();
+        // Actualizar mensaje en el DOM (quitar naranja)
+        const msgDiv = document.querySelector(".mensaje");
+        if (msgDiv) {
+          msgDiv.classList.remove("pausa");
+          msgDiv.classList.remove("terminada");
+          msgDiv.textContent = "";
+        }
+      })
+      .catch((e) => console.error("No se pudo reanudar desde ajustes:", e));
+  }
+
   btnConfig.onclick = () => {
     modal.style.display = "block";
 
@@ -27,10 +48,19 @@ if (modal && btnConfig && closeModal && btnCancelar) {
       })
       .catch((e) => console.error("No se pudo pausar al abrir ajustes:", e));
   };
-  closeModal.onclick = () => (modal.style.display = "none");
-  btnCancelar.onclick = () => (modal.style.display = "none");
+  closeModal.onclick = () => {
+    modal.style.display = "none";
+    reanudarDesdeModal();
+  };
+  btnCancelar.onclick = () => {
+    modal.style.display = "none";
+    reanudarDesdeModal();
+  };
   window.onclick = (e) => {
-    if (e.target == modal) modal.style.display = "none";
+    if (e.target == modal) {
+      modal.style.display = "none";
+      reanudarDesdeModal();
+    }
   };
 }
 
