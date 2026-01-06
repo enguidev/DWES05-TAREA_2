@@ -17,75 +17,91 @@ if (modal && btnConfig && closeModal && btnCancelar) {
 let intervaloRelojes = null;
 let tiempoLocalBlancas = 0;
 let tiempoLocalNegras = 0;
-let relojActivoLocal = 'blancas';
+let relojActivoLocal = "blancas";
 let pausaLocal = false;
 let contadorSincronizacion = 0;
 
 // Función para formatear tiempo
 function formatearTiempo(segundos) {
-  return String(Math.floor(segundos / 60)).padStart(2, "0") +
+  return (
+    String(Math.floor(segundos / 60)).padStart(2, "0") +
     ":" +
-    String(segundos % 60).padStart(2, "0");
+    String(segundos % 60).padStart(2, "0")
+  );
 }
 
 // Actualizar display del reloj en el DOM
 function actualizarDisplayRelojes() {
   const tb = document.getElementById("tiempo-blancas");
   const tn = document.getElementById("tiempo-negras");
-  
+
   if (!tb || !tn) return;
-  
+
   tb.textContent = formatearTiempo(tiempoLocalBlancas);
   tn.textContent = formatearTiempo(tiempoLocalNegras);
-  
+
   // Aplicar clase de tiempo crítico SOLO al reloj activo
   if (relojActivoLocal === "blancas") {
-    tiempoLocalBlancas < 60 ? tb.classList.add("tiempo-critico") : tb.classList.remove("tiempo-critico");
+    tiempoLocalBlancas < 60
+      ? tb.classList.add("tiempo-critico")
+      : tb.classList.remove("tiempo-critico");
     tn.classList.remove("tiempo-critico");
   } else {
-    tiempoLocalNegras < 60 ? tn.classList.add("tiempo-critico") : tn.classList.remove("tiempo-critico");
+    tiempoLocalNegras < 60
+      ? tn.classList.add("tiempo-critico")
+      : tn.classList.remove("tiempo-critico");
     tb.classList.remove("tiempo-critico");
   }
-  
+
   // Actualizar reloj activo/inactivo
   document.querySelectorAll(".reloj").forEach((r) => {
     if (r.classList.contains("reloj-blancas")) {
       relojActivoLocal === "blancas"
-        ? (r.classList.add("reloj-activo"), r.classList.remove("reloj-inactivo"))
-        : (r.classList.remove("reloj-activo"), r.classList.add("reloj-inactivo"));
+        ? (r.classList.add("reloj-activo"),
+          r.classList.remove("reloj-inactivo"))
+        : (r.classList.remove("reloj-activo"),
+          r.classList.add("reloj-inactivo"));
     } else if (r.classList.contains("reloj-negras")) {
       relojActivoLocal === "negras"
-        ? (r.classList.add("reloj-activo"), r.classList.remove("reloj-inactivo"))
-        : (r.classList.remove("reloj-activo"), r.classList.add("reloj-inactivo"));
+        ? (r.classList.add("reloj-activo"),
+          r.classList.remove("reloj-inactivo"))
+        : (r.classList.remove("reloj-activo"),
+          r.classList.add("reloj-inactivo"));
     }
   });
 }
 
 // Decrementar tiempo local cada segundo
 function actualizarTiempoLocal() {
-  if (!document.getElementById("tiempo-blancas") || !document.getElementById("tiempo-negras")) {
+  if (
+    !document.getElementById("tiempo-blancas") ||
+    !document.getElementById("tiempo-negras")
+  ) {
     return;
   }
-  
+
   // Si no está en pausa, decrementar el reloj activo
   if (!pausaLocal) {
-    if (relojActivoLocal === 'blancas' && tiempoLocalBlancas > 0) {
+    if (relojActivoLocal === "blancas" && tiempoLocalBlancas > 0) {
       tiempoLocalBlancas--;
-    } else if (relojActivoLocal === 'negras' && tiempoLocalNegras > 0) {
+    } else if (relojActivoLocal === "negras" && tiempoLocalNegras > 0) {
       tiempoLocalNegras--;
     }
-    
+
     // Verificar si se agotó el tiempo - solo recargar UNA VEZ
-    if ((tiempoLocalBlancas <= 0 || tiempoLocalNegras <= 0) && intervaloRelojes !== null) {
+    if (
+      (tiempoLocalBlancas <= 0 || tiempoLocalNegras <= 0) &&
+      intervaloRelojes !== null
+    ) {
       clearInterval(intervaloRelojes);
       intervaloRelojes = null;
       location.reload();
       return;
     }
   }
-  
+
   actualizarDisplayRelojes();
-  
+
   // Sincronizar con el servidor cada 5 segundos
   contadorSincronizacion++;
   if (contadorSincronizacion >= 5) {
@@ -103,18 +119,24 @@ function sincronizarConServidor() {
     })
     .then((data) => {
       if (data.sin_partida) return;
-      
-      if (data.tiempo_blancas !== undefined && data.tiempo_negras !== undefined) {
+
+      if (
+        data.tiempo_blancas !== undefined &&
+        data.tiempo_negras !== undefined
+      ) {
         // Actualizar variables locales con datos del servidor
         tiempoLocalBlancas = data.tiempo_blancas;
         tiempoLocalNegras = data.tiempo_negras;
         relojActivoLocal = data.reloj_activo;
         pausaLocal = data.pausa || false;
-        
+
         actualizarDisplayRelojes();
-        
+
         // Verificar tiempo agotado solo si el intervalo aún está activo
-        if ((data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) && intervaloRelojes !== null) {
+        if (
+          (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) &&
+          intervaloRelojes !== null
+        ) {
           clearInterval(intervaloRelojes);
           intervaloRelojes = null;
           location.reload();
