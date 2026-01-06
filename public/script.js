@@ -73,12 +73,14 @@ function actualizarRelojes() {
 
         // Verificar si el tiempo se agotó
         if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
+          clearInterval(intervaloRelojes);
           alert(
             "¡Tiempo agotado para " +
               (data.tiempo_blancas <= 0 ? "blancas" : "negras") +
-              "!"
+              "! La partida ha terminado."
           );
-          location.reload();
+          // Recargar después de un pequeño delay para que se muestre el estado final
+          setTimeout(() => location.reload(), 500);
         }
       }
     })
@@ -87,7 +89,7 @@ function actualizarRelojes() {
     });
 }
 
-setInterval(actualizarRelojes, 1000);
+let intervaloRelojes = setInterval(actualizarRelojes, 1000);
 
 // Manejar selección de avatar personalizado
 document.addEventListener("DOMContentLoaded", function () {

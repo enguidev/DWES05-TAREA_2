@@ -30,6 +30,13 @@ function procesarAjaxUpdateClocks()
       }
     }
 
+    // Detectar si el tiempo se agotó y terminar la partida
+    if ($_SESSION['tiempo_blancas'] <= 0) {
+      $_SESSION['partida_terminada_por_tiempo'] = 'negras';
+    } elseif ($_SESSION['tiempo_negras'] <= 0) {
+      $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
+    }
+
     header('Content-Type: application/json');
     echo json_encode([
       'tiempo_blancas' => $_SESSION['tiempo_blancas'],

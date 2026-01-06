@@ -124,6 +124,20 @@ if (isset($_SESSION['partida'])) {
     }
   }
 
+  // Detectar si la partida terminó por tiempo agotado
+  if (isset($_SESSION['partida_terminada_por_tiempo'])) {
+    $ganador = $_SESSION['partida_terminada_por_tiempo'];
+    $jugadores = $partida->getJugadores();
+    if ($ganador === 'blancas') {
+      $partida->setMensaje('⏰ ¡Tiempo agotado para las negras! ' . htmlspecialchars($jugadores['blancas']->getNombre()) . ' ha ganado.');
+    } else {
+      $partida->setMensaje('⏰ ¡Tiempo agotado para las blancas! ' . htmlspecialchars($jugadores['negras']->getNombre()) . ' ha ganado.');
+    }
+    $partida->terminar();
+    $_SESSION['partida'] = serialize($partida);
+    unset($_SESSION['partida_terminada_por_tiempo']);
+  }
+
   // Actualizamos la session
   $casillaSeleccionada = $_SESSION['casilla_seleccionada'];
   // Guardamos la partida en la sesión

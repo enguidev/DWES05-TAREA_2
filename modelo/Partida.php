@@ -609,6 +609,32 @@ class Partida
   }
 
   /**
+   * Obtiene el mensaje de estado
+   * @return string El mensaje actual
+   */
+  public function getMensaje()
+  {
+    return $this->mensaje;
+  }
+
+  /**
+   * Establece el mensaje de estado
+   * @param string $nuevoMensaje El nuevo mensaje
+   */
+  public function setMensaje($nuevoMensaje)
+  {
+    $this->mensaje = $nuevoMensaje;
+  }
+
+  /**
+   * Termina la partida
+   */
+  public function terminar()
+  {
+    $this->partidaTerminada = true;
+  }
+
+  /**
    * Devuelve el oponente del color dado
    * @param string $color 'blancas' o 'negras'
    * @return string El color oponente
