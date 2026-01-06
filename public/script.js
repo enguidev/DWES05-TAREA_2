@@ -281,15 +281,12 @@ function sincronizarConServidor() {
 
         actualizarDisplayRelojes();
 
-        // Verificar tiempo agotado solo si no estamos ya recargando
-        if (
-          (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) &&
-          !recargandoPagina
-        ) {
-          recargandoPagina = true;
-          clearInterval(intervaloRelojes);
-          intervaloRelojes = null;
-          location.reload();
+        // Si el tiempo se agotó, detener el intervalo (sin reload)
+        if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
+          if (intervaloRelojes !== null) {
+            clearInterval(intervaloRelojes);
+            intervaloRelojes = null;
+          }
         }
       }
     })

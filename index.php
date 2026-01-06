@@ -300,9 +300,6 @@ $partidasGuardadasInicio = listarPartidas();
       <?php if ($mostrarModalRevancha): ?>
         <?php renderModalConfirmarRevancha(); ?>
       <?php endif; ?>
-      <?php if ($mostrarModalRevancha): ?>
-        <?php renderModalConfirmarRevancha(); ?>
-      <?php endif; ?>
       <!-- Cabecera del juego -->
       <?php renderGameHeader($partida); ?>
 

@@ -222,19 +222,19 @@ function renderModalCargarPartida($partidas)
 }
 
 /**
- * Renderiza modal de confirmación para reiniciar partida
+ * Renderiza modal de confirmación para nueva partida
  */
 function renderModalConfirmarReiniciar()
 {
 ?>
   <div id="modalConfirmarReiniciar" class="modal-overlay">
     <div class="modal-content">
-      <h2>🔄 Confirmar reinicio</h2>
-      <p>¿Deseas reiniciar la partida? Perderás todo el progreso.</p>
+      <h2>🔄 Confirmar nueva partida</h2>
+      <p>¿Deseas empezar una nueva partida? Perderás todo el progreso.</p>
       <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
       <div class="modal-buttons">
         <form method="post" style="display: inline;">
-          <button type="submit" name="confirmar_reiniciar" class="btn-confirmar btn-reiniciar-confirm">🔄 Reiniciar</button>
+          <button type="submit" name="confirmar_reiniciar" class="btn-confirmar btn-reiniciar-confirm">✅ Sí, nueva partida</button>
         </form>
         <form method="post" style="display: inline;">
           <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cancelar</button>
@@ -255,7 +255,7 @@ function renderModalConfirmarRevancha()
     <div class="modal-content">
       <h2>🔁 Confirmar revancha</h2>
       <p>¿Deseas iniciar una revancha? Se mantendrán los jugadores y la configuración.</p>
-      <p style="color: #667eea; font-weight: 600; margin-top: 10px;">ℹ️ El tablero se reiniciará a la posición inicial.</p>
+      <p style="color: #667eea; font-weight: 600; margin-top: 10px;">ℹ️ El tablero se reiniciará a la posición inicial manteniendo jugadores y configuración.</p>
       <div class="modal-buttons">
         <form method="post" style="display: inline;">
           <button type="submit" name="confirmar_revancha" class="btn-confirmar btn-revancha-confirm">🔁 Revancha</button>
@@ -303,7 +303,7 @@ function renderBotonesControl($partida)
       <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>
     </form>
     <form method="post" style="display: inline;">
-      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar">🔄 Reiniciar</button>
+      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar">🔄 Nueva partida</button>
     </form>
   </div>
 <?php
@@ -507,7 +507,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
           <ul style="list-style: none; padding-left: 0;">
             <li>💾 <strong>Guardar</strong>: Guarda la partida actual para continuarla después</li>
             <li>📁 <strong>Cargar</strong>: Carga una partida guardada anteriormente</li>
-            <li>🔄 <strong>Reiniciar</strong>: Inicia una nueva partida desde el principio</li>
+            <li>🔄 <strong>Nueva partida</strong>: Inicia una nueva partida desde el principio (se pierde progreso y configuración de jugadores)</li>
             <li>⚙️ <strong>Configuración</strong>: Ajusta opciones visuales y de tiempo</li>
           </ul>
 
