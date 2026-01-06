@@ -300,7 +300,7 @@ function renderBotonesControl($partida)
       <button type="submit" name="abrir_modal_revancha" class="btn-revancha" id="btn-revancha" title="Nueva partida con la misma configuración">🔁 Revancha</button>
     </form>
     <form method="post" style="display: inline;">
-      <button type="submit" name="guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar</button>
+      <button type="submit" name="abrir_modal_guardar" class="btn-guardar" id="btn-guardar" <?php echo (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) ? 'disabled' : ''; ?>>💾 Guardar partida</button>
     </form>
     <form method="post" style="display: inline;">
       <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar">🔄 Nueva partida</button>
