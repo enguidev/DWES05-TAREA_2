@@ -7,7 +7,7 @@
 /**
  * Renderiza el formulario de configuración inicial
  */
-function renderConfigForm()
+function renderConfigForm($partidasGuardadas = [])
 {
 ?>
   <div class="container">
@@ -104,7 +104,10 @@ function renderConfigForm()
         </div>
         <hr class="linea-horizontal">
 
-        <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">Iniciar Partida</button>
+        <div class="botones-inicio">
+          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎮 Iniciar Partida</button>
+          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()">📁 Cargar Partida Guardada</button>
+        </div>
       </form>
     </div>
   </div>
@@ -406,3 +409,46 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       </div>
     <?php
   }
+/**
+ * Renderiza el modal para cargar partida desde pantalla inicial
+ */
+function renderModalCargarInicial($partidas)
+{
+  ?>
+  <div id="modalCargarInicial" class="modal-overlay">
+    <div class="modal-content modal-lista">
+      <h2>📁 Cargar Partida Guardada</h2>
+      <?php if (empty($partidas)): ?>
+        <p class="mensaje-vacio">No hay partidas guardadas</p>
+        <div class="modal-buttons">
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalCargarInicial')">✖️ Cerrar</button>
+        </div>
+      <?php else: ?>
+        <div class="lista-partidas">
+          <?php foreach ($partidas as $partida): ?>
+            <div class="item-partida">
+              <div class="info-partida">
+                <div class="nombre-partida"><?php echo htmlspecialchars($partida['nombre']); ?></div>
+                <div class="fecha-partida"><?php echo htmlspecialchars($partida['fecha']); ?></div>
+              </div>
+              <div class="acciones-partida">
+                <form method="post" style="display: inline;">
+                  <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
+                  <button type="submit" name="cargar_partida_inicial" class="btn-cargar-item">📂 Cargar</button>
+                </form>
+                <form method="post" style="display: inline;">
+                  <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
+                  <button type="submit" name="eliminar_partida_inicial" class="btn-eliminar-item" onclick="return confirm('¿Eliminar esta partida?')">🗑️</button>
+                </form>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn-cancelar" onclick="cerrarModal('modalCargarInicial')">✖️ Cerrar</button>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+  <?php
+}

@@ -38,6 +38,20 @@ if (isset($_POST['iniciar_partida'])) {
   iniciarPartida();
 }
 
+// Cargar partida desde pantalla inicial
+if (isset($_POST['cargar_partida_inicial']) && isset($_POST['archivo_partida'])) {
+  $partidaCargada = cargarPartida($_POST['archivo_partida']);
+  if ($partidaCargada) {
+    $_SESSION['partida'] = serialize($partidaCargada);
+    $_SESSION['nombres_configurados'] = true;
+  }
+}
+
+// Eliminar partida desde pantalla inicial
+if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida'])) {
+  eliminarPartida($_POST['archivo_partida']);
+}
+
 // Pausar/Reanudar partida
 if (isset($_POST['toggle_pausa'])) {
   procesarTogglePausa();
@@ -166,6 +180,9 @@ if (isset($_SESSION['partida'])) {
     if ($pieza->estCapturada()) $piezasCapturadas['negras'][] = $pieza;
   }
 }
+
+// Obtener lista de partidas guardadas para la pantalla inicial
+$partidasGuardadasInicio = listarPartidas();
 ?>
 <!-- HTML -->
 <!DOCTYPE html>
@@ -183,7 +200,12 @@ if (isset($_SESSION['partida'])) {
   <!-- Si no se han configurado los nombres de los jugadores... -->
   <?php if (!isset($_SESSION['nombres_configurados'])): ?>
     <!-- ...mostramos el formulario -->
-    <?php renderConfigForm(); ?>
+    <?php renderConfigForm($partidasGuardadasInicio); ?>
+    
+    <!-- Modal para cargar partida desde pantalla inicial -->
+    <?php if (!empty($partidasGuardadasInicio)): ?>
+      <?php renderModalCargarInicial($partidasGuardadasInicio); ?>
+    <?php endif; ?>
     <!-- Si se ha configurado los nombres de los jugadores... -->
   <?php else: ?>
     <!-- ...mostramos la partida -->

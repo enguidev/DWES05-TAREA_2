@@ -609,15 +609,6 @@ class Partida
   }
 
   /**
-   * Obtiene el mensaje de estado
-   * @return string El mensaje actual
-   */
-  public function getMensaje()
-  {
-    return $this->mensaje;
-  }
-
-  /**
    * Establece el mensaje de estado
    * @param string $nuevoMensaje El nuevo mensaje
    */
