@@ -13,6 +13,17 @@ function renderConfigForm($partidasGuardadas = [])
   <div class="container">
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
+      <!-- Sección inicial: Cargar partida guardada -->
+      <div class="seccion-cargar-inicio" style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+        <p style="margin: 0 0 15px 0; font-size: 1.1em; font-weight: bold;">¿Deseas continuar con una partida anterior?</p>
+        <?php if (!empty($partidasGuardadas)): ?>
+          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()" style="margin-bottom: 15px;">📁 Cargar Partida Guardada</button>
+          <p style="margin: 10px 0 0 0; color: #666; font-size: 0.9em;">O crea una nueva partida a continuación</p>
+        <?php else: ?>
+          <p style="margin: 0; color: #999; font-style: italic;">No hay partidas guardadas. Crea una nueva partida.</p>
+        <?php endif; ?>
+      </div>
+
       <form method="post" enctype="multipart/form-data" class="config-form">
         <p class="configuracion-inicial"><strong>Nombres de los jugadores</strong></p>
 
@@ -105,7 +116,6 @@ function renderConfigForm($partidasGuardadas = [])
         <hr class="linea-horizontal">
 
         <div class="botones-inicio">
-          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()" <?php echo empty($partidasGuardadas) ? 'disabled title="No hay partidas guardadas"' : ''; ?>>📁 Cargar Partida Guardada</button>
           <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎮 Iniciar Partida Nueva</button>
         </div>
       </form>
