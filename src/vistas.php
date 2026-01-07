@@ -278,7 +278,7 @@ function renderModalPromocion()
   $pos = isset($_SESSION['promocion_en_curso']['posicion']) ? $_SESSION['promocion_en_curso']['posicion'] : null;
   if (!$color || !$pos) return;
 ?>
-  <div id="modalPromocion" class="modal-overlay">
+  <div id="modalPromocion" class="modal-overlay" style="display: flex !important;">
     <div class="modal-content">
       <h2>👑 Elegir pieza de promoción</h2>
       <p>El peón de <?php echo htmlspecialchars($color); ?> en <?php echo htmlspecialchars($pos); ?> puede promoverse. Elige la pieza:</p>

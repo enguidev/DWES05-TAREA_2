@@ -266,6 +266,12 @@ function procesarJugada($partida)
             ];
             // Pausar partida para elegir pieza
             $_SESSION['pausa'] = true;
+            // Guardar partida antes de redirigir
+            $_SESSION['casilla_seleccionada'] = null;
+            $_SESSION['partida'] = serialize($partida);
+            // Redirigir para mostrar el modal
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
           }
         }
 
