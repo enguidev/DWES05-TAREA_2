@@ -6,7 +6,7 @@
  */
 ?>
 <!-- MODAL CONFIGURACIÓN - Panel para personalizar opciones visuales de la partida -->
-<div id="modalConfig" class="modal">
+<div id="modalConfiguracion" class="modal">
   <div class="modal-content">
     <!-- Encabezado del modal con título y botón cerrar -->
     <div class="modal-header">

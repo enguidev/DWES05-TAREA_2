@@ -396,10 +396,10 @@ function renderGameHeader($partida)
     <h1>♟️ Partida de Ajedrez</h1>
     <div class="header-buttons">
       <!-- Botón para abrir configuración -->
-      <button id="btnConfig" class="btn-config" title="Configuración">⚙️</button>
+      <button id="btnConfiguracion" class="btn-configuracion" title="Configuración">⚙️</button>
       <form method="post" style="display: inline;">
         <!-- Botón para pausar/reanudar según el estado actual -->
-        <button type="submit" name="toggle_pausa" class="btn-pausa" id="btnPausa" title="Pausar/Reanudar">
+        <button type="submit" name="alternar_pausa" class="btn-pausa" id="btnPausa" title="Pausar/Reanudar">
           <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? '▶️' : '⏸️'; ?>
         </button>
       </form>

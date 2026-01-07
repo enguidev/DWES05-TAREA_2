@@ -5,7 +5,7 @@
  * Actualiza los relojes de la partida en tiempo real
  * Recibe peticiones AJAX desde JavaScript para mantener los tiempos sincronizados
  */
-function procesarAjaxUpdateClocks()
+function procesarAjaxActualizarRelojes()
 {
   // Le decimos al navegador que vamos a devolver JSON
   header('Content-Type: application/json');

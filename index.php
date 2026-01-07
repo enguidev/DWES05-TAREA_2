@@ -1,21 +1,21 @@
 <?php
-// Iniciamos la sesión para guardar los datos de la partida
+// Iniciamos la session 
 session_start();
 
-// Traemos todos los archivos que necesitamos para que funcione el ajedrez
+// Archivos necesarios
 require_once 'modelo/Partida.php';
 require_once 'src/funciones_auxiliares.php';
 require_once 'src/vistas.php';
 require_once 'src/controladores.php';
 
-// Cuando JavaScript pide actualizar los relojes, procesamos eso
-if (isset($_GET['ajax']) && $_GET['ajax'] === 'update_clocks') {
+// Manejo de solicitudes AJAX (esto lo he hecho con JS para poder hacerlo en tiempo real, en php sólo al recargar la página)
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'actualizar_relojes') {
   // Manejamos la actualización de los relojes en tiempo real
-  procesarAjaxUpdateClocks();
+  procesarAjaxActualizarRelojes();
 }
 
 // Cuando el usuario abre la configuración, pausamos la partida
-if (isset($_POST['pausar_desde_config'])) {
+if (isset($_POST['pausar_desde_configuracion'])) {
   // Si no estaba pausada, la pausamos ahora
   if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
     $_SESSION['pausa'] = true;
@@ -32,7 +32,7 @@ if (isset($_POST['pausar_desde_config'])) {
 
 // Cuando el usuario cierra la configuración, la partida se reanuda
 // Pero solo si no está guardando configuración al mismo tiempo
-if (isset($_POST['reanudar_desde_config']) && !isset($_POST['guardar_configuracion'])) {
+if (isset($_POST['reanudar_desde_configuracion']) && !isset($_POST['guardar_configuracion'])) {
   // Detenemos la pausa
   $_SESSION['pausa'] = false;
   // Reseteamos el tiempo para que no cuente los segundos que estuvo pausada
@@ -48,7 +48,7 @@ if (isset($_POST['guardar_configuracion'])) {
   // Guardamos los ajustes que cambió
   procesarGuardarConfiguracion();
   // Si además cerró la configuración, reanudamos el juego
-  if (isset($_POST['reanudar_desde_config'])) {
+  if (isset($_POST['reanudar_desde_configuracion'])) {
     $_SESSION['pausa'] = false;
     $_SESSION['ultimo_tick'] = time();
   }
@@ -96,7 +96,7 @@ if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida']
 }
 
 // Si el usuario hace clic en pausar o reanudar, lo procesamos
-if (isset($_POST['toggle_pausa'])) {
+if (isset($_POST['alternar_pausa'])) {
   // Cambiamos el estado de pausa
   procesarTogglePausa();
 }

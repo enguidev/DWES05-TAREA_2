@@ -50,7 +50,7 @@ h1 {
 }
 
 /* Botón de configuración */
-.btn-config {
+.btn-configuracion {
   font-size: 1.5em;
   background: transparent;
   color: #667eea;
@@ -61,7 +61,7 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.btn-config:hover {
+.btn-configuracion:hover {
   transform: rotate(180deg);
 }
 

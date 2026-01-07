@@ -2,20 +2,20 @@
 // CONFIGURACIÓN DEL MODAL DE AJUSTES
 // ========================================
 // Obtenemos los elementos principales del modal de configuración
-const modal = document.getElementById("modalConfig");
-const btnConfig = document.getElementById("btnConfig");
+const modal = document.getElementById("modalConfiguracion");
+const btnConfiguracion = document.getElementById("btnConfiguracion");
 const closeModal = document.querySelector(".close-modal");
 const btnCancelar = document.querySelector(".btn-cancelar-config");
 
 // Si todos los elementos existen, configuramos el comportamiento del modal
-if (modal && btnConfig && closeModal && btnCancelar) {
+if (modal && btnConfiguracion && closeModal && btnCancelar) {
   // Función para reanudar la partida después de cerrar los ajustes
   function reanudarDesdeModal() {
     // Enviamos una solicitud al servidor para reanudar la partida
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ reanudar_desde_config: "1" }),
+      body: new URLSearchParams({ reanudar_desde_configuracion: "1" }),
     })
       .then(() => {
         // Marcamos localmente que no estamos en pausa
@@ -23,7 +23,7 @@ if (modal && btnConfig && closeModal && btnCancelar) {
         // Reseteamos el contador de sincronización
         contadorSincronizacion = 0;
         // Sincronizamos inmediatamente con el servidor para obtener los tiempos correctos
-        return fetch("index.php?ajax=update_clocks");
+        return fetch("index.php?ajax=actualizar_relojes");
       })
       .then((r) => r.json())
       .then((data) => {
@@ -47,7 +47,7 @@ if (modal && btnConfig && closeModal && btnCancelar) {
   }
 
   // Cuando se abre el modal de configuración
-  btnConfig.onclick = () => {
+  btnConfiguracion.onclick = () => {
     // Mostramos el modal
     modal.style.display = "block";
     // Marcamos localmente que estamos en pausa
@@ -57,7 +57,7 @@ if (modal && btnConfig && closeModal && btnCancelar) {
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ pausar_desde_config: "1" }),
+      body: new URLSearchParams({ pausar_desde_configuracion: "1" }),
     })
       .then(() => {
         // Confirmamos la pausa local
@@ -144,12 +144,12 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
 
       // Creamos un campo oculto para reanudar desde config
       let inputReanudar = formConfig.querySelector(
-        'input[name="reanudar_desde_config"]'
+        'input[name="reanudar_desde_configuracion"]'
       );
       if (!inputReanudar) {
         inputReanudar = document.createElement("input");
         inputReanudar.type = "hidden";
-        inputReanudar.name = "reanudar_desde_config";
+        inputReanudar.name = "reanudar_desde_configuracion";
         inputReanudar.value = "1";
         formConfig.appendChild(inputReanudar);
       }
@@ -286,7 +286,7 @@ function sincronizarConServidor() {
   if (recargandoPagina) return;
 
   // Solicitamos los tiempos actuales al servidor
-  fetch("index.php?ajax=update_clocks")
+  fetch("index.php?ajax=actualizar_relojes")
     .then((r) => {
       if (!r.ok) throw new Error("Error en respuesta HTTP: " + r.status);
       return r.json();
@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Si no hay un intervalo de relojes activo, lo iniciamos
   if (!intervaloRelojes && document.getElementById("tiempo-blancas")) {
     // Primero sincronizamos con el servidor para verificar el estado de la partida
-    fetch("index.php?ajax=update_clocks")
+    fetch("index.php?ajax=actualizar_relojes")
       .then((r) => r.json())
       .then((data) => {
         // Si no hay partida o ya terminó, no iniciamos los relojes
@@ -613,7 +613,7 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "toggle_pausa=1",
+      body: "alternar_pausa=1",
     });
   }
 }
