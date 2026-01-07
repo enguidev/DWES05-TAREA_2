@@ -812,7 +812,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
   // Modal para confirmar la eliminación de una partida guardada
   function renderModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
   {
-?>
+    ?>
       <!-- Modal de confirmación con overlay oscuro de fondo -->
       <div id="modalConfirmarEliminar" class="modal-overlay">
         <div class="modal-content">
