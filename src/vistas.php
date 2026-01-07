@@ -20,7 +20,6 @@ function normalizarRutaAvatar($ruta)
  */
 function renderConfigForm($partidasGuardadas = [])
 {
-{
 ?>
   <div class="container">
     <h1>Configuración de Partida</h1>
@@ -757,9 +756,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       </div>
     <?php
   }
-  /**
-   * Renderiza el modal para cargar partida desde pantalla inicial
-   */
+
   // Modal para cargar una partida guardada desde la pantalla de inicio
   function renderModalCargarInicial($partidas)
   {
@@ -812,13 +809,10 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
     <?php
   }
 
-  /**
-   * Renderiza modal de confirmación para eliminar partida
-   */
   // Modal para confirmar la eliminación de una partida guardada
   function renderModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
   {
-    ?>
+?>
       <!-- Modal de confirmación con overlay oscuro de fondo -->
       <div id="modalConfirmarEliminar" class="modal-overlay">
         <div class="modal-content">
@@ -828,15 +822,11 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
           <p>¿Deseas eliminar la partida "<strong><?php echo htmlspecialchars($nombrePartida); ?></strong>"?</p>
           <!-- Advertencia de que la acción es irreversible -->
           <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
-          <!-- Botones de confirmación y cancelación -->
           <div class="modal-buttons">
-            <!-- Formulario para eliminar - el nombre del botón cambia según de dónde se abre -->
             <form method="post" style="display: inline;">
               <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($archivoPartida); ?>">
-              <!-- Si viene desde la pantalla inicial usa 'eliminar_partida_inicial', si no usa 'eliminar_partida' -->
               <button type="submit" name="<?php echo $desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'; ?>" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
             </form>
-            <!-- Botón para cancelar la eliminación -->
             <button type="button" class="btn-cancelar" onclick="cerrarModal('modalConfirmarEliminar')">✖️ Cancelar</button>
           </div>
         </div>
