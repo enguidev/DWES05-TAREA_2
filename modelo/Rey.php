@@ -73,10 +73,15 @@ class Rey extends Pieza
     $difFilas = abs($filaNueva - $filaActual);
     $difCols = abs($colNueva - $colActual);
 
-    $esMovimientoValido = ($difFilas <= 1 && $difCols <= 1) && ($difFilas + $difCols > 0);
+    // Movimiento normal: 1 casilla en cualquier dirección
+    // O movimiento de 2 columnas en la misma fila (enroque)
+    $esMovimientoValido = (
+      ($difFilas <= 1 && $difCols <= 1 && ($difFilas + $difCols > 0)) ||
+      ($difFilas === 0 && $difCols === 2) // Enroque
+    );
 
     if ($esMovimientoValido) {
-      // El rey solo se mueve una casilla, devolvemos solo la posición final
+      // El rey solo se mueve una casilla o dos (enroque), devolvemos solo la posición final
       return [$nuevaPosicion];
     }
 
