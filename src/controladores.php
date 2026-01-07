@@ -305,6 +305,9 @@ function procesarConfirmarPromocion()
 
   $_SESSION['partida'] = serialize($partida);
   unset($_SESSION['promocion_en_curso']);
+  // Reanudar la partida después de la promoción
+  $_SESSION['pausa'] = false;
+  $_SESSION['ultimo_tick'] = time();
 }
 
 /**
@@ -331,8 +334,10 @@ function procesarConfirmarEnroque()
     $_SESSION['partida'] = serialize($partida);
   }
 
-  // Limpiar enroque pendiente
+  // Limpiar enroque pendiente y reanudar la partida
   unset($_SESSION['enroque_pendiente']);
+  $_SESSION['pausa'] = false;
+  $_SESSION['ultimo_tick'] = time();
 }
 
 /**
@@ -343,6 +348,8 @@ function procesarCancelarEnroque()
   if (isset($_SESSION['enroque_pendiente'])) {
     // Simplemente limpiamos la sesión y restauramos mensaje
     unset($_SESSION['enroque_pendiente']);
+    $_SESSION['pausa'] = false;
+    $_SESSION['ultimo_tick'] = time();
 
     if (isset($_SESSION['partida'])) {
       $partida = unserialize($_SESSION['partida']);
