@@ -218,7 +218,7 @@ if (isset($_SESSION['partida'])) {
 
   // Procesamos jugada
   procesarJugada($partida);
-  
+
   // Guardar partida en sesión después de procesar jugada
   $_SESSION['partida'] = serialize($partida);
 
