@@ -159,9 +159,11 @@ B. REGLAS AVANZADAS
    • La partida se pausa hasta confirmar la promoción
 
 ✓ ENROQUE:
-   • Implementado en el motor: corto (O-O) y largo (O-O-O)
+   • Implementado con confirmación del jugador vía modal
+   • Para iniciar: mueve el rey 2 casillas (E→G para corto, E→C para largo)
+   • Si las condiciones se cumplen, aparece un modal preguntando si deseas ejecutar el enroque
+   • Puedes confirmar o cancelar (si cancelas, el rey no se mueve y conservas la opción)
    • Validación completa: piezas sin mover, casillas libres y sin jaque intermedio
-   • Nota de UI: puede no sugerir casillas automáticamente; ejecuta moviendo el rey a G/C
 
 ✓ CAPTURA AL PASO:
    • Implementada: disponible inmediatamente tras avance doble del peón rival
@@ -334,8 +336,13 @@ CAPTURAS:
 
 PROMOCIÓN:
    - Si tu peón llega al extremo opuesto
-   - Se convierte automáticamente en Dama
-   - Verás un mensaje de confirmación
+   - Se abre un modal para elegir pieza: Dama, Torre, Alfil o Caballo
+   - La partida se pausa hasta que confirmes la elección
+
+ENROQUE:
+   - Para intentar enroque: mueve el rey 2 casillas (E→G o E→C)
+   - Si es válido, aparece un modal de confirmación
+   - Puedes confirmar para ejecutar o cancelar para diferirlo
 
 
 ───────────────────────────────────────────────────────────────────────────────
@@ -364,6 +371,52 @@ Tecnología: el historial se genera y persiste en servidor (PHP) mediante
 [modelo/Partida.php](modelo/Partida.php). El desplegable del panel se gestiona
 con una pequeña función de cliente en
 [public/script.js](public/script.js) (`toggleHistorial()`), sin lógica de juego.
+
+───────────────────────────────────────────────────────────────────────────────
+GLOSARIO DE NOTACIÓN
+───────────────────────────────────────────────────────────────────────────────
+
+PIEZAS (letras en español):
+- R: Rey, D: Dama, T: Torre, A: Alfil, C: Caballo, Peón: sin letra (ej. `e4`).
+
+SÍMBOLOS:
+- x: captura (ej. `Txd4`).
+- +: jaque (ej. `Dg7+`).
+- #: jaque mate (ej. `Dg7#`).
+- O-O: enroque corto; O-O-O: enroque largo.
+- =pieza: promoción (ej. `e8=D`, `c1=C`).
+- e.p.: captura al paso (ej. `exd6 e.p.`).
+
+EJEMPLOS:
+- `1. e4 e5 2. Cf3 Cc6 3. Ab5 O-O`.
+- `Txd4`, `Dg7+`, `e8=D`, `exd6 e.p.`.
+
+
+───────────────────────────────────────────────────────────────────────────────
+CÓMO SE GENERA LA NOTACIÓN (INTERNO)
+───────────────────────────────────────────────────────────────────────────────
+
+- Motor y registro:
+   • La notación se construye en servidor dentro de [modelo/Partida.php](modelo/Partida.php) mediante `generarNotacionAlgebraica()`.
+   • Cada jugada válida llama a `registrarMovimientoEnNotacion()` y se añade a `historialMovimientos`.
+
+- Desambiguación de piezas iguales:
+   • Si dos piezas del mismo tipo pueden ir a la misma casilla, se añade columna o fila del origen: `Tae1` o `T1e1` según corresponda.
+   • Para peones, se indica columna en capturas: `exd5`.
+
+- Capturas, jaque y mate:
+   • Captura añade `x` (ej. `Axf7`).
+   • Tras aplicar la jugada, si el rey rival queda en jaque se añade `+`; si es jaque mate se añade `#`.
+
+- Enroque y promoción:
+   • Enroque se anota como `O-O` (corto) o `O-O-O` (largo).
+   • Promoción añade `=pieza` usando la elección del modal: `e8=D`, `c1=C`, etc.
+
+- Captura al paso:
+   • Detectada por el último movimiento de peón a doble paso y posición adyacente; se puede anotar como `e.p.` para claridad.
+
+- Persistencia:
+   • El array `historialMovimientos` se guarda y se restaura en JSON al usar guardar/cargar partida, por lo que el historial es permanente.
 
  
 ───────────────────────────────────────────────────────────────────────────────
@@ -560,6 +613,7 @@ DECISIONES DE DISEÑO
 ✓ Sincronización de relojes cada 5 segundos (balance precisión/carga)
 ✓ Pausa automática al abrir modales para evitar pérdidas de tiempo
 ✓ Promoción mediante modal con elección de pieza
+✓ Enroque con confirmación del jugador para permitir diferir la decisión
 
 
 ───────────────────────────────────────────────────────────────────────────────
@@ -588,7 +642,6 @@ OPTIMIZACIONES
 LIMITACIONES CONOCIDAS
 ───────────────────────────────────────────────────────────────────────────────
 
-⚠ Enroque: el motor lo soporta; la UI puede no sugerir casillas (ejecuta moviendo el rey a G/C)
 ⚠ Sin validación de repetición de posiciones (tablas por repetición)
 ⚠ Mejoras de UX pendientes: animaciones avanzadas, sonidos, temas
 
@@ -597,7 +650,6 @@ LIMITACIONES CONOCIDAS
 POSIBLES MEJORAS FUTURAS
 ───────────────────────────────────────────────────────────────────────────────
 
-🔮 UI de enroque con sugerencia visual de casillas
 🔮 Animaciones de movimiento y capturas + sonidos
 🔮 Resaltado desde historial al pasar el cursor
 🔮 Modo multijugador online (WebSockets)
@@ -639,7 +691,6 @@ REQUISITOS DEL ENUNCIADO (DWES U5) Y COBERTURA:
    • Guardar, cargar, nueva partida y revancha con confirmación
 
 PENDIENTES DE MEJORA (NO CRÍTICOS):
-- Enroque: Motor implementado; mejorar UI para sugerir casillas
 - Validación adicional de archivos: endurecer tamaño/mime y manejo de nombres
 - UX: Sonidos, temas de tablero y animaciones
 

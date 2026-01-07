@@ -162,6 +162,27 @@ if (isset($_POST['confirmar_promocion']) && isset($_POST['tipo_promocion'])) {
   $mostrarModalPromocion = false;
 }
 
+// Mostrar modal de enroque si está pendiente (PHP puro)
+$mostrarModalEnroque = false;
+if (isset($_SESSION['enroque_pendiente'])) {
+  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+    $_SESSION['pausa'] = true; // Pausar mientras se decide
+  }
+  $mostrarModalEnroque = true;
+}
+
+// Confirmar enroque desde modal
+if (isset($_POST['confirmar_enroque'])) {
+  procesarConfirmarEnroque();
+  $mostrarModalEnroque = false;
+}
+
+// Cancelar enroque desde modal
+if (isset($_POST['cancelar_enroque'])) {
+  procesarCancelarEnroque();
+  $mostrarModalEnroque = false;
+}
+
 // Mostrar modal para cargar partida
 $mostrarModalCargar = false;
 $partidasGuardadas = [];
@@ -319,6 +340,11 @@ $partidasGuardadasInicio = listarPartidas();
       <?php if ($mostrarModalPromocion): ?>
         <?php renderModalPromocion(); ?>
       <?php endif; ?>
+
+      <?php if ($mostrarModalEnroque): ?>
+        <?php renderModalEnroque(); ?>
+      <?php endif; ?>
+
       <!-- Cabecera del juego -->
       <?php renderGameHeader($partida); ?>
 

@@ -308,6 +308,51 @@ function procesarConfirmarPromocion()
 }
 
 /**
+ * Procesa la confirmación de enroque
+ */
+function procesarConfirmarEnroque()
+{
+  if (!isset($_SESSION['enroque_pendiente']) || !isset($_SESSION['partida'])) {
+    return;
+  }
+
+  $origen = isset($_POST['origen_enroque']) ? $_POST['origen_enroque'] : null;
+  $destino = isset($_POST['destino_enroque']) ? $_POST['destino_enroque'] : null;
+  $tipo = isset($_POST['tipo_enroque']) ? $_POST['tipo_enroque'] : null;
+
+  if (!$origen || !$destino || !$tipo || !in_array($tipo, ['corto', 'largo'])) {
+    return;
+  }
+
+  $partida = unserialize($_SESSION['partida']);
+  
+  // Ejecutar el enroque
+  if ($partida->ejecutarEnroque($origen, $destino, $tipo)) {
+    $_SESSION['partida'] = serialize($partida);
+  }
+
+  // Limpiar enroque pendiente
+  unset($_SESSION['enroque_pendiente']);
+}
+
+/**
+ * Procesa la cancelación de enroque
+ */
+function procesarCancelarEnroque()
+{
+  if (isset($_SESSION['enroque_pendiente'])) {
+    // Simplemente limpiamos la sesión y restauramos mensaje
+    unset($_SESSION['enroque_pendiente']);
+    
+    if (isset($_SESSION['partida'])) {
+      $partida = unserialize($_SESSION['partida']);
+      $partida->setMensaje("Turno de {$partida->getJugadores()[$partida->getTurno()]->getNombre()}");
+      $_SESSION['partida'] = serialize($partida);
+    }
+  }
+}
+
+/**
  * Deshace una jugada
  */
 function deshacerJugada($partida)

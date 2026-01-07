@@ -302,6 +302,41 @@ function renderModalPromocion()
 }
 
 /**
+ * Renderiza el modal de confirmación de enroque
+ */
+function renderModalEnroque()
+{
+  $tipo = isset($_SESSION['enroque_pendiente']['tipo']) ? $_SESSION['enroque_pendiente']['tipo'] : null;
+  $color = isset($_SESSION['enroque_pendiente']['color']) ? $_SESSION['enroque_pendiente']['color'] : null;
+  $origen = isset($_SESSION['enroque_pendiente']['origen']) ? $_SESSION['enroque_pendiente']['origen'] : null;
+  $destino = isset($_SESSION['enroque_pendiente']['destino']) ? $_SESSION['enroque_pendiente']['destino'] : null;
+  if (!$tipo || !$color) return;
+
+  $nombreEnroque = ($tipo === 'corto') ? 'enroque corto (O-O)' : 'enroque largo (O-O-O)';
+?>
+  <div id="modalEnroque" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🏰 Confirmación de enroque</h2>
+      <p>Has movido el rey de <?php echo htmlspecialchars($color); ?> a una posición que permite realizar el <strong><?php echo htmlspecialchars($nombreEnroque); ?></strong>.</p>
+      <p>¿Deseas ejecutar el enroque ahora?</p>
+      <div class="modal-info" style="margin: 15px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; font-size: 0.9em;">
+        <strong>Nota:</strong> Si cancelas, el rey no se moverá y conservarás la opción de enrocar más tarde.
+      </div>
+      <form method="post" class="form-enroque">
+        <input type="hidden" name="origen_enroque" value="<?php echo htmlspecialchars($origen); ?>">
+        <input type="hidden" name="destino_enroque" value="<?php echo htmlspecialchars($destino); ?>">
+        <input type="hidden" name="tipo_enroque" value="<?php echo htmlspecialchars($tipo); ?>">
+        <div class="modal-buttons">
+          <button type="submit" name="confirmar_enroque" value="1" class="btn-confirmar">✅ Confirmar enroque</button>
+          <button type="submit" name="cancelar_enroque" value="1" class="btn-cancelar">❌ Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+<?php
+}
+
+/**
  * Renderiza el header del juego
  */
 function renderGameHeader($partida)

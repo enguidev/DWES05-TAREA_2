@@ -90,14 +90,22 @@ class Partida
     list($filaDest, $colDest) = $coordsDestino;
 
     // Enroque: el rey se desplaza 2 columnas en la misma fila
+    // Ahora requiere confirmación del jugador vía modal
     if ($piezaOrigen instanceof Rey && !$piezaOrigen->haMovido()) {
       if ($filaOrig === $filaDest && abs($colDest - $colOrig) === 2) {
         // Determinar corto/largo por dirección de columna
         if ($colDest > $colOrig) {
           // Corto (E -> G)
           if ($this->puedeEnrocarCorto($this->turno)) {
-            $esEnroque = true;
-            $tipoEnroque = 'corto';
+            // En lugar de ejecutar automáticamente, pedimos confirmación
+            $_SESSION['enroque_pendiente'] = [
+              'tipo' => 'corto',
+              'color' => $this->turno,
+              'origen' => $origen,
+              'destino' => $destino
+            ];
+            $this->mensaje = "¿Deseas hacer enroque corto?";
+            return false; // No ejecutar todavía
           } else {
             $this->mensaje = "Enroque corto no permitido";
             return false;
@@ -105,8 +113,15 @@ class Partida
         } else {
           // Largo (E -> C)
           if ($this->puedeEnrocarLargo($this->turno)) {
-            $esEnroque = true;
-            $tipoEnroque = 'largo';
+            // En lugar de ejecutar automáticamente, pedimos confirmación
+            $_SESSION['enroque_pendiente'] = [
+              'tipo' => 'largo',
+              'color' => $this->turno,
+              'origen' => $origen,
+              'destino' => $destino
+            ];
+            $this->mensaje = "¿Deseas hacer enroque largo?";
+            return false; // No ejecutar todavía
           } else {
             $this->mensaje = "Enroque largo no permitido";
             return false;
@@ -849,6 +864,88 @@ class Partida
   public function setMensaje($nuevoMensaje)
   {
     $this->mensaje = $nuevoMensaje;
+  }
+
+  /**
+   * Ejecuta el enroque tras confirmación del jugador
+   * @param string $origen Posición de origen (rey)
+   * @param string $destino Posición de destino (rey)
+   * @param string $tipo Tipo de enroque: 'corto' o 'largo'
+   * @return bool True si se ejecutó correctamente
+   */
+  public function ejecutarEnroque($origen, $destino, $tipo)
+  {
+    // Validar que es el turno correcto
+    $piezaOrigen = $this->jugadores[$this->turno]->getPiezaEnPosicion($origen);
+    if (!$piezaOrigen || !($piezaOrigen instanceof Rey)) {
+      $this->mensaje = "Error: no hay un rey en la posición de origen";
+      return false;
+    }
+
+    // Determinar posiciones según el tipo de enroque
+    $color = $this->turno;
+    $posReyDestino = ($color === 'blancas') ? (($tipo === 'corto') ? 'G1' : 'C1') : (($tipo === 'corto') ? 'G8' : 'C8');
+    $posTorreOrigen = ($color === 'blancas') ? (($tipo === 'corto') ? 'H1' : 'A1') : (($tipo === 'corto') ? 'H8' : 'A8');
+    $posTorreDestino = ($color === 'blancas') ? (($tipo === 'corto') ? 'F1' : 'D1') : (($tipo === 'corto') ? 'F8' : 'D8');
+
+    $torre = $this->jugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
+    if (!$torre || !($torre instanceof Torre)) {
+      $this->mensaje = "Error: no se encontró la torre para el enroque";
+      return false;
+    }
+
+    // Ejecutar el movimiento
+    $piezaOrigen->setPosicion($posReyDestino);
+    $piezaOrigen->setHaMovido(true);
+    $torre->setPosicion($posTorreDestino);
+    $torre->setHaMovido(true);
+
+    // Registrar en historial con notación estándar
+    $notacion = ($tipo === 'corto') ? 'O-O' : 'O-O-O';
+    
+    // Cambiar turno
+    $turnoAnterior = $this->turno;
+    $this->turno = $this->oponente($this->turno);
+
+    // Comprobar si el nuevo turno está en jaque/mate
+    if ($this->estaEnJaque($this->turno)) {
+      if ($this->esJaqueMate($this->turno)) {
+        $this->partidaTerminada = true;
+        $ganador = $this->oponente($this->turno);
+        $this->mensaje = "¡Jaque mate! {$this->jugadores[$ganador]->getNombre()} ha ganado";
+        $notacion .= '#';
+      } else {
+        $this->mensaje = "Jaque a {$this->jugadores[$this->turno]->getNombre()}";
+        $notacion .= '+';
+      }
+    } else {
+      $this->mensaje = "Turno de {$this->jugadores[$this->turno]->getNombre()}";
+    }
+
+    // Registrar en historial de movimientos
+    $this->historialMovimientos[] = [
+      'numero' => count($this->historialMovimientos) + 1,
+      'color' => $turnoAnterior,
+      'notacion' => $notacion,
+      'captura' => false
+    ];
+
+    // Guardar estado para deshacer
+    $estadoSerializado = serialize([
+      'jugadores' => [
+        'blancas' => clone $this->jugadores['blancas'],
+        'negras' => clone $this->jugadores['negras']
+      ],
+      'turno' => $turnoAnterior,
+      'mensaje' => "Enroque " . $tipo,
+      'terminada' => false
+    ]);
+    $this->historial[] = $estadoSerializado;
+    if (count($this->historial) > 10) {
+      array_shift($this->historial);
+    }
+
+    return true;
   }
 
   /**
