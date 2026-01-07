@@ -425,7 +425,7 @@ $partidasGuardadasInicio = listarPartidas();
         }
         ?>
       </div>
-      
+
       <!-- Los relojes de cada jugador -->
       <?php renderRelojes($jugadores, $marcador); ?>
 

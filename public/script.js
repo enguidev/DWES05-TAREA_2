@@ -104,9 +104,15 @@ if (modal && btnConfig && closeModal && btnCancelar) {
 // ========================================
 // Obtenemos los elementos del formulario de configuración
 const formConfig = modal ? modal.querySelector("form") : null;
-const btnGuardarConfig = modal ? modal.querySelector(".btn-guardar-config") : null;
-const chkCoords = modal ? modal.querySelector('input[name="mostrar_coordenadas"]') : null;
-const chkCapturas = modal ? modal.querySelector('input[name="mostrar_capturas"]') : null;
+const btnGuardarConfig = modal
+  ? modal.querySelector(".btn-guardar-config")
+  : null;
+const chkCoords = modal
+  ? modal.querySelector('input[name="mostrar_coordenadas"]')
+  : null;
+const chkCapturas = modal
+  ? modal.querySelector('input[name="mostrar_capturas"]')
+  : null;
 
 // Si el formulario existe, controlamos que el botón guardar solo se active si hay cambios
 if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
@@ -164,13 +170,13 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
 // SISTEMA DE ACTUALIZACIÓN DE RELOJES
 // ========================================
 // Variables locales para controlar los relojes sin depender de AJAX cada 100ms
-let intervaloRelojes = null;  // Intervalo para actualizar relojes cada segundo
-let tiempoLocalBlancas = 0;   // Segundos restantes para blancas
-let tiempoLocalNegras = 0;    // Segundos restantes para negras
+let intervaloRelojes = null; // Intervalo para actualizar relojes cada segundo
+let tiempoLocalBlancas = 0; // Segundos restantes para blancas
+let tiempoLocalNegras = 0; // Segundos restantes para negras
 let relojActivoLocal = "blancas"; // Quién está jugando ahora
-let pausaLocal = false;        // Si la partida está en pausa
+let pausaLocal = false; // Si la partida está en pausa
 let contadorSincronizacion = 0; // Contador para sincronizar cada 5 segundos
-let recargandoPagina = false;  // Flag para evitar múltiples recargas cuando se agota el tiempo
+let recargandoPagina = false; // Flag para evitar múltiples recargas cuando se agota el tiempo
 
 // Función para formatear segundos a MM:SS
 function formatearTiempo(segundos) {
