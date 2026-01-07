@@ -344,6 +344,19 @@ ENROQUE:
    - Si es válido, aparece un modal de confirmación
    - Puedes confirmar para ejecutar o cancelar para diferirlo
 
+PRUEBA DE ENROQUE (DESDE INICIO DE PARTIDA):
+   La siguiente secuencia permite hacer enroque corto (O-O) con blancas en el movimiento 7:
+
+   1. Blancas:  E2 → E4  (peón)
+   2. Negras:   E7 → E5  (peón)
+   3. Blancas:  G1 → F3  (caballo)
+   4. Negras:   B8 → C6  (caballo)
+   5. Blancas:  F1 → C4  (alfil)
+   6. Negras:   D7 → D6  (peón, o cualquier movimiento)
+   7. Blancas:  E1 → G1  (REY - Se abrirá modal de confirmación de enroque)
+      → Confirma: Rey a G1, Torre a F1
+      → Historial: O-O
+
 
 ───────────────────────────────────────────────────────────────────────────────
 CONTROLES DE PARTIDA
