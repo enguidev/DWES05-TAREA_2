@@ -1,34 +1,41 @@
-// Modal de configuración
+// ========================================
+// CONFIGURACIÓN DEL MODAL DE AJUSTES
+// ========================================
+// Obtenemos los elementos principales del modal de configuración
 const modal = document.getElementById("modalConfig");
 const btnConfig = document.getElementById("btnConfig");
 const closeModal = document.querySelector(".close-modal");
 const btnCancelar = document.querySelector(".btn-cancelar-config");
 
+// Si todos los elementos existen, configuramos el comportamiento del modal
 if (modal && btnConfig && closeModal && btnCancelar) {
-  // Función para reanudar la partida (quitar pausa)
+  // Función para reanudar la partida después de cerrar los ajustes
   function reanudarDesdeModal() {
+    // Enviamos una solicitud al servidor para reanudar la partida
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ reanudar_desde_config: "1" }),
     })
       .then(() => {
+        // Marcamos localmente que no estamos en pausa
         pausaLocal = false;
-        // Resetear contador de sincronización a 0 para evitar que haya sync pendiente
+        // Reseteamos el contador de sincronización
         contadorSincronizacion = 0;
-        // Sincronizar inmediatamente con servidor para traer tiempos correctos
+        // Sincronizamos inmediatamente con el servidor para obtener los tiempos correctos
         return fetch("index.php?ajax=update_clocks");
       })
       .then((r) => r.json())
       .then((data) => {
+        // Si hay partida activa y no está terminada, actualizamos los tiempos locales
         if (!data.sin_partida && !data.partida_terminada) {
-          // Actualizar tiempos locales con datos del servidor
           tiempoLocalBlancas = data.tiempo_blancas;
           tiempoLocalNegras = data.tiempo_negras;
           relojActivoLocal = data.reloj_activo;
         }
+        // Actualizamos los relojes en la pantalla
         actualizarDisplayRelojes();
-        // Actualizar mensaje en el DOM (quitar naranja)
+        // Quitamos el mensaje de pausa del DOM
         const msgDiv = document.querySelector(".mensaje");
         if (msgDiv) {
           msgDiv.classList.remove("pausa");
@@ -39,20 +46,25 @@ if (modal && btnConfig && closeModal && btnCancelar) {
       .catch((e) => console.error("No se pudo reanudar desde ajustes:", e));
   }
 
+  // Cuando se abre el modal de configuración
   btnConfig.onclick = () => {
+    // Mostramos el modal
     modal.style.display = "block";
+    // Marcamos localmente que estamos en pausa
     pausaLocal = true;
 
-    // Pausar partida en servidor al abrir ajustes para evitar que corra el reloj
+    // Pausamos la partida en el servidor para que no corra el reloj
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ pausar_desde_config: "1" }),
     })
       .then(() => {
+        // Confirmamos la pausa local
         pausaLocal = true;
+        // Actualizamos el display de relojes
         actualizarDisplayRelojes();
-        // Actualizar mensaje en el DOM a naranja
+        // Mostramos el mensaje de pausa en naranja
         const msgDiv = document.querySelector(".mensaje");
         if (msgDiv) {
           msgDiv.textContent = "\u23F8\uFE0F PARTIDA EN PAUSA";
@@ -62,57 +74,69 @@ if (modal && btnConfig && closeModal && btnCancelar) {
       })
       .catch((e) => console.error("No se pudo pausar al abrir ajustes:", e));
   };
+
+  // Cuando se hace clic en la X del modal
   closeModal.onclick = () => {
     modal.style.display = "none";
+    // Reanudamos la partida
     reanudarDesdeModal();
   };
+
+  // Cuando se hace clic en el botón Cancelar
   btnCancelar.onclick = () => {
     modal.style.display = "none";
+    // Reanudamos la partida
     reanudarDesdeModal();
   };
+
+  // Cuando se hace clic fuera del modal (en el overlay)
   window.onclick = (e) => {
     if (e.target == modal) {
       modal.style.display = "none";
+      // Reanudamos la partida
       reanudarDesdeModal();
     }
   };
 }
 
-// Deshabilitar "Guardar Cambios" hasta que haya modificaciones en la config
+// ========================================
+// CONTROL DEL BOTÓN GUARDAR CONFIGURACIÓN
+// ========================================
+// Obtenemos los elementos del formulario de configuración
 const formConfig = modal ? modal.querySelector("form") : null;
-const btnGuardarConfig = modal
-  ? modal.querySelector(".btn-guardar-config")
-  : null;
-const chkCoords = modal
-  ? modal.querySelector('input[name="mostrar_coordenadas"]')
-  : null;
-const chkCapturas = modal
-  ? modal.querySelector('input[name="mostrar_capturas"]')
-  : null;
+const btnGuardarConfig = modal ? modal.querySelector(".btn-guardar-config") : null;
+const chkCoords = modal ? modal.querySelector('input[name="mostrar_coordenadas"]') : null;
+const chkCapturas = modal ? modal.querySelector('input[name="mostrar_capturas"]') : null;
 
+// Si el formulario existe, controlamos que el botón guardar solo se active si hay cambios
 if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
+  // Guardamos el estado inicial de los checkboxes
   const estadoInicial = {
     coords: chkCoords.checked,
     capturas: chkCapturas.checked,
   };
 
+  // Función para actualizar el estado del botón guardar
   const actualizarEstadoGuardar = () => {
+    // Verificamos si algo cambió comparando con el estado inicial
     const cambiado =
       chkCoords.checked !== estadoInicial.coords ||
       chkCapturas.checked !== estadoInicial.capturas;
+    // Si nada cambió, deshabilitamos el botón
     btnGuardarConfig.disabled = !cambiado;
     btnGuardarConfig.classList.toggle("btn-disabled", !cambiado);
   };
 
-  // Prevenir submit por defecto y reanudar pausa primero
+  // Cuando se hace clic en guardar cambios
   btnGuardarConfig.addEventListener("click", (e) => {
+    // Solo permitir si el botón está habilitado
     if (
       !btnGuardarConfig.disabled &&
       !btnGuardarConfig.classList.contains("btn-disabled")
     ) {
       e.preventDefault();
 
-      // Crear un campo oculto para reanudar desde config
+      // Creamos un campo oculto para reanudar desde config
       let inputReanudar = formConfig.querySelector(
         'input[name="reanudar_desde_config"]'
       );
@@ -124,26 +148,31 @@ if (formConfig && btnGuardarConfig && chkCoords && chkCapturas) {
         formConfig.appendChild(inputReanudar);
       }
 
-      // Hacer submit normal con reanudar incluido
+      // Enviamos el formulario con los cambios
       formConfig.submit();
     }
   });
 
+  // Cuando cambian los checkboxes, actualizamos el estado del botón
   chkCoords.addEventListener("change", actualizarEstadoGuardar);
   chkCapturas.addEventListener("change", actualizarEstadoGuardar);
+  // Actualizamos el estado inicial
   actualizarEstadoGuardar();
 }
 
-// Actualizar relojes con contador local y sincronización periódica
-let intervaloRelojes = null;
-let tiempoLocalBlancas = 0;
-let tiempoLocalNegras = 0;
-let relojActivoLocal = "blancas";
-let pausaLocal = false;
-let contadorSincronizacion = 0;
-let recargandoPagina = false; // Flag para evitar múltiples recargas
+// ========================================
+// SISTEMA DE ACTUALIZACIÓN DE RELOJES
+// ========================================
+// Variables locales para controlar los relojes sin depender de AJAX cada 100ms
+let intervaloRelojes = null;  // Intervalo para actualizar relojes cada segundo
+let tiempoLocalBlancas = 0;   // Segundos restantes para blancas
+let tiempoLocalNegras = 0;    // Segundos restantes para negras
+let relojActivoLocal = "blancas"; // Quién está jugando ahora
+let pausaLocal = false;        // Si la partida está en pausa
+let contadorSincronizacion = 0; // Contador para sincronizar cada 5 segundos
+let recargandoPagina = false;  // Flag para evitar múltiples recargas cuando se agota el tiempo
 
-// Función para formatear tiempo
+// Función para formatear segundos a MM:SS
 function formatearTiempo(segundos) {
   return (
     String(Math.floor(segundos / 60)).padStart(2, "0") +
@@ -152,17 +181,20 @@ function formatearTiempo(segundos) {
   );
 }
 
-// Actualizar display del reloj en el DOM
+// Actualizar lo que se ve en el HTML de los relojes
 function actualizarDisplayRelojes() {
+  // Obtenemos los elementos donde se muestran los tiempos
   const tb = document.getElementById("tiempo-blancas");
   const tn = document.getElementById("tiempo-negras");
 
+  // Si los elementos no existen, salimos
   if (!tb || !tn) return;
 
+  // Mostramos los tiempos formateados
   tb.textContent = formatearTiempo(tiempoLocalBlancas);
   tn.textContent = formatearTiempo(tiempoLocalNegras);
 
-  // Aplicar clase de tiempo crítico SOLO al reloj activo
+  // Resaltamos en rojo SOLO el reloj del jugador que está jugando si le quedan menos de 60 segundos
   if (relojActivoLocal === "blancas") {
     tiempoLocalBlancas < 60
       ? tb.classList.add("tiempo-critico")
@@ -175,15 +207,17 @@ function actualizarDisplayRelojes() {
     tb.classList.remove("tiempo-critico");
   }
 
-  // Actualizar reloj activo/inactivo
+  // Actualizamos los estilos de reloj activo/inactivo en todos los relojes
   document.querySelectorAll(".reloj").forEach((r) => {
     if (r.classList.contains("reloj-blancas")) {
+      // Si es el reloj de blancas y blancas está jugando
       relojActivoLocal === "blancas"
         ? (r.classList.add("reloj-activo"),
           r.classList.remove("reloj-inactivo"))
         : (r.classList.remove("reloj-activo"),
           r.classList.add("reloj-inactivo"));
     } else if (r.classList.contains("reloj-negras")) {
+      // Si es el reloj de negras y negras está jugando
       relojActivoLocal === "negras"
         ? (r.classList.add("reloj-activo"),
           r.classList.remove("reloj-inactivo"))
@@ -193,11 +227,12 @@ function actualizarDisplayRelojes() {
   });
 }
 
-// Decrementar tiempo local cada segundo
+// Función que se ejecuta cada segundo para decrementar el reloj
 function actualizarTiempoLocal() {
-  // Si ya estamos recargando, no hacer nada
+  // Si ya estamos recargando la página, no hacer nada
   if (recargandoPagina) return;
 
+  // Verificamos que existen los elementos del reloj
   if (
     !document.getElementById("tiempo-blancas") ||
     !document.getElementById("tiempo-negras")
@@ -205,7 +240,7 @@ function actualizarTiempoLocal() {
     return;
   }
 
-  // Si no está en pausa, decrementar el reloj activo
+  // Si no está en pausa, decrementamos el reloj del jugador actual
   if (!pausaLocal) {
     if (relojActivoLocal === "blancas" && tiempoLocalBlancas > 0) {
       tiempoLocalBlancas--;
@@ -213,23 +248,25 @@ function actualizarTiempoLocal() {
       tiempoLocalNegras--;
     }
 
-    // Verificar si se agotó el tiempo - solo recargar UNA VEZ
+    // Si se agotó el tiempo, recargamos la página SOLO UNA VEZ
     if (
       (tiempoLocalBlancas <= 0 || tiempoLocalNegras <= 0) &&
       !recargandoPagina
     ) {
       recargandoPagina = true;
+      // Detenemos el intervalo de actualización
       clearInterval(intervaloRelojes);
       intervaloRelojes = null;
-      // Recargar sin timeout para evitar que se ejecute otra vez
+      // Recargamos la página para mostrar el resultado
       location.reload();
       return;
     }
   }
 
+  // Actualizamos lo que se ve en pantalla
   actualizarDisplayRelojes();
 
-  // Sincronizar con el servidor cada 5 segundos
+  // Cada 5 segundos sincronizamos con el servidor para verificar que los tiempos sean correctos
   contadorSincronizacion++;
   if (contadorSincronizacion >= 5) {
     sincronizarConServidor();
@@ -237,23 +274,25 @@ function actualizarTiempoLocal() {
   }
 }
 
-// Sincronizar con el servidor
+// Función para sincronizar los tiempos con el servidor
 function sincronizarConServidor() {
   // Si ya estamos recargando, no sincronizar
   if (recargandoPagina) return;
 
+  // Solicitamos los tiempos actuales al servidor
   fetch("index.php?ajax=update_clocks")
     .then((r) => {
       if (!r.ok) throw new Error("Error en respuesta HTTP: " + r.status);
       return r.json();
     })
     .then((data) => {
-      // Si ya estamos recargando, ignorar datos
+      // Si ya estamos recargando, ignorar los datos
       if (recargandoPagina) return;
 
+      // Si no hay partida, salimos
       if (data.sin_partida) return;
 
-      // Si la partida terminó, detener todo y no recargar
+      // Si la partida terminó, detenemos todo sin recargar
       if (data.partida_terminada) {
         if (intervaloRelojes !== null) {
           clearInterval(intervaloRelojes);
@@ -262,26 +301,28 @@ function sincronizarConServidor() {
         return;
       }
 
+      // Si el servidor nos envía tiempos válidos
       if (
         data.tiempo_blancas !== undefined &&
         data.tiempo_negras !== undefined
       ) {
-        // Actualizar variables locales con datos del servidor
+        // Actualizamos nuestros tiempos locales con los del servidor
         tiempoLocalBlancas = data.tiempo_blancas;
         tiempoLocalNegras = data.tiempo_negras;
         relojActivoLocal = data.reloj_activo;
         pausaLocal = data.pausa || false;
 
-        // DEBUG: Mostrar estado de pausa
+        // Log para debugging si la partida está en pausa
         if (data.pausa) {
           console.warn(
             "⚠️ LA PARTIDA ESTÁ EN PAUSA - Los movimientos están bloqueados"
           );
         }
 
+        // Actualizamos la pantalla
         actualizarDisplayRelojes();
 
-        // Si el tiempo se agotó, detener el intervalo (sin reload)
+        // Si el tiempo se agotó desde el servidor, detenemos el intervalo
         if (data.tiempo_blancas <= 0 || data.tiempo_negras <= 0) {
           if (intervaloRelojes !== null) {
             clearInterval(intervaloRelojes);
@@ -295,48 +336,59 @@ function sincronizarConServidor() {
     });
 }
 
-// Manejar selección de avatar personalizado
+// ========================================
+// INICIALIZACIÓN AL CARGAR LA PÁGINA
+// ========================================
+// Manejar avatares personalizados y funciones adicionales
 document.addEventListener("DOMContentLoaded", function () {
-  // Resetear flag de recarga al cargar la página
+  // Reseteamos el flag de recarga cuando la página se carga
   recargandoPagina = false;
 
-  // Iniciar intervalo de actualización de relojes cuando el DOM está listo
+  // Si no hay un intervalo de relojes activo, lo iniciamos
   if (!intervaloRelojes && document.getElementById("tiempo-blancas")) {
-    // Primero sincronizar para verificar si la partida está terminada
+    // Primero sincronizamos con el servidor para verificar el estado de la partida
     fetch("index.php?ajax=update_clocks")
       .then((r) => r.json())
       .then((data) => {
+        // Si no hay partida o ya terminó, no iniciamos los relojes
         if (data.sin_partida || data.partida_terminada) {
-          // No iniciar relojes si no hay partida o ya terminó
           return;
         }
-        // Si hay partida activa, inicializar variables y relojes
+        // Si hay partida activa, inicializamos las variables locales
         tiempoLocalBlancas = data.tiempo_blancas;
         tiempoLocalNegras = data.tiempo_negras;
         relojActivoLocal = data.reloj_activo;
         pausaLocal = data.pausa || false;
+        // Actualizamos la pantalla
         actualizarDisplayRelojes();
-        // Iniciar intervalo
+        // Iniciamos el intervalo para actualizar cada segundo
         intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
       })
       .catch((e) => console.error("Error al inicializar relojes:", e));
   }
 
+  // ========================================
+  // GESTIÓN DE AVATARES PERSONALIZADOS
+  // ========================================
+  // Obtenemos los selectores de avatar para ambos jugadores
   const selectBlancas = document.querySelector('select[name="avatar_blancas"]');
   const selectNegras = document.querySelector('select[name="avatar_negras"]');
   const inputBlancas = document.getElementById("avatar_custom_blancas");
   const inputNegras = document.getElementById("avatar_custom_negras");
 
-  // Función para validar archivo
+  // Función para validar que el archivo sea una imagen válida
   function validarArchivo(file) {
+    // Solo permitimos JPEG, PNG y GIF
     const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024; // Máximo 2MB
 
+    // Verificamos el tipo de archivo
     if (!allowedTypes.includes(file.type)) {
       alert("Solo se permiten archivos de imagen (JPEG, PNG, GIF)");
       return false;
     }
 
+    // Verificamos el tamaño
     if (file.size > maxSize) {
       alert("El archivo es demasiado grande. Máximo 2MB.");
       return false;
@@ -345,14 +397,18 @@ document.addEventListener("DOMContentLoaded", function () {
     return true;
   }
 
-  // Previsualización de imagen
+  // Función para mostrar una previsualización de la imagen seleccionada
   function mostrarPrevisualizacion(input, previewId) {
     const file = input.files[0];
+    // Si hay archivo y es válido
     if (file && validarArchivo(file)) {
+      // Leemos el archivo como URL de datos
       const reader = new FileReader();
       reader.onload = function (e) {
+        // Intentamos obtener la previsualización existente
         let preview = document.getElementById(previewId);
         if (!preview) {
+          // Si no existe, creamos un nuevo elemento de imagen
           preview = document.createElement("img");
           preview.id = previewId;
           preview.className = "avatar-preview";
@@ -362,14 +418,18 @@ document.addEventListener("DOMContentLoaded", function () {
           preview.style.marginLeft = "10px";
           preview.style.border = "3px solid #5568d3";
           preview.style.boxShadow = "0 4px 10px rgba(85, 104, 211, 0.3)";
+          // Lo añadimos junto al input
           input.parentNode.appendChild(preview);
         }
+        // Mostramos la imagen
         preview.src = e.target.result;
       };
+      // Leemos el archivo
       reader.readAsDataURL(file);
     }
   }
 
+  // MANEJO DE AVATARES DEL JUGADOR BLANCO
   if (selectBlancas && inputBlancas) {
     const contenedorBlancas = document.getElementById(
       "contenedor-custom-blancas"
@@ -378,25 +438,33 @@ document.addEventListener("DOMContentLoaded", function () {
       "nombre-archivo-blancas"
     );
 
+    // Cuando se selecciona un avatar del dropdown
     selectBlancas.addEventListener("change", function () {
       if (this.value === "custom") {
+        // Si elige "personalizado", mostramos el input de archivo
         if (contenedorBlancas) contenedorBlancas.style.display = "block";
       } else {
+        // Si elige un avatar predefinido, ocultamos el input
         if (contenedorBlancas) contenedorBlancas.style.display = "none";
+        // Eliminamos la previsualización
         const preview = document.getElementById("preview_blancas");
         if (preview) preview.remove();
       }
     });
 
+    // Cuando selecciona un archivo
     inputBlancas.addEventListener("change", function () {
       if (this.files && this.files[0]) {
+        // Mostramos el nombre del archivo
         if (nombreArchivoBlancas)
           nombreArchivoBlancas.textContent = this.files[0].name;
+        // Mostramos la previsualización
         mostrarPrevisualizacion(this, "preview_blancas");
       }
     });
   }
 
+  // MANEJO DE AVATARES DEL JUGADOR NEGRO
   if (selectNegras && inputNegras) {
     const contenedorNegras = document.getElementById(
       "contenedor-custom-negras"
@@ -405,36 +473,51 @@ document.addEventListener("DOMContentLoaded", function () {
       "nombre-archivo-negras"
     );
 
+    // Cuando se selecciona un avatar del dropdown
     selectNegras.addEventListener("change", function () {
       if (this.value === "custom") {
+        // Si elige "personalizado", mostramos el input de archivo
         if (contenedorNegras) contenedorNegras.style.display = "block";
       } else {
+        // Si elige un avatar predefinido, ocultamos el input
         if (contenedorNegras) contenedorNegras.style.display = "none";
+        // Eliminamos la previsualización
         const preview = document.getElementById("preview_negras");
         if (preview) preview.remove();
       }
     });
 
+    // Cuando selecciona un archivo
     inputNegras.addEventListener("change", function () {
       if (this.files && this.files[0]) {
+        // Mostramos el nombre del archivo
         if (nombreArchivoNegras)
           nombreArchivoNegras.textContent = this.files[0].name;
+        // Mostramos la previsualización
         mostrarPrevisualizacion(this, "preview_negras");
       }
     });
   }
 });
 
-// Funciones para modales
+// ========================================
+// FUNCIONES PARA GESTIÓN DE MODALES
+// ========================================
+
+// Función para cerrar un modal por su ID
 function cerrarModal(modalId) {
+  // Obtenemos el modal por su ID
   const modal = document.getElementById(modalId);
   if (modal) {
+    // Lo ocultamos cambiando su display a none
     modal.style.display = "none";
   }
 }
 
-// Función genérica para mostrar modales de confirmación
+// Función genérica para abrir diferentes modales de confirmación
+// Soporta: eliminar, reiniciar, cargar
 function abrirModalConfirmacion(tipo, opciones = {}) {
+  // Variables para los diferentes tipos de modal
   let titulo = "";
   let icono = "";
   let mensaje = "";
@@ -442,7 +525,9 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
   let accionHTML = "";
   let modeloId = "modalConfirmacion";
 
+  // Configuramos el contenido según el tipo de modal
   if (tipo === "eliminar") {
+    // Modal para confirmar eliminación de partida guardada
     titulo = "⚠️ Confirmar eliminación";
     icono = "🗑️";
     mensaje = `¿Deseas eliminar la partida "<strong>${opciones.nombre}</strong>"?`;
@@ -459,6 +544,7 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     `;
     modeloId = "modalConfirmarEliminar";
   } else if (tipo === "reiniciar") {
+    // Modal para confirmar reinicio de partida
     titulo = "🔄 Confirmar reinicio";
     icono = "🔄";
     mensaje = "¿Deseas reiniciar la partida? Perderás todo el progreso.";
@@ -470,6 +556,7 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     `;
     modeloId = "modalConfirmarReiniciar";
   } else if (tipo === "cargar") {
+    // Modal para confirmar carga de partida guardada
     titulo = "📁 Confirmar carga";
     icono = "📁";
     mensaje =
@@ -484,7 +571,7 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     modeloId = "modalConfirmarCargar";
   }
 
-  // Crear el HTML del modal
+  // Creamos el HTML del modal con los valores configurados
   const modalHTML = `
     <div id="${modeloId}" class="modal-overlay">
       <div class="modal-content">
@@ -499,24 +586,24 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
     </div>
   `;
 
-  // Eliminar modal anterior si existe
+  // Eliminamos el modal anterior si existe
   const modalAnterior = document.getElementById(modeloId);
   if (modalAnterior) {
     modalAnterior.remove();
   }
 
-  // Agregar modal al DOM
+  // Añadimos el nuevo modal al DOM
   document.body.insertAdjacentHTML("beforeend", modalHTML);
 
-  // Mostrar modal
+  // Mostramos el modal
   const newModal = document.getElementById(modeloId);
   if (newModal) {
     newModal.style.display = "flex";
   }
 
-  // Si es reiniciar, pausar la partida automáticamente sin recargar
+  // Si es un reinicio, pausamos la partida automáticamente
   if (tipo === "reiniciar") {
-    // Pausar con AJAX sin recargar la página
+    // Pausamos con AJAX sin recargar la página
     fetch("index.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -525,46 +612,62 @@ function abrirModalConfirmacion(tipo, opciones = {}) {
   }
 }
 
-// Mantener compatibilidad con función anterior
+// Función para mantener compatibilidad con el código existente (eliminar partida)
 function abrirModalConfirmarEliminar(nombre, archivo, desdeInicio) {
   abrirModalConfirmacion("eliminar", { nombre, archivo, desdeInicio });
 }
 
-// Función para abrir modal cargar desde pantalla inicial
+// Función para abrir el modal de cargar partida desde la pantalla inicial
 function abrirModalCargarInicial() {
+  // Obtenemos el modal
   const modal = document.getElementById("modalCargarInicial");
   if (modal) {
+    // Lo mostramos
     modal.style.display = "flex";
   }
 }
 
-// Función para desplegar/contraer el historial
+// ========================================
+// FUNCIONES PARA EXPANDIR/CONTRAER SECCIONES
+// ========================================
+
+// Función para mostrar/ocultar el historial de movimientos
 function toggleHistorial() {
+  // Obtenemos el contenedor del historial y el icono de toggle
   const contenido = document.getElementById("historial-contenido");
   const toggle = document.getElementById("historial-toggle");
 
   if (contenido && toggle) {
     if (contenido.style.display === "none") {
+      // Si está oculto, lo mostramos
       contenido.style.display = "block";
+      // Rotamos el icono hacia abajo
       toggle.style.transform = "rotate(180deg)";
     } else {
+      // Si está visible, lo ocultamos
       contenido.style.display = "none";
+      // Volvemos el icono a la posición normal
       toggle.style.transform = "rotate(0deg)";
     }
   }
 }
 
-// Función para desplegar/contraer las instrucciones
+// Función para mostrar/ocultar las instrucciones y reglas
 function toggleInstrucciones() {
+  // Obtenemos el contenedor de instrucciones y el icono de toggle
   const contenido = document.getElementById("instrucciones-contenido");
   const toggle = document.getElementById("instrucciones-toggle");
 
   if (contenido && toggle) {
     if (contenido.style.display === "none") {
+      // Si está oculto, lo mostramos
       contenido.style.display = "block";
+      // Rotamos el icono hacia abajo
       toggle.style.transform = "rotate(180deg)";
     } else {
+      // Si está visible, lo ocultamos
       contenido.style.display = "none";
+      // Volvemos el icono a la posición normal
       toggle.style.transform = "rotate(0deg)";
     }
   }

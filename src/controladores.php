@@ -1,17 +1,16 @@
 <?php
+// Funciones de controladores para la aplicación de ajedrez
 
 /**
- * Funciones de controladores para la aplicación de ajedrez
- */
-
-/**
- * Procesa la petición AJAX para actualizar relojes
+ * Actualiza los relojes de la partida en tiempo real
+ * Recibe peticiones AJAX desde JavaScript para mantener los tiempos sincronizados
  */
 function procesarAjaxUpdateClocks()
 {
+  // Le decimos al navegador que vamos a devolver JSON
   header('Content-Type: application/json');
 
-  // Si no hay sesión de partida activa, devolver estado vacío
+  // Si no hay una partida activa, devolvemos valores vacíos
   if (!isset($_SESSION['tiempo_blancas']) || !isset($_SESSION['tiempo_negras']) || !isset($_SESSION['reloj_activo'])) {
     echo json_encode([
       'tiempo_blancas' => 0,
@@ -26,35 +25,46 @@ function procesarAjaxUpdateClocks()
 
   $ahora = time();
 
-  // Actualizar tiempo solo si la partida no está en pausa y no ha terminado por tiempo
+  // Solo restamos tiempo si la partida no está pausada y no se acabó el tiempo
   if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-    // Si ya se detectó tiempo agotado, no actualizar más
+    // Si el tiempo no se agotó, seguimos contando
     if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
+      // Si ya tuvimos un registro anterior, calculamos el tiempo que ha pasado
       if (isset($_SESSION['ultimo_tick'])) {
+        // Restamos la hora actual a la última vez que actualizamos
         $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
 
+        // Si pasó algún segundo, lo restamos del reloj del jugador actual
         if ($tiempoTranscurrido > 0) {
+          // Si es turno de blancas, restamos de su tiempo
           if ($_SESSION['reloj_activo'] === 'blancas') {
             $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
           } else {
+            // Si no, restamos de las negras
             $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
           }
+          // Actualizamos la última vez que contamos tiempo
           $_SESSION['ultimo_tick'] = $ahora;
         }
       } else {
+        // En la primera ejecución, solo registramos la hora
         $_SESSION['ultimo_tick'] = $ahora;
       }
     }
   }
 
-  // Detectar si el tiempo se agotó y terminar la partida (solo una vez)
+  // Verificamos si algún jugador se quedó sin tiempo (solo una vez)
   if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
+    // Si las blancas se acabaron el tiempo, ganan las negras
     if ($_SESSION['tiempo_blancas'] <= 0) {
       $_SESSION['partida_terminada_por_tiempo'] = 'negras';
-      $_SESSION['tiempo_blancas'] = 0; // Asegurar que esté en 0
+      // Aseguramos que el tiempo sea exactamente 0
+      $_SESSION['tiempo_blancas'] = 0;
     } elseif ($_SESSION['tiempo_negras'] <= 0) {
+      // Si las negras se acabaron el tiempo, ganan las blancas
       $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
-      $_SESSION['tiempo_negras'] = 0; // Asegurar que esté en 0
+      // Aseguramos que el tiempo sea exactamente 0
+      $_SESSION['tiempo_negras'] = 0;
     }
   }
 
@@ -75,24 +85,26 @@ function procesarAjaxUpdateClocks()
 }
 
 /**
- * Procesa la configuración guardada
+ * Guarda los ajustes que el usuario cambió en el modal de configuración
  */
 function procesarGuardarConfiguracion()
 {
-  // Solo permitir cambiar opciones visuales, no el tiempo
+  // Guardamos si mostrar o no las coordenadas del tablero
   $_SESSION['config']['mostrar_coordenadas'] = isset($_POST['mostrar_coordenadas']);
+  // Guardamos si mostrar o no las piezas capturadas
   $_SESSION['config']['mostrar_capturas'] = isset($_POST['mostrar_capturas']);
 }
 
 /**
- * Inicia una nueva partida
+ * Crea una nueva partida con los jugadores y configuración elegida
  */
 function iniciarPartida()
 {
+  // Obtenemos los nombres de los jugadores, eliminando espacios al principio y final
   $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
   $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
 
-  // Manejar avatares
+  // Procesamos los avatares que eligieron los jugadores
   $avatarBlancas = null;
   $avatarNegras = null;
 
@@ -112,35 +124,44 @@ function iniciarPartida()
     }
   }
 
-  // Guardar configuración elegida
+  // Guardamos la configuración elegida por el usuario
   $_SESSION['config'] = [
-    'tiempo_inicial' => (int)$_POST['tiempo_inicial'],
-    'incremento' => (int)$_POST['incremento'],
-    'mostrar_coordenadas' => isset($_POST['mostrar_coordenadas']),
-    'mostrar_capturas' => isset($_POST['mostrar_capturas'])
+    'tiempo_inicial' => (int)$_POST['tiempo_inicial'], // Tiempo base para cada jugador
+    'incremento' => (int)$_POST['incremento'], // Tiempo extra por movimiento
+    'mostrar_coordenadas' => isset($_POST['mostrar_coordenadas']), // Mostrar letras y números
+    'mostrar_capturas' => isset($_POST['mostrar_capturas']) // Mostrar piezas capturadas
   ];
 
+  // Creamos una nueva partida con los nombres de los jugadores
   $_SESSION['partida'] = serialize(new Partida($nombreBlancas, $nombreNegras));
+  // Al inicio, no hay casilla seleccionada
   $_SESSION['casilla_seleccionada'] = null;
+  // Inicializamos los tiempos de ambos jugadores
   $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
   $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
+  // Las blancas siempre comienzan
   $_SESSION['reloj_activo'] = 'blancas';
+  // Registramos la hora actual para contar el tiempo
   $_SESSION['ultimo_tick'] = time();
+  // Marcamos que ya se configuró la partida
   $_SESSION['nombres_configurados'] = true;
+  // La partida no está pausada al inicio
   $_SESSION['pausa'] = false;
+  // Guardamos los avatares elegidos
   $_SESSION['avatar_blancas'] = $avatarBlancas;
   $_SESSION['avatar_negras'] = $avatarNegras;
 }
 
 /**
- * Procesa la pausa/reanudación
+ * Pausa o reanuda la partida según su estado actual
  */
 function procesarTogglePausa()
 {
+  // Si existe el indicador de pausa, lo invertimos
   if (isset($_SESSION['pausa'])) {
     $_SESSION['pausa'] = !$_SESSION['pausa'];
 
-    // Si se reanuda, resetear ultimo_tick
+    // Si reanudamos la partida, reseteamos el contador de tiempo
     if (!$_SESSION['pausa']) {
       $_SESSION['ultimo_tick'] = time();
     }
@@ -148,10 +169,11 @@ function procesarTogglePausa()
 }
 
 /**
- * Reinicia la partida
+ * Borra toda la partida y vuelve a la pantalla de inicio
  */
 function reiniciarPartida()
 {
+  // Borramos toda la información de la partida
   unset($_SESSION['partida']);
   unset($_SESSION['casilla_seleccionada']);
   unset($_SESSION['tiempo_blancas']);
@@ -160,47 +182,56 @@ function reiniciarPartida()
   unset($_SESSION['ultimo_tick']);
   unset($_SESSION['nombres_configurados']);
   unset($_SESSION['pausa']);
-  unset($_SESSION['partida_terminada_por_tiempo']); // Limpiar mensaje de tiempo agotado
+  unset($_SESSION['partida_terminada_por_tiempo']); // También el indicador de tiempo agotado
   unset($_SESSION['avatar_blancas']);
   unset($_SESSION['avatar_negras']);
+  // Recargamos la página para que vuelva a la pantalla de inicio
   header("Location: " . $_SERVER['PHP_SELF']);
   exit;
 }
 
 /**
- * Revancha: nueva partida manteniendo jugadores, avatares y configuración
+ * Crea una nueva partida pero mantiene a los mismos jugadores, avatares y configuración
  */
 function revanchaPartida()
 {
+  // Si no hay partida anterior, volvemos al inicio
   if (!isset($_SESSION['partida'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
   }
 
+  // Obtenemos la partida anterior
   $partidaActual = unserialize($_SESSION['partida']);
   $jugadores = $partidaActual->getJugadores();
 
-  // Obtener nombres de jugadores
+  // Guardamos los nombres de los jugadores
   $nombreBlancas = $jugadores['blancas']->getNombre();
   $nombreNegras = $jugadores['negras']->getNombre();
 
-  // Crear nueva partida con los mismos nombres
+  // Creamos una partida nueva con los mismos nombres
   $_SESSION['partida'] = serialize(new Partida($nombreBlancas, $nombreNegras));
+  // Limpiamos la casilla seleccionada
   $_SESSION['casilla_seleccionada'] = null;
 
-  // Resetear tiempos al valor inicial configurado
+  // Reseteamos los tiempos al valor inicial
   if (isset($_SESSION['config']['tiempo_inicial'])) {
     $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
     $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
   }
 
+  // Iniciamos con las blancas
   $_SESSION['reloj_activo'] = 'blancas';
+  // Reseteamos el reloj
   $_SESSION['ultimo_tick'] = time();
+  // La partida empieza sin pausar
   $_SESSION['pausa'] = false;
+  // Limpiamos el indicador de tiempo agotado
   unset($_SESSION['partida_terminada_por_tiempo']);
 
-  // Mantener avatares y configuración visual (ya están en sesión)
+  // Los avatares y configuración ya están guardados, los mantenemos
 
+  // Recargamos la página
   header("Location: " . $_SERVER['PHP_SELF']);
   exit;
 }
