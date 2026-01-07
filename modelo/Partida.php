@@ -902,7 +902,7 @@ class Partida
 
     // Registrar en historial con notación estándar
     $notacion = ($tipo === 'corto') ? 'O-O' : 'O-O-O';
-    
+
     // Cambiar turno
     $turnoAnterior = $this->turno;
     $this->turno = $this->oponente($this->turno);

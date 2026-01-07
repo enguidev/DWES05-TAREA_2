@@ -325,7 +325,7 @@ function procesarConfirmarEnroque()
   }
 
   $partida = unserialize($_SESSION['partida']);
-  
+
   // Ejecutar el enroque
   if ($partida->ejecutarEnroque($origen, $destino, $tipo)) {
     $_SESSION['partida'] = serialize($partida);
@@ -343,7 +343,7 @@ function procesarCancelarEnroque()
   if (isset($_SESSION['enroque_pendiente'])) {
     // Simplemente limpiamos la sesión y restauramos mensaje
     unset($_SESSION['enroque_pendiente']);
-    
+
     if (isset($_SESSION['partida'])) {
       $partida = unserialize($_SESSION['partida']);
       $partida->setMensaje("Turno de {$partida->getJugadores()[$partida->getTurno()]->getNombre()}");
