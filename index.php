@@ -150,9 +150,6 @@ if (isset($_POST['confirmar_guardar']) && isset($_POST['nombre_partida']) && iss
 // Mostrar modal de promoción si está en curso (PHP puro)
 $mostrarModalPromocion = false;
 if (isset($_SESSION['promocion_en_curso'])) {
-  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-    $_SESSION['pausa'] = true; // Pausar mientras se elige pieza
-  }
   $mostrarModalPromocion = true;
 }
 
