@@ -385,6 +385,29 @@ Tecnología: el historial se genera y persiste en servidor (PHP) mediante
 con una pequeña función de cliente en
 [public/script.js](public/script.js) (`toggleHistorial()`), sin lógica de juego.
 
+
+───────────────────────────────────────────────────────────────────────────────
+PRUEBA DE PROMOCIÓN DE PEÓN (DESDE INICIO DE PARTIDA)
+───────────────────────────────────────────────────────────────────────────────
+
+La siguiente secuencia permite promocionar un peón (blancas) en el movimiento 5:
+
+   1. Blancas:  E2 → E4  (peón)
+   2. Negras:   A7 → A5  (peón)
+   3. Blancas:  E4 → E5  (peón avanza)
+   4. Negras:   A5 → A4  (peón avanza)
+   5. Blancas:  E5 → E6  (peón avanza)
+   6. Negras:   A4 → A3  (peón avanza)
+   7. Blancas:  E6 → E7  (peón avanza hacia la promoción)
+   8. Negras:   A3 → A2  (peón avanza)
+   9. Blancas:  E7 → E8  (PEÓN LLEGA AL FINAL - Modal de promoción)
+      → Se abre modal con 4 opciones: Dama, Torre, Alfil, Caballo
+      → Selecciona tu pieza preferida
+      → Historial: e8=D (si eliges Dama), e8=T (Torre), e8=A (Alfil), e8=C (Caballo)
+
+NOTA: El peón negro también podría llegar a A1 en el movimiento 10, mostrando
+promoción en la fila 1 (a1=D, a1=T, etc.).
+
 ───────────────────────────────────────────────────────────────────────────────
 GLOSARIO DE NOTACIÓN
 ───────────────────────────────────────────────────────────────────────────────
@@ -706,6 +729,102 @@ REQUISITOS DEL ENUNCIADO (DWES U5) Y COBERTURA:
 PENDIENTES DE MEJORA (NO CRÍTICOS):
 - Validación adicional de archivos: endurecer tamaño/mime y manejo de nombres
 - UX: Sonidos, temas de tablero y animaciones
+
+
+================================================================================
+11. GUÍA COMPLETA DEL ENROQUE
+================================================================================
+
+───────────────────────────────────────────────────────────────────────────────
+ENROQUE CORTO (O-O)
+───────────────────────────────────────────────────────────────────────────────
+
+El enroque corto es el movimiento especial entre el rey y la torre del flanco
+de rey (lado derecho del tablero).
+
+CONDICIONES PARA ENROQUE CORTO:
+✓ Rey no ha movido en toda la partida
+✓ Torre del flanco de rey (H1/H8) no ha movido en toda la partida
+✓ No hay piezas entre el rey y la torre
+✓ El rey no está en jaque
+✓ El rey no pasa por una casilla atacada (incluida la de destino)
+
+MOVIMIENTO:
+- Rey se mueve desde E1 a G1 (blancas) o E8 a G8 (negras)
+- Torre se mueve desde H1 a F1 (blancas) o H8 a F8 (negras)
+- Ambas piezas se mueven simultáneamente
+
+NOTACIÓN EN HISTORIAL: O-O
+
+SECUENCIA DE PRUEBA (DESDE INICIO):
+   1. Blancas:  E2 → E4
+   2. Negras:   E7 → E5
+   3. Blancas:  G1 → F3
+   4. Negras:   B8 → C6
+   5. Blancas:  F1 → C4
+   6. Negras:   D7 → D6
+   7. Blancas:  E1 → G1 (Modal enroque) → Confirma
+      → Rey a G1, Torre a F1
+      → Historial: O-O
+
+
+───────────────────────────────────────────────────────────────────────────────
+ENROQUE LARGO (O-O-O)
+───────────────────────────────────────────────────────────────────────────────
+
+El enroque largo es el movimiento especial entre el rey y la torre del flanco
+de dama (lado izquierdo del tablero).
+
+CONDICIONES PARA ENROQUE LARGO:
+✓ Rey no ha movido en toda la partida
+✓ Torre del flanco de dama (A1/A8) no ha movido en toda la partida
+✓ No hay piezas entre el rey y la torre
+✓ El rey no está en jaque
+✓ El rey no pasa por una casilla atacada (incluida la de destino)
+
+MOVIMIENTO:
+- Rey se mueve desde E1 a C1 (blancas) o E8 a C8 (negras)
+- Torre se mueve desde A1 a D1 (blancas) o A8 a D8 (negras)
+- Ambas piezas se mueven simultáneamente
+
+NOTACIÓN EN HISTORIAL: O-O-O
+
+SECUENCIA DE PRUEBA (DESDE INICIO):
+   1. Blancas:  E2 → E4
+   2. Negras:   E7 → E5
+   3. Blancas:  G1 → F3
+   4. Negras:   B8 → C6
+   5. Blancas:  B1 → C3
+   6. Negras:   F8 → B4
+   7. Blancas:  D1 → D2 (Mueve la dama)
+   8. Negras:   E8 → C8 (Modal enroque largo) → Confirma
+      → Rey a C8, Torre a D8
+      → Historial: O-O-O
+
+
+───────────────────────────────────────────────────────────────────────────────
+DIFERENCIAS RESUMIDAS
+───────────────────────────────────────────────────────────────────────────────
+
+                    ENROQUE CORTO (O-O)      ENROQUE LARGO (O-O-O)
+───────────────────────────────────────────────────────────────────────────────
+Torre:              H1 (blancas) / H8        A1 (blancas) / A8 (negras)
+                    (negras)
+
+Rey destino:        G1 (blancas) / G8        C1 (blancas) / C8 (negras)
+                    (negras)
+
+Torre destino:      F1 (blancas) / F8        D1 (blancas) / D8 (negras)
+                    (negras)
+
+Casillas libres:    F1, G1 (blancas)         B1, C1, D1 (blancas)
+requeridas:         F8, G8 (negras)          B8, C8, D8 (negras)
+
+Notación:           O-O                      O-O-O
+
+Lado:               Flanco de rey (derecha)  Flanco de dama (izquierda)
+
+Distancia:          Rey 2 casillas derecha   Rey 2 casillas izquierda
 
 
 ================================================================================
