@@ -43,9 +43,10 @@ PROMOCIÓN:
 ENROQUE:
    - Para intentar enroque: 
      1. Haz clic en el REY (se resaltará en amarillo)
-     2. Haz clic en la casilla destino 2 posiciones hacia la torre (G1/G8 para enroque corto, C1/C8 para enroque largo)
+     2. Haz clic en la casilla donde quieres mover el rey (G1/G8 para enroque corto, C1/C8 para enroque largo)
+     3. Haz clic en la TORRE correspondiente (H1/H8 para enroque corto, A1/A8 para enroque largo)
    - Si es válido, aparece un modal de confirmación preguntando si deseas hacer el enroque
-   - Puedes CONFIRMAR para ejecutarlo (rey y torre se mueven automáticamente) o CANCELAR para posponer el enroque y hacer otro movimiento
+   - Puedes CONFIRMAR para ejecutarlo (rey y torre se mueven automáticamente a sus posiciones finales) o CANCELAR para posponer el enroque y hacer otro movimiento
 
 PRUEBA DE ENROQUE (DESDE INICIO DE PARTIDA):
    La siguiente secuencia permite hacer enroque corto (O-O) con blancas en el movimiento 7:
