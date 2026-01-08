@@ -122,7 +122,9 @@ Reglas avanzadas:
 -----------------------------------------------
 
 - JAQUE: Detecta cuando el rey está amenazado
+
 - JAQUE MATE: Detecta cuando no hay movimientos legales para salir del jaque
+
 - TABLAS (EMPATE):
   -Stalemate (ahogado): el jugador al que le toca mover no está en jaque, pero no tiene ningún movimiento legal
   - Material insuficiente: se declara tablas cuando sólo hay reyes, o rey + alfil vs rey, o rey + caballo vs rey
@@ -148,10 +150,6 @@ Reglas avanzadas:
   - No puedes moverte si dejas a tu rey en jaque
   - Validación en tiempo real
 
-  -Estructura del proyecto
-
-
-
 -----------------------------------------------
 Jugando una partida:
 -----------------------------------------------
@@ -161,7 +159,7 @@ PASO 1: Seleccionar pieza
    - Bordes rojos pulsantes indican capturas posibles
 
 PASO 2: Mover pieza (se podrá deshacer posteriormente hasta los 10 últimos movimientos 
-clicando el botón "Deshacer"")
+        clicando el botón "Deshacer"")
    - Haz clic en una casilla marcada en verde
    - La pieza se moverá automáticamente
    - El turno pasará al otro jugador
@@ -194,10 +192,10 @@ ENROQUE:
 -----------------------------------------------
 Historial de movimientos:
 -----------------------------------------------
-  1-. Bajo el tablero, haz clic en el encabezado “Historial de movimientos”.
-  2-. Se desplegará un panel con las jugadas en notación algebraica.
+  1-. Bajo el tablero, haz clic en el desplegable “Historial de movimientos”
+  2-. Se desplegará un panel con las jugadas en notación algebraica
     - Ejemplo: 1. e4 e5, 2. Cf3 Cc6, 3. Ab5 O-O
-  3-. El historial se guarda junto con la partida y se recupera al cargar.
+  3-. El historial se guarda junto con la partida y se recupera al cargar
 
 -----------------------------------------------
 GLOSARIO DE NOTACIÓN
