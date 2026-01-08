@@ -40,7 +40,7 @@ function renderConfigForm($partidasGuardadas = [])
       <hr class="linea-horizontal">
 
       <form method="post" enctype="multipart/form-data" class="config-form">
-        <p class="configuracion-inicial"><strong>Nombres de los jugadores</strong></p>
+        <p class="configuracion-inicial"><strong>Configuración de los jugadores</strong></p>
 
         <!-- Configuración del jugador de blancas -->
         <div class="jugador-config blancas-config">
@@ -157,7 +157,7 @@ function renderConfigForm($partidasGuardadas = [])
 
         <div class="botones-inicio">
           <!-- Botón para iniciar la partida con la configuración elegida -->
-          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">🎮 Iniciar Partida Nueva</button>
+          <button type="submit" name="iniciar_partida" class="btn-iniciar-partida">Iniciar Partida Nueva</button>
         </div>
       </form>
     </div>

@@ -8,7 +8,7 @@ require_once 'src/funciones_auxiliares.php';
 require_once 'src/vistas.php';
 require_once 'src/controladores.php';
 
-// Manejo de solicitudes AJAX (esto lo he hecho con JS para poder hacerlo en tiempo real, en php sólo al recargar la página)
+// Manejo de solicitudes AJAX (esto lo he hecho con JS para poder hacerlo en tiempo real, en php sólo al recargar la página
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'actualizar_relojes') {
   // Manejamos la actualización de los relojes en tiempo real
   procesarAjaxActualizarRelojes();
