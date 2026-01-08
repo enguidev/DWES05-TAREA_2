@@ -124,28 +124,29 @@ Reglas avanzadas:
 - JAQUE: Detecta cuando el rey está amenazado
 - JAQUE MATE: Detecta cuando no hay movimientos legales para salir del jaque
 - TABLAS (EMPATE):
-  • Stalemate (ahogado): el jugador al que le toca mover no está en jaque, pero no tiene ningún movimiento legal
-  • Material insuficiente (implementado): se declara tablas cuando sólo hay reyes, o rey + alfil vs rey, o rey + caballo vs rey
+  -Stalemate (ahogado): el jugador al que le toca mover no está en jaque, pero no tiene ningún movimiento legal
+  - Material insuficiente: se declara tablas cuando sólo hay reyes, o rey + alfil vs rey, o rey + caballo vs rey
+  - No estoy muy seguro que funcione perfectamente
 
 - PROMOCIÓN DE PEÓN:
-   • Al llegar al extremo opuesto se abre un modal
-   • Elección de pieza: Dama, Torre, Alfil o Caballo
-   • La partida se pausa hasta confirmar la promoción
+   - Al llegar al extremo opuesto se abre un modal
+   - Elección de pieza: Dama, Torre, Alfil o Caballo
+   - La partida se pausa hasta confirmar la promoción
 
 - ENROQUE:
-   • Implementado con confirmación del jugador vía modal
-   • Para iniciar: mueve el rey 2 casillas (E→G para corto, E→C para largo)
-   • Si las condiciones se cumplen, aparece un modal preguntando si deseas ejecutar el enroque
-   • Puedes confirmar o cancelar (si cancelas, el rey no se mueve y conservas la opción)
-   • Validación completa: piezas sin mover, casillas libres y sin jaque intermedio
+   - Implementado con confirmación del jugador vía modal
+   - Para iniciar: mueve el rey 2 casillas (E→G para corto, E→C para largo)
+   - Si las condiciones se cumplen, aparece un modal preguntando si deseas ejecutar el enroque
+   - Puedes confirmar o cancelar (si cancelas, el rey no se mueve y conservas la opción)
+   - Validación completa: piezas sin mover, casillas libres y sin jaque intermedio
 
 - CAPTURA AL PASO:
-   • Implementada: disponible inmediatamente tras avance doble del peón rival
-   • Detección por último movimiento y posición adyacente
+   - Implementada: disponible inmediatamente tras avance doble del peón rival
+   - Detección por último movimiento y posición adyacente
 
 - PREVENCIÓN DE MOVIMIENTOS ILEGALES:
-  • No puedes moverte si dejas a tu rey en jaque
-  • Validación en tiempo real
+  - No puedes moverte si dejas a tu rey en jaque
+  - Validación en tiempo real
 
   -Estructura del proyecto
 
