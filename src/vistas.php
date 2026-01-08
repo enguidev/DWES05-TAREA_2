@@ -612,31 +612,31 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
                     // Convertir posiciones a coordenadas numéricas
                     $coordsOrigen = [$letras[array_search($casillaSeleccionada[0], $letras)], (int)$casillaSeleccionada[1]];
                     $coordsDestino = [$letras[array_search($posicion[0], $letras)], (int)$posicion[1]];
-                    
+
                     // Dirección de avance según el color
                     $direccion = ($turno === 'blancas') ? 1 : -1;
-                    
+
                     // Verificar si es movimiento diagonal de 1 casilla hacia adelante
                     $difFilas = $coordsDestino[1] - $coordsOrigen[1];
                     $difCols = abs(array_search($coordsDestino[0], $letras) - array_search($coordsOrigen[0], $letras));
-                    
+
                     if ($difFilas === $direccion && $difCols === 1) {
                       // Casilla donde estaría el peón a capturar (misma fila origen, columna destino)
                       $posCapturaEnPassant = $posicion[0] . $casillaSeleccionada[1];
                       $piezaPosibleCapturada = obtenerPiezaEnCasilla($posCapturaEnPassant, $partida);
-                      
+
                       // Verificar que hay un peón enemigo en esa posición
                       if ($piezaPosibleCapturada instanceof Peon && $piezaPosibleCapturada->getColor() !== $turno) {
                         // Obtener el último movimiento de la partida
                         $ultimoMovimiento = $partida->getUltimoMovimiento();
-                        
+
                         if ($ultimoMovimiento && $ultimoMovimiento['pieza'] === 'Peon' && $ultimoMovimiento['color'] !== $turno) {
                           // Convertir origen y destino del último movimiento a coordenadas
                           $umOrigen = $ultimoMovimiento['origen'];
                           $umDestino = $ultimoMovimiento['destino'];
                           $umOrigenFila = (int)$umOrigen[1];
                           $umDestinoFila = (int)$umDestino[1];
-                          
+
                           // Verificar que fue un avance de 2 casillas y acabó en la posición a capturar
                           $salto = abs($umDestinoFila - $umOrigenFila);
                           if ($salto === 2 && $umDestino === $posCapturaEnPassant) {
