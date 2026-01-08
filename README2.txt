@@ -124,10 +124,8 @@ Reglas avanzadas:
 - JAQUE: Detecta cuando el rey está amenazado
 - JAQUE MATE: Detecta cuando no hay movimientos legales para salir del jaque
 - TABLAS (EMPATE):
-  • Stalemate: No hay movimientos legales pero no hay jaque (implementado)
-  • Material insuficiente: Solo quedan reyes (implementado)
-  • Rey + Alfil vs Rey (implementado)
-  • Rey + Caballo vs Rey (implementado)
+  • Stalemate (ahogado): el jugador al que le toca mover no está en jaque, pero no tiene ningún movimiento legal
+  • Material insuficiente (implementado): se declara tablas cuando sólo hay reyes, o rey + alfil vs rey, o rey + caballo vs rey
 
 - PROMOCIÓN DE PEÓN:
    • Al llegar al extremo opuesto se abre un modal
