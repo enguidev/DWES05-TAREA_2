@@ -831,12 +831,8 @@ class Partida
     $piezasBlancas = array_filter($this->jugadores['blancas']->getPiezas(), fn($p) => !$p->estCapturada());
     $piezasNegras = array_filter($this->jugadores['negras']->getPiezas(), fn($p) => !$p->estCapturada());
 
-    $tieneBlancasPiezas = count(array_filter($piezasBlancas, fn($p) => !($p instanceof Rey))) > 0;
-    $tieneNegrasPiezas = count(array_filter($piezasNegras, fn($p) => !($p instanceof Rey))) > 0;
+    if ($this->materialInsuficiente($piezasBlancas, $piezasNegras)) return true;
 
-    if (!$tieneBlancasPiezas && !$tieneNegrasPiezas) return true; // Solo reyes
-
-    // Más complejos, pero por ahora solo stalemate
     return false;
   }
 
@@ -847,13 +843,88 @@ class Partida
    */
   private function tieneMovimientosLegales($color)
   {
-    // Simplificado: verificar si alguna pieza puede mover sin dejar rey en jaque
+    $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
     foreach ($this->jugadores[$color]->getPiezas() as $pieza) {
       if ($pieza->estCapturada()) continue;
-      // Simular movimientos posibles
-      // Por simplicidad, asumir que si no está en jaque y hay piezas, hay movimientos
-      return true;
+      $origen = $pieza->getPosicion();
+      if (!$origen) continue;
+
+      foreach ($letras as $col) {
+        for ($fila = 1; $fila <= 8; $fila++) {
+          $destino = $col . $fila;
+          if ($destino === $origen) continue;
+
+          $piezaDestino = $this->obtenerPiezaEnPosicion($destino);
+          $esCaptura = ($piezaDestino !== null && $piezaDestino->getColor() !== $color);
+          if ($piezaDestino !== null && $piezaDestino->getColor() === $color) continue;
+
+          $casillasRecorridas = ($pieza instanceof Peon)
+            ? $pieza->simulaMovimiento($destino, $esCaptura)
+            : $pieza->simulaMovimiento($destino);
+
+          if (empty($casillasRecorridas)) continue;
+
+          $hayBloqueo = false;
+          if (!($pieza instanceof Caballo)) {
+            for ($i = 0; $i < count($casillasRecorridas) - 1; $i++) {
+              if ($this->obtenerPiezaEnPosicion($casillasRecorridas[$i]) !== null) {
+                $hayBloqueo = true;
+                break;
+              }
+            }
+          }
+          if ($hayBloqueo) continue;
+
+          $backup = serialize($this->jugadores);
+          $tempJugadores = unserialize($backup);
+          $piezaOrigenTemp = $tempJugadores[$color]->getPiezaEnPosicion($origen);
+          $piezaDestinoTemp = $this->obtenerPiezaEnPosicion($destino, $tempJugadores);
+
+          if ($piezaDestinoTemp && $esCaptura) {
+            $piezaDestinoTemp->capturar();
+          }
+
+          if ($piezaOrigenTemp) {
+            $piezaOrigenTemp->setPosicion($destino);
+            $piezaOrigenTemp->setHaMovido(true);
+            if ($piezaOrigenTemp instanceof Peon) {
+              $piezaOrigenTemp->setEsPrimerMovimiento(false);
+            }
+          }
+
+          if (!$this->estaEnJaque($color, $tempJugadores)) {
+            return true;
+          }
+        }
+      }
     }
+
+    return false;
+  }
+
+  /**
+   * Detecta material insuficiente para jaque mate
+   * @param array $piezasBlancas
+   * @param array $piezasNegras
+   * @return bool
+   */
+  private function materialInsuficiente($piezasBlancas, $piezasNegras)
+  {
+    $sinRey = fn($piezas) => array_filter($piezas, fn($p) => !($p instanceof Rey));
+
+    $restantesB = $sinRey($piezasBlancas);
+    $restantesN = $sinRey($piezasNegras);
+
+    // Solo reyes
+    if (count($restantesB) === 0 && count($restantesN) === 0) return true;
+
+    // Rey + (alfil o caballo) vs rey
+    $esMinor = fn($restantes) => count($restantes) === 1 && ($restantes[0] instanceof Alfil || $restantes[0] instanceof Caballo);
+
+    if ($esMinor($restantesB) && count($restantesN) === 0) return true;
+    if ($esMinor($restantesN) && count($restantesB) === 0) return true;
+
     return false;
   }
 
@@ -954,6 +1025,15 @@ class Partida
   public function terminar()
   {
     $this->partidaTerminada = true;
+  }
+
+  /**
+   * Obtiene el último movimiento realizado
+   * @return array|null Array con información del último movimiento o null
+   */
+  public function getUltimoMovimiento()
+  {
+    return $this->ultimoMovimiento;
   }
 
   /**

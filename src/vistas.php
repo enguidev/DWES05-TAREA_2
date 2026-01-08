@@ -568,7 +568,9 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
 
                   // Los peones tienen movimientos especiales (diagonal para capturar, recto para avanzar)
                   if ($piezaSeleccionada instanceof Peon) {
-                    $movimientos = $piezaSeleccionada->simulaMovimiento($posicion, $hayPiezaDestino);
+                    // Para peones: si hay pieza enemiga en destino, es captura
+                    $esCapturaNormal = ($hayPiezaDestino && $piezaEnDestino->getColor() !== $turno);
+                    $movimientos = $piezaSeleccionada->simulaMovimiento($posicion, $esCapturaNormal);
                   } else {
                     // Para otras piezas, simulamos el movimiento normal
                     $movimientos = $piezaSeleccionada->simulaMovimiento($posicion);
@@ -600,6 +602,49 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
                       } else {
                         // Si no hay pieza en destino, es un movimiento normal
                         $esMovimientoPosible = true;
+                      }
+                    }
+                  }
+
+                  // DETECCIÓN DE CAPTURA AL PASO
+                  // Si es un peón y el movimiento diagonal a casilla vacía no fue detectado, verificar captura al paso
+                  if ($piezaSeleccionada instanceof Peon && !$hayPiezaDestino && !$esMovimientoPosible) {
+                    // Convertir posiciones a coordenadas numéricas
+                    $coordsOrigen = [$letras[array_search($casillaSeleccionada[0], $letras)], (int)$casillaSeleccionada[1]];
+                    $coordsDestino = [$letras[array_search($posicion[0], $letras)], (int)$posicion[1]];
+                    
+                    // Dirección de avance según el color
+                    $direccion = ($turno === 'blancas') ? 1 : -1;
+                    
+                    // Verificar si es movimiento diagonal de 1 casilla hacia adelante
+                    $difFilas = $coordsDestino[1] - $coordsOrigen[1];
+                    $difCols = abs(array_search($coordsDestino[0], $letras) - array_search($coordsOrigen[0], $letras));
+                    
+                    if ($difFilas === $direccion && $difCols === 1) {
+                      // Casilla donde estaría el peón a capturar (misma fila origen, columna destino)
+                      $posCapturaEnPassant = $posicion[0] . $casillaSeleccionada[1];
+                      $piezaPosibleCapturada = obtenerPiezaEnCasilla($posCapturaEnPassant, $partida);
+                      
+                      // Verificar que hay un peón enemigo en esa posición
+                      if ($piezaPosibleCapturada instanceof Peon && $piezaPosibleCapturada->getColor() !== $turno) {
+                        // Obtener el último movimiento de la partida
+                        $ultimoMovimiento = $partida->getUltimoMovimiento();
+                        
+                        if ($ultimoMovimiento && $ultimoMovimiento['pieza'] === 'Peon' && $ultimoMovimiento['color'] !== $turno) {
+                          // Convertir origen y destino del último movimiento a coordenadas
+                          $umOrigen = $ultimoMovimiento['origen'];
+                          $umDestino = $ultimoMovimiento['destino'];
+                          $umOrigenFila = (int)$umOrigen[1];
+                          $umDestinoFila = (int)$umDestino[1];
+                          
+                          // Verificar que fue un avance de 2 casillas y acabó en la posición a capturar
+                          $salto = abs($umDestinoFila - $umOrigenFila);
+                          if ($salto === 2 && $umDestino === $posCapturaEnPassant) {
+                            // ¡Captura al paso válida!
+                            $esMovimientoPosible = true;
+                            $esCaptura = true;
+                          }
+                        }
                       }
                     }
                   }
@@ -668,7 +713,7 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       <div class="historial-movimientos">
         <!-- Encabezado del historial (clickeable para expandir/contraer) -->
         <div class="historial-header" onclick="toggleHistorial()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
-          <span><strong>📋 Historial de movimientos</strong></span>
+          <span><strong>Historial de movimientos</strong></span>
           <span id="historial-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
         </div>
         <!-- Contenido del historial (inicialmente oculto) -->
@@ -719,38 +764,38 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       <div class="instrucciones" style="margin-top: 25px;">
         <!-- Encabezado de instrucciones (clickeable para expandir/contraer) -->
         <div class="instrucciones-header" onclick="toggleInstrucciones()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
-          <span><strong>📚 Reglas y Controles</strong></span>
+          <span><strong>Reglas y Controles</strong></span>
           <span id="instrucciones-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
         </div>
         <!-- Contenido de instrucciones (inicialmente oculto) -->
         <div id="instrucciones-contenido" class="instrucciones-contenido" style="display: none; padding: 15px; background: #fafafa; border-radius: 5px; margin-top: 5px;">
           <!-- SECCIÓN: Cómo jugar -->
-          <h4 style="margin-top: 0; color: #333;">🎮 Cómo jugar:</h4>
+          <h4 style="margin-top: 0; color: #333;">Cómo jugar:</h4>
           <ol>
-            <li>⏸️ <strong>Pausa/Reanudar</strong>: Usa el botón superior (⏸️/▶️) para pausar la partida</li>
-            <li>⏱️ <strong>Reloj</strong>: Solo corre el reloj del jugador en turno</li>
-            <li>🟢 <strong>Movimientos válidos</strong>: Se marcan con círculos verdes</li>
-            <li>🔴 <strong>Capturas</strong>: Se marcan con borde rojo pulsante</li>
-            <li>⏰ <strong>Tiempo límite</strong>: Si llegas a 0:00, pierdes automáticamente</li>
+            <li><strong>Pausa/Reanudar</strong>: Usa el botón superior (⏸️/▶️) para pausar la partida</li>
+            <li><strong>Reloj</strong>: Solo corre el reloj del jugador en turno</li>
+            <li><strong>Movimientos válidos</strong>: Se marcan con círculos verdes</li>
+            <li><strong>Capturas</strong>: Se marcan con borde rojo pulsante</li>
+            <li><strong>Tiempo límite</strong>: Si llegas a 0:00, pierdes automáticamente</li>
           </ol>
 
           <!-- SECCIÓN: Gestión de partida -->
-          <h4 style="margin-top: 15px; color: #333;">💾 Gestión de partida:</h4>
+          <h4 style="margin-top: 15px; color: #333;">Gestión de partida:</h4>
           <ul style="list-style: none; padding-left: 0;">
-            <li>💾 <strong>Guardar</strong>: Guarda la partida actual para continuarla después</li>
-            <li>📁 <strong>Cargar</strong>: Carga una partida guardada anteriormente</li>
-            <li>🔄 <strong>Nueva partida</strong>: Inicia una nueva partida desde el principio (se pierde progreso y configuración de jugadores)</li>
-            <li>⚙️ <strong>Configuración</strong>: Ajusta opciones visuales y de tiempo</li>
+            <li><strong>-Guardar</strong>: Guarda la partida actual para continuarla posteriormente (solo posible si pausas la partida)</li>
+            <li><strong>-Cargar</strong>: Carga una partida guardada anteriormente</li>
+            <li><strong>-Nueva partida</strong>: Inicia una nueva partida desde el principio</li>
+            <li><strong>-Configuración</strong>: Ajusta opciones visuales y de tiempo</li>
           </ul>
 
           <!-- SECCIÓN: Configuración -->
-          <h4 style="margin-top: 15px; color: #333;">⚙️ Configuración:</h4>
+          <h4 style="margin-top: 15px; color: #333;">Configuración:</h4>
           <ul style="list-style: none; padding-left: 0;">
-            <li>🎨 <strong>Avatares</strong>: Personaliza la imagen de los jugadores</li>
-            <li>⏱️ <strong>Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
-            <li>➕ <strong>Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
-            <li>📊 <strong>Mostrar coordenadas</strong>: Activa/desactiva las letras y números del tablero</li>
-            <li>📸 <strong>Mostrar capturas</strong>: Visualiza las piezas capturadas</li>
+            <li><strong>-Avatares</strong>: Personaliza la imagen de los jugadores</li>
+            <li><strong>-Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
+            <li><strong>-Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
+            <li><strong>-Mostrar coordenadas</strong>: Activa/desactiva las letras y números del tablero</li>
+            <li><strong>-Mostrar capturas</strong>: Visualiza las piezas capturadas</li>
           </ul>
         </div>
       </div>

@@ -52,7 +52,7 @@ Pantalla inicial "Configuración de partida":
 Pantalla de partida/juego "Partida de Ajedrez":
 -----------------------------------------------
   -Empezando de arriba hacia abajo tenemos:
-    -Icono representativo de un peón con el título Partida de Ajedrez, botones de ajustes con:
+    -Icono representativo de un peón con el literal Partida de Ajedrez como título, botón de ajustes con:
       -Las opciones de interfaz para mostrar u ocultar tanto las coordenadas del tablero (A-H, 1-8)
        como el panel de piezas capturadas (estas 2 cosas se aplicarán en tiempo real)
       -Información del tiempo:
@@ -65,13 +65,15 @@ Pantalla de partida/juego "Partida de Ajedrez":
         -La partida se mantendrá pausada mientras tomemos decisiones y no cerremos el modal
         -Configuración persistente entre sesiones
     Botón de pause/play donde podremos pausar o reanudar la partida (cuando la partida esté pausada, 
-    se habilitará el botón de "Guardar partida") 
+    se habilitará el botón de "Guardar partida". También se auto-pausará cuando estemos tomando 
+    decisiones (como por ejemplo en una ventana modal y se reanudará al salir de ella y volver a la partida))
 
-    -Contenedor de información e iteración con el/los usuarios/jugadores:
+    -Contenedor de información e iteración con el/los usuario/s - jugador/es:
       - Turno actual
-      - Jaque / Jaque Mate
+      - Detección de jaque, jaque mate 
       - Errores de movimiento
-      - Promoción de peón
+      - Promoción de peón (cuando llega un peón a la parte contraria, el usuario/jugador puede elegir 
+        por cual ficha promocionar (una Dama, una Torre, un Alfil o un Caballo))
       - Fin de partida
 
 
@@ -94,67 +96,56 @@ Pantalla de partida/juego "Partida de Ajedrez":
 
     -Fila de botones con las siguientes funciones:
       -Botón de deshacer movimiento/s (hasta 10 movimientos)
-      -Botón de revancha para volver a hacer una partida con la misma 
-       configuración de jugadores, tiempo y vista
+      -Botón de revancha para volver a hacer una partida con la misma configuración de jugadores, tiempo y vista
       -Botón para guardar una partida y así poder reanudarla posteriormente cuando se desee:
         -Se puede editar el nombre de guardado que viene por defecto
         -Se almacena en formato JSON con el estado completo de piezas, tiempo, turno e historial
         -Sólo estará disponible cuando pongamos la partida en pausa
       -Botón de nueva partida para comenzar una nueva partida (con ventana modal de conformación por si hemos 
-       clicado sin querer dicho botón)
+       clicado sin querer dicho botón y así evitar errores y sustos y más si ibas a ganar 😜)
       
     -Desplegable de historial de movimientos en formato algebraico de cada jugador
 
     -Desplegable de reglas y controles del juego
 
-  -Se puede meter en la configuración en tiempo de juego pulsando el engranaje de la aparte superior 
-   del tablero
-  -Se puede pausar y reanudar la partida con el botón de pause/play
-  -Validación de reglas
-  -Detección de jaque, jaque mate y tablas
-  -Cuando llega un peón a la parte contraria, el usuario/jugador puede elegir por 
-   cual ficha promocionar (una Dama, una Torre, un Alfil o un Caballo).
-  -Hay un reloj de tiempo por jugador el cual se puede Configurar
-  -Guardar partidas
-  -Deshacer movimientos
   -Detección de piezas bloqueando caminos
   -Validación de capturas (no puedes capturar tus propias piezas)
   -Control de turnos alternados
   -Detección de movimientos ilegales
   -Cuando se acabe el tiempo de alguno de los jugadores, se acabará la partida y se 
    informará de quien ha perdido y quien ha ganado
-  -Se podrá realizar otra partida con la misma configuración de jugadores, tiempo, etc 
-   pulsando el botón "Revancha" disponible en la parte inferior del tablero de juego
 
-  ───────────────────────────────────────────────────────────────────────────────
-B. REGLAS AVANZADAS
-───────────────────────────────────────────────────────────────────────────────
 
-✓ JAQUE: Detecta cuando el rey está amenazado
-✓ JAQUE MATE: Detecta cuando no hay movimientos legales para salir del jaque
-✓ TABLAS (EMPATE):
-  • Stalemate: No hay movimientos legales pero no hay jaque
-  • Material insuficiente: Solo quedan reyes
-  • Rey + Alfil vs Rey
-  • Rey + Caballo vs Rey
 
-✓ PROMOCIÓN DE PEÓN:
+-----------------------------------------------
+Reglas avanzadas:
+-----------------------------------------------
+
+- JAQUE: Detecta cuando el rey está amenazado
+- JAQUE MATE: Detecta cuando no hay movimientos legales para salir del jaque
+- TABLAS (EMPATE):
+  • Stalemate: No hay movimientos legales pero no hay jaque (implementado)
+  • Material insuficiente: Solo quedan reyes (implementado)
+  • Rey + Alfil vs Rey (implementado)
+  • Rey + Caballo vs Rey (implementado)
+
+- PROMOCIÓN DE PEÓN:
    • Al llegar al extremo opuesto se abre un modal
    • Elección de pieza: Dama, Torre, Alfil o Caballo
    • La partida se pausa hasta confirmar la promoción
 
-✓ ENROQUE:
+- ENROQUE:
    • Implementado con confirmación del jugador vía modal
    • Para iniciar: mueve el rey 2 casillas (E→G para corto, E→C para largo)
    • Si las condiciones se cumplen, aparece un modal preguntando si deseas ejecutar el enroque
    • Puedes confirmar o cancelar (si cancelas, el rey no se mueve y conservas la opción)
    • Validación completa: piezas sin mover, casillas libres y sin jaque intermedio
 
-✓ CAPTURA AL PASO:
+- CAPTURA AL PASO:
    • Implementada: disponible inmediatamente tras avance doble del peón rival
    • Detección por último movimiento y posición adyacente
 
-✓ PREVENCIÓN DE MOVIMIENTOS ILEGALES:
+- PREVENCIÓN DE MOVIMIENTOS ILEGALES:
   • No puedes moverte si dejas a tu rey en jaque
   • Validación en tiempo real
 
@@ -231,6 +222,9 @@ EJEMPLOS:
 
 Aún se podría mejorar más:
   -Partida sin tiempo
+  -Multilenguaje (prácticamente, sería sencillo ya que son una número limitado de frases y siempre son las mismas 
+   e incluso con un patrón Observer podríamos cambiar el idioma incluso en tiempo real sin necesidad de hacerlo en 
+   el inicio de la partida nii tener que reiniciarla)
   -Más información al usuario.
   -Devolver tiempo perdido a los usuarios al deshacer movimientos
   -Mejoras de UX:
