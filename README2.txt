@@ -1,9 +1,9 @@
 Engui_Garcia_Carlos_DWES05-TAREA
 
 Tarea basada en lo más fiel posible al juego del ajedrez.
-Está desarrollado en su gran mayoría en PHP (con programación Orientada a Objetos) 
-y un archivo de JavaScript (script.js) para las funcionalidades extras a lo que 
-pide el enunciado de la tarea que no he podido hacer correctamente con PHP.
+Está desarrollado en su gran mayoría en PHP (con programación Orientada a Objetos),
+HTML, CSS y un archivo de JavaScript (script.js) para las funcionalidades extras a 
+lo que pide el enunciado de la tarea que no he podido hacer correctamente con PHP.
 
 Es un motor de ajedrez lo más completo posible.
 
@@ -191,6 +191,61 @@ PROMOCIÓN:
    - La partida se pausa mientras tengamos abierto el modal
 
 ENROQUE:
-   - Para intentar enroque: mueve el rey 2 casillas (E→G o E→C)
-   - Si es válido, aparece un modal de confirmación
-   - Puedes confirmar para ejecutar o cancelar y así posponer el enroque para más tarde
+   - Para intentar enroque: 
+     1-. Haz clic en el REY (se resaltará en amarillo)
+     2-. Haz clic en la casilla donde quieres mover el rey (G1/G8 para enroque corto,
+         C1/C8 para enroque largo)
+     3-. Haz clic en la TORRE correspondiente (H1/H8 para enroque corto, A1/A8 para 
+         enroque largo)
+   - Si es válido, aparece un modal de confirmación preguntando si deseas hacer el enroque
+   - Puedes CONFIRMAR para ejecutarlo (rey y torre se mueven automáticamente a sus posiciones 
+     finales) o CANCELAR para posponer el enroque y hacer otro movimiento
+
+-----------------------------------------------
+Historial de movimientos:
+-----------------------------------------------
+  1-. Bajo el tablero, haz clic en el encabezado “Historial de movimientos”.
+  2-. Se desplegará un panel con las jugadas en notación algebraica.
+    - Ejemplo: 1. e4 e5, 2. Cf3 Cc6, 3. Ab5 O-O
+  3-. El historial se guarda junto con la partida y se recupera al cargar.
+
+-----------------------------------------------
+GLOSARIO DE NOTACIÓN
+-----------------------------------------------
+
+PIEZAS (letras en español):
+- R: Rey, D: Dama, T: Torre, A: Alfil, C: Caballo, Peón: sin letra (ej. `e4`).
+
+SÍMBOLOS:
+- x: captura (ej. `Txd4`).
+- +: jaque (ej. `Dg7+`).
+- #: jaque mate (ej. `Dg7#`).
+- O-O: enroque corto; O-O-O: enroque largo.
+- =pieza: promoción (ej. `e8=D`, `c1=C`).
+- e.p.: captura al paso (ej. `exd6 e.p.`).
+
+EJEMPLOS:
+- `1. e4 e5 2. Cf3 Cc6 3. Ab5 O-O`.
+- `Txd4`, `Dg7+`, `e8=D`, `exd6 e.p.`.
+
+
+Aún se podría mejorar más:
+  -Partida sin tiempo
+  -Más información al usuario.
+  -Devolver tiempo perdido a los usuarios al deshacer movimientos
+  -Mejoras de UX:
+    -Animaciones.
+    -Más información al usuario (como por ejemplo al entrar en ajustes durante la partida, 
+     informar de más cosas como el tiempo qu ele queda a cada jugador, fichas capturadas y 
+     puntuación de cada jugador, más opciones en ese modal que sólo están en la pantalla de 
+     partida, etc)
+    -Sonidos (al mover las fichas, acabar el juego, aviso acústico de alguna información, 
+     terminación de partida, etc) 
+    -Temas (Oscuro/Light o personalización más personalizada y completa)
+    -Videos explicativos (de ejemplos de uso)
+    -Pequeño tour de para que sirve cada elemento del juego
+    -Resaltado del cursor 
+  -Validación de tablas
+  -Modo multijugador online con WebSockets
+  -Guardar puntuaciones con nombres al terminar
+  -Que se pudiera jugar contra la computadora, pero eso ya es una funcionalidad muy avanzada

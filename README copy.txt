@@ -5,61 +5,6 @@
 9. Notas Técnicas
 
 
-───────────────────────────────────────────────────────────────────────────────
-I. DISEÑO RESPONSIVE
-───────────────────────────────────────────────────────────────────────────────
-
-✓ Adaptación automática a diferentes pantallas:
-  • Desktop (> 768px): Tablero grande, panel lateral
-  • Tablet (480px - 768px): Tablero medio, panel adaptado
-  • Móvil (< 480px): Tablero compacto, panel debajo
-
-✓ Imágenes de piezas escalables
-✓ Botones táctiles optimizados
-✓ Texto legible en todas las resoluciones
-
-
-================================================================================
-6. GUÍA DE USO
-================================================================================
-
-
-
-───────────────────────────────────────────────────────────────────────────────
-JUGANDO UNA PARTIDA
-───────────────────────────────────────────────────────────────────────────────
-
-
-CAPTURAS:
-   - Haz clic en una casilla con borde rojo
-   - La pieza enemiga será capturada
-   - Aparecerá en el panel de capturas
-
-PROMOCIÓN:
-   - Si tu peón llega al extremo opuesto
-   - Se abre un modal para elegir pieza: Dama, Torre, Alfil o Caballo
-   - La partida se pausa hasta que confirmes la elección
-
-ENROQUE:
-   - Para intentar enroque: 
-     1. Haz clic en el REY (se resaltará en amarillo)
-     2. Haz clic en la casilla donde quieres mover el rey (G1/G8 para enroque corto, C1/C8 para enroque largo)
-     3. Haz clic en la TORRE correspondiente (H1/H8 para enroque corto, A1/A8 para enroque largo)
-   - Si es válido, aparece un modal de confirmación preguntando si deseas hacer el enroque
-   - Puedes CONFIRMAR para ejecutarlo (rey y torre se mueven automáticamente a sus posiciones finales) o CANCELAR para posponer el enroque y hacer otro movimiento
-
-PRUEBA DE ENROQUE (DESDE INICIO DE PARTIDA):
-   La siguiente secuencia permite hacer enroque corto (O-O) con blancas en el movimiento 7:
-
-   1. Blancas:  E2 → E4  (peón)
-   2. Negras:   E7 → E5  (peón)
-   3. Blancas:  G1 → F3  (caballo)
-   4. Negras:   B8 → C6  (caballo)
-   5. Blancas:  F1 → C4  (alfil)
-   6. Negras:   D7 → D6  (peón, o cualquier movimiento)
-   7. Blancas:  E1 → G1  (REY - Se abrirá modal de confirmación de enroque)
-      → Confirma: Rey a G1, Torre a F1
-      → Historial: O-O
 
 
 ───────────────────────────────────────────────────────────────────────────────
@@ -78,11 +23,6 @@ CONTROLES DE PARTIDA
 VER HISTORIAL DE MOVIMIENTOS
 ───────────────────────────────────────────────────────────────────────────────
 
-1. Bajo el tablero, haz clic en el encabezado “📋 Historial de movimientos”.
-2. Se desplegará un panel con las jugadas en notación algebraica.
-   - Ejemplo: 1. e4 e5, 2. Cf3 Cc6, 3. Ab5 O-O
-3. El historial se guarda junto con la partida y se recupera al cargar.
-
 Tecnología: el historial se genera y persiste en servidor (PHP) mediante
 `Partida::registrarMovimientoEnNotacion()` y `getHistorialMovimientos()` en
 [modelo/Partida.php](modelo/Partida.php). El desplegable del panel se gestiona
@@ -90,46 +30,8 @@ con una pequeña función de cliente en
 [public/script.js](public/script.js) (`toggleHistorial()`), sin lógica de juego.
 
 
-───────────────────────────────────────────────────────────────────────────────
-PRUEBA DE PROMOCIÓN DE PEÓN (DESDE INICIO DE PARTIDA)
-───────────────────────────────────────────────────────────────────────────────
 
-La siguiente secuencia permite promocionar un peón (blancas) en el movimiento 5:
 
-   1. Blancas:  E2 → E4  (peón)
-   2. Negras:   A7 → A5  (peón)
-   3. Blancas:  E4 → E5  (peón avanza)
-   4. Negras:   A5 → A4  (peón avanza)
-   5. Blancas:  E5 → E6  (peón avanza)
-   6. Negras:   A4 → A3  (peón avanza)
-   7. Blancas:  E6 → E7  (peón avanza hacia la promoción)
-   8. Negras:   A3 → A2  (peón avanza)
-   9. Blancas:  E7 → E8  (PEÓN LLEGA AL FINAL - Modal de promoción)
-      → Se abre modal con 4 opciones: Dama, Torre, Alfil, Caballo
-      → Selecciona tu pieza preferida
-      → Historial: e8=D (si eliges Dama), e8=T (Torre), e8=A (Alfil), e8=C (Caballo)
-
-NOTA: El peón negro también podría llegar a A1 en el movimiento 10, mostrando
-promoción en la fila 1 (a1=D, a1=T, etc.).
-
-───────────────────────────────────────────────────────────────────────────────
-GLOSARIO DE NOTACIÓN
-───────────────────────────────────────────────────────────────────────────────
-
-PIEZAS (letras en español):
-- R: Rey, D: Dama, T: Torre, A: Alfil, C: Caballo, Peón: sin letra (ej. `e4`).
-
-SÍMBOLOS:
-- x: captura (ej. `Txd4`).
-- +: jaque (ej. `Dg7+`).
-- #: jaque mate (ej. `Dg7#`).
-- O-O: enroque corto; O-O-O: enroque largo.
-- =pieza: promoción (ej. `e8=D`, `c1=C`).
-- e.p.: captura al paso (ej. `exd6 e.p.`).
-
-EJEMPLOS:
-- `1. e4 e5 2. Cf3 Cc6 3. Ab5 O-O`.
-- `Txd4`, `Dg7+`, `e8=D`, `exd6 e.p.`.
 
 
 ───────────────────────────────────────────────────────────────────────────────
@@ -312,92 +214,6 @@ public/script.js:
    - Validación de formularios
    - Efectos visuales
 
-
-================================================================================
-8. TECNOLOGÍAS UTILIZADAS
-================================================================================
-
-BACKEND:
-- PHP 7.4+ (POO, Sesiones, Serialización)
-- Almacenamiento JSON para persistencia
-- Sistema de archivos para avatares
-
-FRONTEND:
-- HTML5 semántico
-- CSS3 (Flexbox, Grid, Animaciones, Media Queries)
-- JavaScript Vanilla (ES6+)
-- AJAX con Fetch API
-
-ARQUITECTURA:
-- MVC adaptado (Modelo-Vista-Controlador)
-- POO con herencia y abstracción
-- Separación de responsabilidades
-- DRY (Don't Repeat Yourself)
-
-
-================================================================================
-9. NOTAS TÉCNICAS
-================================================================================
-
-───────────────────────────────────────────────────────────────────────────────
-DECISIONES DE DISEÑO
-───────────────────────────────────────────────────────────────────────────────
-
-✓ Notación de ajedrez estándar (A1-H8)
-✓ Sistema de coordenadas interno [fila, columna] (0-7)
-✓ Serialización de objetos para historial y guardado
-✓ Clonación profunda para simular movimientos sin alterar estado
-✓ Validación en dos fases: cliente (UX) y servidor (seguridad)
-
-✓ Historial persistente y serializado para guardado/carga
-✓ Sincronización de relojes cada 5 segundos (balance precisión/carga)
-✓ Pausa automática al abrir modales para evitar pérdidas de tiempo
-✓ Promoción mediante modal con elección de pieza
-✓ Enroque con confirmación del jugador para permitir diferir la decisión
-
-
-───────────────────────────────────────────────────────────────────────────────
-SEGURIDAD
-───────────────────────────────────────────────────────────────────────────────
-
-✓ Validación de subida de imágenes (tipo, tamaño)
-✓ Sanitización de nombres de archivo
-✓ htmlspecialchars() en todos los inputs de usuario
-✓ Validación de existencia de archivos antes de cargar
-✓ Sesiones PHP para mantener estado del servidor
-
-
-───────────────────────────────────────────────────────────────────────────────
-OPTIMIZACIONES
-───────────────────────────────────────────────────────────────────────────────
-
-✓ Caché de movimientos posibles en cliente
-✓ AJAX solo para actualizaciones críticas (relojes)
-✓ Lazy loading conceptual (solo carga partida cuando necesario)
-✓ CSS minificado en producción
-✓ Imágenes optimizadas (PNG transparente, tamaño reducido)
-
-
-───────────────────────────────────────────────────────────────────────────────
-LIMITACIONES CONOCIDAS
-───────────────────────────────────────────────────────────────────────────────
-
-⚠ Sin validación de repetición de posiciones (tablas por repetición)
-⚠ Mejoras de UX pendientes: animaciones avanzadas, sonidos, temas
-
-
-───────────────────────────────────────────────────────────────────────────────
-POSIBLES MEJORAS FUTURAS
-───────────────────────────────────────────────────────────────────────────────
-
-🔮 Animaciones de movimiento y capturas + sonidos
-🔮 Resaltado desde historial al pasar el cursor
-🔮 Modo multijugador online (WebSockets)
-🔮 AI para jugar contra la computadora
-🔮 Análisis de partida post-juego
-🔮 Exportar partidas en formato PGN
-🔮 Temas de tablero personalizables
-
 ================================================================================
 10. MAPA DE REQUISITOS VS FUNCIONALIDADES
 ================================================================================
@@ -529,19 +345,3 @@ Notación:           O-O                      O-O-O
 Lado:               Flanco de rey (derecha)  Flanco de dama (izquierda)
 
 Distancia:          Rey 2 casillas derecha   Rey 2 casillas izquierda
-
-
-================================================================================
-CRÉDITOS Y CONTACTO
-================================================================================
-
-Proyecto desarrollado como parte de la Tarea DWES05
-Grado Superior DAW 2025-26
-Desarrollo Web en Entorno Servidor
-
-Fecha: Enero 2026
-Versión: 2.0
-
-================================================================================
-                            FIN DEL DOCUMENTO
-================================================================================
