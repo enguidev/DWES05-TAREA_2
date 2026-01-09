@@ -3,6 +3,7 @@
 Este documento explica, punto por punto, cómo se ejecuta la aplicación desde la entrada en el índice y cómo se ha modularizado la lógica.
 
 ## Entrada en índice
+
 - Archivo principal: [index.php](index.php)
 - Inicio de sesión: `session_start()`.
 - Carga de dependencias: [modelo/Partida.php](modelo/Partida.php), [src/funciones_auxiliares.php](src/funciones_auxiliares.php), [src/vistas.php](src/vistas.php), [src/controladores.php](src/controladores.php).
@@ -11,6 +12,7 @@ Este documento explica, punto por punto, cómo se ejecuta la aplicación desde l
 - Resolución de la solicitud: `resolverAcciones()` procesa todos los `POST/GET` y devuelve un estado para la vista.
 
 ## ResolverAcciones: qué hace y en qué orden
+
 Implementado en [src/controladores.php](src/controladores.php).
 
 - `pausar_desde_configuracion`: pausa la partida, actualiza `ultimo_tick` y responde JSON.
@@ -50,6 +52,7 @@ Implementado en [src/controladores.php](src/controladores.php).
 - Partidas disponibles en inicio: `partidasGuardadasInicio = listarPartidas()`.
 
 ## Render de vistas
+
 - Inicio (sin `nombres_configurados`):
   - Formulario: `renderConfigForm(partidasGuardadasInicio)` en [src/vistas.php](src/vistas.php).
   - Modal de carga inicial: `renderModalCargarInicial(partidasGuardadasInicio)` si hay partidas.
@@ -66,11 +69,13 @@ Implementado en [src/controladores.php](src/controladores.php).
   - Tablero: `renderTablero(partida, casillaSeleccionada, turno, piezasCapturadas)`.
 
 ## Resumen de modularización
+
 - Lógica de comprobaciones trasladada de [index.php](index.php) a `resolverAcciones()` en [src/controladores.php](src/controladores.php).
 - Defaults y saneado de estado a `aplicarConfigPredeterminada()` en [src/controladores.php](src/controladores.php).
 - `index.php` queda como orquestador: sesión + includes + ruta AJAX + aplicar defaults + resolver acciones + render de vistas.
 
 ## Puntos clave de tiempo y pausa
+
 - Relojes en tiempo real: `procesarAjaxActualizarRelojes()` usa `ultimo_tick` y `reloj_activo` para restar tiempo; detecta tiempo agotado y marca `partida_terminada_por_tiempo`.
 - Pausas: acciones de configuración, modales de reinicio/revancha/cargar, promoción y enroque establecen `$_SESSION['pausa']` para evitar movimientos y congelar relojes.
 - Reanudaciones: al cerrar modales o confirmar operaciones se reanuda y se resetea `ultimo_tick`.
