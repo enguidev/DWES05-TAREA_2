@@ -104,7 +104,7 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
                           // Si está pausada, le ponemos una clase especial
                           if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
                             echo 'pausa';
-                          } elseif ($partida->estaTerminada()) {
+                          } elseif ($partida && $partida->estaTerminada()) {
                             // Si terminó, le ponemos otra clase especial
                             echo 'terminada';
                           }
@@ -116,14 +116,14 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
           echo "⏸️ PARTIDA EN PAUSA";
 
           // Si la partida terminó...
-        } elseif ($partida->estaTerminada()) {
+        } elseif ($partida && $partida->estaTerminada()) {
           // ...mostramos el mensaje de quién ganó
-          echo htmlspecialchars($mensaje);
+          echo htmlspecialchars($mensaje ?? '');
 
           // Si está jugándose...
         } else {
           // ...mostramos los mensajes normales (jaque, etc.)
-          echo htmlspecialchars($mensaje);
+          echo htmlspecialchars($mensaje ?? '');
         }
         ?>
       </div>
