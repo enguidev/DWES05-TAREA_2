@@ -654,3 +654,247 @@ function manejarSubidaAvatar($inputName, $color)
 
   return null;
 }
+
+/**
+ * Aplica configuración por defecto si no existe en sesión
+ */
+function aplicarConfigPredeterminada()
+{
+  $configDefecto = [
+    'tiempo_inicial' => 600,
+    'incremento' => 0,
+    'mostrar_coordenadas' => true,
+    'mostrar_capturas' => true
+  ];
+
+  if (!isset($_SESSION['config'])) {
+    $_SESSION['config'] = $configDefecto;
+  }
+
+  if (isset($_SESSION['partida']) && !isset($_SESSION['pausa'])) {
+    $_SESSION['pausa'] = false;
+  }
+}
+
+/**
+ * Resuelve todas las acciones de la solicitud y prepara el estado para la vista
+ * Devuelve un array asociativo con los datos necesarios para renderizar
+ */
+function resolverAcciones()
+{
+  $estado = [
+    'mostrarModalReiniciar' => false,
+    'mostrarModalRevancha' => false,
+    'mostrarModalGuardar' => false,
+    'nombrePartidaSugerido' => '',
+    'mostrarModalPromocion' => false,
+    'mostrarModalEnroque' => false,
+    'mostrarModalCargar' => false,
+    'partidasGuardadas' => [],
+    'partida' => null,
+    'jugadores' => null,
+    'marcador' => null,
+    'mensaje' => null,
+    'turno' => null,
+    'casillaSeleccionada' => null,
+    'piezasCapturadas' => ['blancas' => [], 'negras' => []],
+    'partidasGuardadasInicio' => []
+  ];
+
+  // Pausar desde configuración (respuesta JSON)
+  if (isset($_POST['pausar_desde_configuracion'])) {
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+      $_SESSION['pausa'] = true;
+    }
+    if (isset($_SESSION['ultimo_tick'])) {
+      $_SESSION['ultimo_tick'] = time();
+    }
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
+    exit;
+  }
+
+  // Reanudar desde configuración (respuesta JSON)
+  if (isset($_POST['reanudar_desde_configuracion']) && !isset($_POST['guardar_configuracion'])) {
+    $_SESSION['pausa'] = false;
+    $_SESSION['ultimo_tick'] = time();
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
+    exit;
+  }
+
+  // Guardar configuración y, si procede, reanudar
+  if (isset($_POST['guardar_configuracion'])) {
+    procesarGuardarConfiguracion();
+    if (isset($_POST['reanudar_desde_configuracion'])) {
+      $_SESSION['pausa'] = false;
+      $_SESSION['ultimo_tick'] = time();
+    }
+  }
+
+  // Iniciar partida nueva
+  if (isset($_POST['iniciar_partida'])) {
+    iniciarPartida();
+  }
+
+  // Cargar/eliminar desde pantalla inicial
+  if (isset($_POST['cargar_partida_inicial']) && isset($_POST['archivo_partida'])) {
+    $partidaCargada = cargarPartida($_POST['archivo_partida']);
+    if ($partidaCargada) {
+      $_SESSION['partida'] = serialize($partidaCargada);
+      $_SESSION['nombres_configurados'] = true;
+    }
+  }
+
+  if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida'])) {
+    eliminarPartida($_POST['archivo_partida']);
+  }
+
+  // Pausa/reanudar manual
+  if (isset($_POST['alternar_pausa'])) {
+    procesarTogglePausa();
+  }
+
+  // Modales de reinicio y revancha
+  if (isset($_POST['abrir_modal_reiniciar'])) {
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+      $_SESSION['pausa'] = true;
+    }
+    $estado['mostrarModalReiniciar'] = true;
+  }
+
+  if (isset($_POST['abrir_modal_revancha'])) {
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+      $_SESSION['pausa'] = true;
+    }
+    $estado['mostrarModalRevancha'] = true;
+  }
+
+  // Cancelar cualquier modal
+  if (isset($_POST['cancelar_modal'])) {
+    if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
+      $_SESSION['pausa'] = false;
+    }
+  }
+
+  // Confirmaciones que redirigen
+  if (isset($_POST['confirmar_reiniciar'])) {
+    reiniciarPartida(); // redirige y exit
+  }
+  if (isset($_POST['confirmar_revancha'])) {
+    revanchaPartida(); // redirige y exit
+  }
+
+  // Modal Guardar
+  if (isset($_POST['abrir_modal_guardar']) && isset($_SESSION['partida'])) {
+    $partidaTmp = unserialize($_SESSION['partida']);
+    $jugadoresTmp = $partidaTmp->getJugadores();
+    $estado['nombrePartidaSugerido'] = $jugadoresTmp['blancas']->getNombre() . ' vs ' . $jugadoresTmp['negras']->getNombre() . ' - ' . date('d/m/Y H:i');
+    $estado['mostrarModalGuardar'] = true;
+  }
+
+  if (isset($_POST['confirmar_guardar']) && isset($_POST['nombre_partida']) && isset($_SESSION['partida'])) {
+    $partidaTmp = unserialize($_SESSION['partida']);
+    guardarPartida($partidaTmp, $_POST['nombre_partida']);
+    $estado['mostrarModalGuardar'] = false;
+  }
+
+  // Promoción
+  if (isset($_SESSION['promocion_en_curso'])) {
+    $estado['mostrarModalPromocion'] = true;
+  }
+  if (isset($_POST['confirmar_promocion']) && isset($_POST['tipo_promocion'])) {
+    procesarConfirmarPromocion();
+    $estado['mostrarModalPromocion'] = false;
+  }
+
+  // Enroque
+  if (isset($_SESSION['enroque_pendiente'])) {
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+      $_SESSION['pausa'] = true;
+    }
+    $estado['mostrarModalEnroque'] = true;
+  }
+  if (isset($_POST['confirmar_enroque'])) {
+    procesarConfirmarEnroque();
+    $estado['mostrarModalEnroque'] = false;
+  }
+  if (isset($_POST['cancelar_enroque'])) {
+    procesarCancelarEnroque();
+    $estado['mostrarModalEnroque'] = false;
+  }
+
+  // Modal Cargar
+  if (isset($_POST['abrir_modal_cargar'])) {
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+      $_SESSION['pausa'] = true;
+    }
+    $estado['partidasGuardadas'] = listarPartidas();
+    $estado['mostrarModalCargar'] = true;
+  }
+  if (isset($_POST['cargar_partida']) && isset($_POST['archivo_partida'])) {
+    $partidaCargada = cargarPartida($_POST['archivo_partida']);
+    if ($partidaCargada) {
+      $estado['partida'] = $partidaCargada;
+      $_SESSION['partida'] = serialize($estado['partida']);
+    }
+  }
+  if (isset($_POST['eliminar_partida']) && isset($_POST['archivo_partida'])) {
+    eliminarPartida($_POST['archivo_partida']);
+    $estado['partidasGuardadas'] = listarPartidas();
+    $estado['mostrarModalCargar'] = true;
+  }
+
+  // Procesamiento del juego si hay partida
+  if (isset($_SESSION['partida'])) {
+    $estado['partida'] = unserialize($_SESSION['partida']);
+
+    procesarJugada($estado['partida']);
+    $_SESSION['partida'] = serialize($estado['partida']);
+
+    if (isset($_POST['deshacer'])) {
+      deshacerJugada($estado['partida']);
+    }
+    if (isset($_POST['guardar'])) {
+      guardarPartida($estado['partida']);
+    }
+    if (isset($_POST['cargar'])) {
+      $partidaCargada = cargarPartida();
+      if ($partidaCargada) {
+        $estado['partida'] = $partidaCargada;
+      }
+    }
+
+    if (isset($_SESSION['partida_terminada_por_tiempo'])) {
+      $ganador = $_SESSION['partida_terminada_por_tiempo'];
+      $jugadoresLocal = $estado['partida']->getJugadores();
+      if ($ganador === 'blancas') {
+        $estado['partida']->setMensaje('⏰ ¡Tiempo agotado para las negras! ' . htmlspecialchars($jugadoresLocal['blancas']->getNombre()) . ' ha ganado.');
+      } else {
+        $estado['partida']->setMensaje('⏰ ¡Tiempo agotado para las blancas! ' . htmlspecialchars($jugadoresLocal['negras']->getNombre()) . ' ha ganado.');
+      }
+      $estado['partida']->terminar();
+      $_SESSION['partida'] = serialize($estado['partida']);
+      unset($_SESSION['partida_terminada_por_tiempo']);
+    }
+
+    $estado['casillaSeleccionada'] = $_SESSION['casilla_seleccionada'];
+    $estado['marcador'] = $estado['partida']->marcador();
+    $estado['mensaje'] = $estado['partida']->getMensaje();
+    $estado['turno'] = $estado['partida']->getTurno();
+    $estado['jugadores'] = $estado['partida']->getJugadores();
+
+    // Piezas capturadas
+    foreach ($estado['jugadores']['blancas']->getPiezas() as $pieza) {
+      if ($pieza->estCapturada()) $estado['piezasCapturadas']['blancas'][] = $pieza;
+    }
+    foreach ($estado['jugadores']['negras']->getPiezas() as $pieza) {
+      if ($pieza->estCapturada()) $estado['piezasCapturadas']['negras'][] = $pieza;
+    }
+  }
+
+  // Partidas guardadas para la pantalla inicial
+  $estado['partidasGuardadasInicio'] = listarPartidas();
+
+  return $estado;
+}
