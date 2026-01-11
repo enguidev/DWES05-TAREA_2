@@ -658,87 +658,88 @@ function procesarJugada($partida)
     // Si no hay casilla seleccionada, intentamos seleccionar la pieza en la casilla clickeada
     if ($_SESSION['casilla_seleccionada'] === null) {
 
-      // Buscamos la pieza en la casilla
-      $piezaSeleccionada = obtenerPiezaEnCasilla($casilla, $partida);
+      $piezaClickeada = obtenerPiezaEnCasilla($casilla, $partida); // Pieza en la casilla clickeada
 
       // Si hay una pieza y es del color del turno actual, la seleccionamos
-      if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $partida->getTurno()) $_SESSION['casilla_seleccionada'] = $casilla;
-      else {
+      if ($piezaClickeada && $piezaClickeada->getColor() === $partida->getTurno()) $_SESSION['casilla_seleccionada'] = $casilla;
+      else $_SESSION['casilla_seleccionada'] = null;
+    } else {
 
-        $piezaClickeada = obtenerPiezaEnCasilla($casilla, $partida); // Pieza en la casilla clickeada
+      // Ya hay una casilla seleccionada, procesamos el movimiento o re-seleccionamos
+      $origen = $_SESSION['casilla_seleccionada']; // Obtenemos la casilla de origen
 
-        // Si hay una pieza y es del color del turno actual, la seleccionamos
-        if ($piezaClickeada && $piezaClickeada->getColor() === $partida->getTurno()) $_SESSION['casilla_seleccionada'] = $casilla;
-        else {
+      // Si se hace clic en otra pieza del mismo color, cambiamos la selección
+      $piezaDestino = obtenerPiezaEnCasilla($casilla, $partida);
+      if ($piezaDestino && $piezaDestino->getColor() === $partida->getTurno()) {
 
-          $origen = $_SESSION['casilla_seleccionada']; // Obtenemos la casilla de origen
+        $_SESSION['casilla_seleccionada'] = $casilla;
+      } else {
 
-          $destino = $casilla; // Casilla de destino (la que se clickeó)
+        $destino = $casilla; // Casilla de destino (la que se clickeó)
 
-          $exito = $partida->jugada($origen, $destino); // Intentamos realizar la jugada
+        $exito = $partida->jugada($origen, $destino); // Intentamos realizar la jugada
 
-          // Si la jugada fue exitosa
-          if ($exito) {
+        // Si la jugada fue exitosa
+        if ($exito) {
 
-            $ahora = time(); // Actualizar el tiempo antes de cambiar de turno
+          $ahora = time(); // Actualizar el tiempo antes de cambiar de turno
 
-            $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];  // Tiempo que tomó la jugada
+          $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];  // Tiempo que tomó la jugada
 
-            $turnoAnterior = $_SESSION['reloj_activo']; // Guardamos el turno anterior antes de cambiarlo
+          $turnoAnterior = $_SESSION['reloj_activo']; // Guardamos el turno anterior antes de cambiarlo
 
-            // Si fue el turno de las blancas, restamos su tiempo
-            if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+          // Si fue el turno de las blancas, restamos su tiempo
+          if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
 
-            // Si fue el turno de las negras, restamos su tiempo
-            else $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+          // Si fue el turno de las negras, restamos su tiempo
+          else $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
 
-            // Incremento Fischer (después de restar el tiempo transcurrido)
-            // Si han configurado un tiempo de incremento
-            if ($_SESSION['config']['incremento'] > 0) {
+          // Incremento Fischer (después de restar el tiempo transcurrido)
+          // Si han configurado un tiempo de incremento
+          if ($_SESSION['config']['incremento'] > 0) {
 
-              // Si fue el turno de las blancas, le sumamos el incremento
-              if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
+            // Si fue el turno de las blancas, le sumamos el incremento
+            if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
 
-              // Si fue el turno de las negras, le sumamos el incremento
-              else $_SESSION['tiempo_negras'] += $_SESSION['config']['incremento'];
-            }
-
-            // cambiamos el reloj activo al otro jugador
-            $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
-
-            $_SESSION['ultimo_tick'] = time(); // Actualizamos el ultimo tick
-
-            // Promoción elegible de peón
-
-            $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida); // Obtenemos la pieza en la casilla de destino
-
-            // Si la pieza en la casilla de destino es un peón
-            if ($piezaEnDestino instanceof Peon && $piezaEnDestino->puedePromoverse()) {
-
-              // Guardamos la información de la promoción en curso
-              $_SESSION['promocion_en_curso'] = [
-
-                'color' => $turnoAnterior, // Color del peón que promueve
-
-                'posicion' => $destino // Posición del peón que promueve
-              ];
-
-              $_SESSION['pausa'] = true; // Pausamos la partida para elegir pieza
-
-              $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
-
-              $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
-
-              header("Location: " . $_SERVER['PHP_SELF']); // Recargamos la página para que vuelva a la pantalla de inicio
-
-              exit; // Terminamos la ejecución del script
-            }
+            // Si fue el turno de las negras, le sumamos el incremento
+            else $_SESSION['tiempo_negras'] += $_SESSION['config']['incremento'];
           }
 
-          $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
+          // cambiamos el reloj activo al otro jugador
+          $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
 
-          $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
+          $_SESSION['ultimo_tick'] = time(); // Actualizamos el ultimo tick
+
+          // Promoción elegible de peón
+
+          $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida); // Obtenemos la pieza en la casilla de destino
+
+          // Si la pieza en la casilla de destino es un peón
+          if ($piezaEnDestino instanceof Peon && $piezaEnDestino->puedePromoverse()) {
+
+            // Guardamos la información de la promoción en curso
+            $_SESSION['promocion_en_curso'] = [
+
+              'color' => $turnoAnterior, // Color del peón que promueve
+
+              'posicion' => $destino // Posición del peón que promueve
+            ];
+
+            $_SESSION['pausa'] = true; // Pausamos la partida para elegir pieza
+
+            $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
+
+            $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
+
+            header("Location: " . $_SERVER['PHP_SELF']); // Recargamos la página para que vuelva a la pantalla de inicio
+
+            exit; // Terminamos la ejecución del script
+          }
         }
+
+        $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
+
+        $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
       }
     }
   }
@@ -845,6 +846,155 @@ function guardarPartida($partida, $nombrePartida = null)
   file_put_contents(__DIR__ . '/../data/partidas/' . $nombreArchivo . '.json', json_encode($data, JSON_PRETTY_PRINT));
 
   return $nombreArchivo; // Retornamos el nombre del archivo guardado
+}
+
+
+// Devuelve la lista de partidas guardadas ordenadas por fecha descendente
+function listarPartidas()
+{
+  $directorio = __DIR__ . '/../data/partidas';
+
+  if (!is_dir($directorio)) return [];
+
+  $archivos = glob($directorio . '/*.json');
+
+  if (!$archivos) return [];
+
+  $partidas = [];
+
+  foreach ($archivos as $rutaArchivo) {
+
+    if (!is_file($rutaArchivo)) continue;
+
+    $contenido = json_decode(file_get_contents($rutaArchivo), true);
+
+    if (!is_array($contenido)) continue;
+
+    $timestamp = isset($contenido['timestamp']) ? (int)$contenido['timestamp'] : filemtime($rutaArchivo);
+
+    $partidas[] = [
+
+      'nombre' => isset($contenido['nombre']) ? $contenido['nombre'] : basename($rutaArchivo, '.json'),
+
+      'fecha' => isset($contenido['fecha']) ? $contenido['fecha'] : date('Y-m-d H:i:s', $timestamp),
+
+      'archivo' => basename($rutaArchivo),
+
+      'timestamp' => $timestamp
+    ];
+  }
+
+  // Ordenamos de la más reciente a la más antigua
+  usort($partidas, function ($a, $b) {
+
+    return $b['timestamp'] <=> $a['timestamp'];
+  });
+
+  return $partidas;
+}
+
+
+// Carga una partida guardada desde JSON y restaura la sesión
+function cargarPartida($archivo = null)
+{
+  $rutaArchivo = $archivo
+    ? __DIR__ . '/../data/partidas/' . basename($archivo)
+    : __DIR__ . '/../data/partida_guardada.json';
+
+  if (!file_exists($rutaArchivo)) return false;
+
+  $contenido = json_decode(file_get_contents($rutaArchivo), true);
+
+  if (!is_array($contenido) || !isset($contenido['partida'])) return false;
+
+  $partida = unserialize($contenido['partida']);
+
+  // Restaura valores básicos de sesión
+  $_SESSION['partida'] = $contenido['partida'];
+
+  $_SESSION['casilla_seleccionada'] = isset($contenido['casilla_seleccionada']) ? $contenido['casilla_seleccionada'] : null;
+
+  $_SESSION['tiempo_blancas'] = isset($contenido['tiempo_blancas']) ? (int)$contenido['tiempo_blancas'] : 0;
+
+  $_SESSION['tiempo_negras'] = isset($contenido['tiempo_negras']) ? (int)$contenido['tiempo_negras'] : 0;
+
+  $_SESSION['reloj_activo'] = isset($contenido['reloj_activo']) ? $contenido['reloj_activo'] : 'blancas';
+
+  $_SESSION['config'] = isset($contenido['config']) && is_array($contenido['config']) ? $contenido['config'] : [];
+
+  $_SESSION['pausa'] = isset($contenido['pausa']) ? (bool)$contenido['pausa'] : false;
+
+  $_SESSION['nombres_configurados'] = true;
+
+  $_SESSION['ultimo_tick'] = time();
+
+  // Restauramos avatares, priorizando los que se guardaron en disco
+  $_SESSION['avatar_blancas'] = restaurarAvatarGuardado($contenido, 'blancas');
+
+  $_SESSION['avatar_negras'] = restaurarAvatarGuardado($contenido, 'negras');
+
+  return $partida;
+}
+
+
+// Elimina una partida guardada y sus avatares asociados
+function eliminarPartida($archivo)
+{
+  $rutaArchivo = __DIR__ . '/../data/partidas/' . basename($archivo);
+
+  if (!file_exists($rutaArchivo)) return false;
+
+  $contenido = json_decode(file_get_contents($rutaArchivo), true);
+
+  // Eliminamos avatares personalizados guardados
+  foreach (['blancas', 'negras'] as $color) {
+
+    $campoAvatar = 'avatar_' . $color . '_guardado';
+
+    if (isset($contenido[$campoAvatar]) && $contenido[$campoAvatar]) {
+
+      $rutaAvatar = __DIR__ . '/../data/partidas/avatares/' . basename($contenido[$campoAvatar]);
+
+      if (file_exists($rutaAvatar)) unlink($rutaAvatar);
+    }
+  }
+
+  unlink($rutaArchivo);
+
+  return true;
+}
+
+
+// Copia un avatar guardado a la carpeta pública y devuelve la ruta relativa
+function restaurarAvatarGuardado($contenido, $color)
+{
+  $campoGuardado = 'avatar_' . $color . '_guardado';
+
+  $campoOriginal = 'avatar_' . $color;
+
+  $directorioPublico = __DIR__ . '/../public/imagenes/avatares/';
+
+  if (isset($contenido[$campoGuardado]) && $contenido[$campoGuardado]) {
+
+    $archivo = basename($contenido[$campoGuardado]);
+
+    $origen = __DIR__ . '/../data/partidas/avatares/' . $archivo;
+
+    if (file_exists($origen)) {
+
+      if (!is_dir($directorioPublico)) mkdir($directorioPublico, 0755, true);
+
+      // Limpiamos avatares previos del mismo color
+      foreach (glob($directorioPublico . 'avatar_' . $color . '_*') as $anterior) if (is_file($anterior)) unlink($anterior);
+
+      copy($origen, $directorioPublico . $archivo);
+
+      return 'public/imagenes/avatares/' . $archivo;
+    }
+  }
+
+  // Si no hay avatar guardado, devolvemos el que estuviera en la partida
+  return isset($contenido[$campoOriginal]) ? $contenido[$campoOriginal] : null;
 }
 
 // Para confirmar una promoción de peón eligiendo la pieza destino
