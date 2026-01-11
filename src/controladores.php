@@ -460,7 +460,7 @@ function resolverAcciones()
 }
 
 
- // Para guardar los ajustes que el usuario cambió en el modal de configuración
+// Para guardar los ajustes que el usuario cambió en el modal de configuración
 function procesarGuardarConfiguracion()
 {
   // Guardamos si mostrar o no las coordenadas del tablero
@@ -494,7 +494,7 @@ function iniciarPartida()
 
     // Si se eligió un avatar personalizado, gestionamos la subida del archivo
     if ($_POST["avatar_blancas"] === "personalizado") $avatarBlancas = manejarSubidaAvatar("avatar_personalizado_blancas", "blancas");
-    
+
     // Si se eligió un avatar predefinido distinto al por defecto, lo asignamos
     elseif ($_POST["avatar_blancas"] !== "predeterminado") $avatarBlancas = $_POST["avatar_blancas"];
   }
@@ -535,11 +535,11 @@ function iniciarPartida()
   $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
 
   $_SESSION['reloj_activo'] = 'blancas'; // Las blancas empiezan jugando
-  
+
   $_SESSION['ultimo_tick'] = time(); // Registramos la hora actual para contar el tiempo
-  
+
   $_SESSION['nombres_configurados'] = true; // Marcamos que ya se configuró la partida
-  
+
   $_SESSION['pausa'] = false; // La partida no está pausada al inicio
 
   // Guardamos los avatares elegidos de ambos jugadores
@@ -548,7 +548,7 @@ function iniciarPartida()
 }
 
 
- // Para pausa o reanuda la partida según su estado actual
+// Para pausa o reanuda la partida según su estado actual
 function procesarTogglePausa()
 {
   // Si existe el indicador de pausa
@@ -634,7 +634,7 @@ function revanchaPartida()
   }
 
   $_SESSION['reloj_activo'] = 'blancas'; // Iniciamos el tiempo con las blancas
-  
+
   $_SESSION['ultimo_tick'] = time(); // Obtenemos la hora actual para contar el tiempo
 
   $_SESSION['pausa'] = false; // La partida no está en pausa al inicio
@@ -665,83 +665,83 @@ function procesarJugada($partida)
       if ($piezaSeleccionada && $piezaSeleccionada->getColor() === $partida->getTurno()) $_SESSION['casilla_seleccionada'] = $casilla;
       else {
 
-      $piezaClickeada = obtenerPiezaEnCasilla($casilla, $partida); // Pieza en la casilla clickeada
+        $piezaClickeada = obtenerPiezaEnCasilla($casilla, $partida); // Pieza en la casilla clickeada
 
-      // Si hay una pieza y es del color del turno actual, la seleccionamos
-      if ($piezaClickeada && $piezaClickeada->getColor() === $partida->getTurno()) $_SESSION['casilla_seleccionada'] = $casilla;
-      else {
+        // Si hay una pieza y es del color del turno actual, la seleccionamos
+        if ($piezaClickeada && $piezaClickeada->getColor() === $partida->getTurno()) $_SESSION['casilla_seleccionada'] = $casilla;
+        else {
 
-        $origen = $_SESSION['casilla_seleccionada']; // Obtenemos la casilla de origen
+          $origen = $_SESSION['casilla_seleccionada']; // Obtenemos la casilla de origen
 
-        $destino = $casilla; // Casilla de destino (la que se clickeó)
+          $destino = $casilla; // Casilla de destino (la que se clickeó)
 
-        $exito = $partida->jugada($origen, $destino); // Intentamos realizar la jugada
+          $exito = $partida->jugada($origen, $destino); // Intentamos realizar la jugada
 
-        // Si la jugada fue exitosa
-        if ($exito) {
+          // Si la jugada fue exitosa
+          if ($exito) {
 
-          $ahora = time(); // Actualizar el tiempo antes de cambiar de turno
+            $ahora = time(); // Actualizar el tiempo antes de cambiar de turno
 
-          $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];  // Tiempo que tomó la jugada
+            $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];  // Tiempo que tomó la jugada
 
-          $turnoAnterior = $_SESSION['reloj_activo']; // Guardamos el turno anterior antes de cambiarlo
+            $turnoAnterior = $_SESSION['reloj_activo']; // Guardamos el turno anterior antes de cambiarlo
 
-          // Si fue el turno de las blancas, restamos su tiempo
-          if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
+            // Si fue el turno de las blancas, restamos su tiempo
+            if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
 
-          // Si fue el turno de las negras, restamos su tiempo
-          else $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
+            // Si fue el turno de las negras, restamos su tiempo
+            else $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
 
-          // Incremento Fischer (después de restar el tiempo transcurrido)
-          // Si han configurado un tiempo de incremento
-          if ($_SESSION['config']['incremento'] > 0) {
+            // Incremento Fischer (después de restar el tiempo transcurrido)
+            // Si han configurado un tiempo de incremento
+            if ($_SESSION['config']['incremento'] > 0) {
 
-            // Si fue el turno de las blancas, le sumamos el incremento
-            if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
+              // Si fue el turno de las blancas, le sumamos el incremento
+              if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
 
-            // Si fue el turno de las negras, le sumamos el incremento
-            else $_SESSION['tiempo_negras'] += $_SESSION['config']['incremento'];
+              // Si fue el turno de las negras, le sumamos el incremento
+              else $_SESSION['tiempo_negras'] += $_SESSION['config']['incremento'];
+            }
+
+            // cambiamos el reloj activo al otro jugador
+            $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
+
+            $_SESSION['ultimo_tick'] = time(); // Actualizamos el ultimo tick
+
+            // Promoción elegible de peón
+
+            $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida); // Obtenemos la pieza en la casilla de destino
+
+            // Si la pieza en la casilla de destino es un peón
+            if ($piezaEnDestino instanceof Peon && $piezaEnDestino->puedePromoverse()) {
+
+              // Guardamos la información de la promoción en curso
+              $_SESSION['promocion_en_curso'] = [
+
+                'color' => $turnoAnterior, // Color del peón que promueve
+
+                'posicion' => $destino // Posición del peón que promueve
+              ];
+
+              $_SESSION['pausa'] = true; // Pausamos la partida para elegir pieza
+
+              $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
+
+              $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
+
+              header("Location: " . $_SERVER['PHP_SELF']); // Recargamos la página para que vuelva a la pantalla de inicio
+
+              exit; // Terminamos la ejecución del script
+            }
           }
 
-          // cambiamos el reloj activo al otro jugador
-          $_SESSION['reloj_activo'] = ($turnoAnterior === 'blancas') ? 'negras' : 'blancas';
+          $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
 
-          $_SESSION['ultimo_tick'] = time(); // Actualizamos el ultimo tick
-
-          // Promoción elegible de peón
-
-          $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida); // Obtenemos la pieza en la casilla de destino
-
-          // Si la pieza en la casilla de destino es un peón
-          if ($piezaEnDestino instanceof Peon && $piezaEnDestino->puedePromoverse()) {
-            
-            // Guardamos la información de la promoción en curso
-            $_SESSION['promocion_en_curso'] = [
-
-              'color' => $turnoAnterior, // Color del peón que promueve
-
-              'posicion' => $destino // Posición del peón que promueve
-            ];
-
-            $_SESSION['pausa'] = true; // Pausamos la partida para elegir pieza
-           
-            $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
-
-            $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
-          
-            header("Location: " . $_SERVER['PHP_SELF']); // Recargamos la página para que vuelva a la pantalla de inicio
-
-            exit; // Terminamos la ejecución del script
-          }
+          $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
         }
-
-        $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
-
-        $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
       }
     }
   }
-}
 }
 
 
@@ -751,7 +751,7 @@ function deshacerJugada($partida)
   $partida->deshacerJugada(); // Deshacemos la última jugada
 
   $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
-  
+
   $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
 }
 
@@ -886,7 +886,7 @@ function procesarConfirmarPromocion()
   unset($_SESSION['promocion_en_curso']); // Limpiamos la promoción en curso
 
   $_SESSION['pausa'] = false; // Reanudamos la partida
-  
+
   $_SESSION['ultimo_tick'] = time(); // Actualizamos el último tick
 }
 
@@ -920,23 +920,33 @@ function procesarConfirmarEnroque()
   $_SESSION['ultimo_tick'] = time();
 }
 
-/**
- * Procesa la cancelación de enroque
- */
+
+// Para gestionar la cancelación del enroque
 function procesarCancelarEnroque()
 {
+  // Si hay un enroque pendiente
   if (isset($_SESSION['enroque_pendiente'])) {
-    // Simplemente limpiamos la sesión y restauramos mensaje
-    unset($_SESSION['enroque_pendiente']);
-    $_SESSION['pausa'] = false;
-    $_SESSION['ultimo_tick'] = time();
 
+    // Simplemente limpiamos la sesión y restauramos mensaje
+
+    unset($_SESSION['enroque_pendiente']); // Limpiamos el enroque pendiente
+
+    $_SESSION['pausa'] = false; // Reanudamos la partida
+
+    $_SESSION['ultimo_tick'] = time(); // Actualizamos el último tick
+
+    // Si hay una partida, restauramos el mensaje del turno actual
     if (isset($_SESSION['partida'])) {
-      $partida = unserialize($_SESSION['partida']);
+
+      $partida = unserialize($_SESSION['partida']); // Obtenemos la partida desde sesión
+
+      // Restauramos el mensaje del turno actual
       $partida->setMensaje("Turno de {$partida->getJugadores()[$partida->getTurno()]->getNombre()}");
-      $_SESSION['partida'] = serialize($partida);
+
+      $_SESSION['partida'] = serialize($partida); // Guardamos la partida en sesión
     }
   }
+}
 /**
  * Maneja la subida de un archivo de avatar personalizado
  * @param string $inputName Nombre del campo de archivo
