@@ -377,8 +377,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // GESTIÓN DE AVATARES PERSONALIZADOS
   // ========================================
   // Obtenemos los selectores de avatar para ambos jugadores
-  const selectBlancas = document.querySelector("select[name=\"avatar_blancas\"]");
-  const selectNegras = document.querySelector("select[name=\"avatar_negras\"]");
+  const selectBlancas = document.querySelector('select[name="avatar_blancas"]');
+  const selectNegras = document.querySelector('select[name="avatar_negras"]');
   const inputBlancas = document.getElementById("avatar_personalizado_blancas");
   const inputNegras = document.getElementById("avatar_personalizado_negras");
 
