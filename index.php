@@ -14,12 +14,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'actualizar_relojes') {
 }
 
 // Configuración por defecto y estado inicial
-aplicarConfigPredeterminada();
+aplicarConfigPredeterminada(); // Inicializa `$_SESSION['config']` y `$_SESSION['pausa]`
 
 // Resolver acciones y preparar estado para la vista
 $estado = resolverAcciones();
 
-// Extraer variables de estado para la vista
+// Extraemos variables de estado para la vista
 $mostrarModalReiniciar = $estado['mostrarModalReiniciar'];
 $mostrarModalRevancha = $estado['mostrarModalRevancha'];
 $mostrarModalGuardar = $estado['mostrarModalGuardar'];

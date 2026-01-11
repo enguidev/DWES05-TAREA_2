@@ -1,17 +1,19 @@
 <?php
 // Funciones de controladores para la aplicación de ajedrez
 
-/**
- * Actualiza los relojes de la partida en tiempo real
- * Recibe peticiones AJAX desde JavaScript para mantener los tiempos sincronizados
+/*
+ Actualiza los relojes de la partida en tiempo real
+Recibe peticiones AJAX desde JavaScript para mantener los tiempos sincronizados
  */
 function procesarAjaxActualizarRelojes()
 {
-  // Le decimos al navegador que vamos a devolver JSON
+  // Le decimos al navegador que vamos a devolver JSON (no HTML)
   header('Content-Type: application/json');
 
-  // Si no hay una partida activa, devolvemos valores vacíos
+  // Si no hay variables de sesión de tiempo, significa que no hay partida iniciada. En ese caso, devuelve valores vacíos y termina
   if (!isset($_SESSION['tiempo_blancas']) || !isset($_SESSION['tiempo_negras']) || !isset($_SESSION['reloj_activo'])) {
+
+    // Convertimos un array a texto JSON y lo imprime.
     echo json_encode([
       'tiempo_blancas' => 0,
       'tiempo_negras' => 0,
@@ -19,34 +21,53 @@ function procesarAjaxActualizarRelojes()
       'pausa' => false,
       'sin_partida' => true
     ]);
+
+    /* Guarda todos los cambios de sesión en el servidor 
+    Importante ya que en PHP, las sesiones bloquean el acceso a otros scripts y el navegador estaría haciendo múltiples peticiones 
+    AJAX rápidas y se quedaría esperando
+    */
     session_write_close();
+
+    // Termina la ejecución del script evitando se envíe JSOn duplicado y cierra la conexión con el navegador
     exit;
   }
 
+  // Obtenemos la hora actual (segundos desde 1970)
   $ahora = time();
 
   // Solo restamos tiempo si la partida no está pausada y no se acabó el tiempo
   if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+
     // Si el tiempo no se agotó, seguimos contando
     if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
-      // Si ya tuvimos un registro anterior, calculamos el tiempo que ha pasado
+
+      // Si ya tuvimos un registro anterior, calculamos el tiempo que ha pasado desde entonces
       if (isset($_SESSION['ultimo_tick'])) {
+
         // Restamos la hora actual a la última vez que actualizamos
         $tiempoTranscurrido = $ahora - $_SESSION['ultimo_tick'];
 
         // Si pasó algún segundo, lo restamos del reloj del jugador actual
         if ($tiempoTranscurrido > 0) {
+
           // Si es turno de blancas, restamos de su tiempo
           if ($_SESSION['reloj_activo'] === 'blancas') {
+
             $_SESSION['tiempo_blancas'] = max(0, $_SESSION['tiempo_blancas'] - $tiempoTranscurrido);
-          } else {
+
             // Si no, restamos de las negras
+          } else {
+
             $_SESSION['tiempo_negras'] = max(0, $_SESSION['tiempo_negras'] - $tiempoTranscurrido);
           }
+
           // Actualizamos la última vez que contamos tiempo
           $_SESSION['ultimo_tick'] = $ahora;
         }
+
+        // Si no había registro anterior...
       } else {
+
         // En la primera ejecución, solo registramos la hora
         $_SESSION['ultimo_tick'] = $ahora;
       }
@@ -55,23 +76,36 @@ function procesarAjaxActualizarRelojes()
 
   // Verificamos si algún jugador se quedó sin tiempo (solo una vez)
   if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
+
     // Si las blancas se acabaron el tiempo, ganan las negras
     if ($_SESSION['tiempo_blancas'] <= 0) {
+
       $_SESSION['partida_terminada_por_tiempo'] = 'negras';
+
       // Aseguramos que el tiempo sea exactamente 0
       $_SESSION['tiempo_blancas'] = 0;
+
+      // Si las negras se acabaron el tiempo, ganan las blancas
     } elseif ($_SESSION['tiempo_negras'] <= 0) {
+
       // Si las negras se acabaron el tiempo, ganan las blancas
       $_SESSION['partida_terminada_por_tiempo'] = 'blancas';
+
       // Aseguramos que el tiempo sea exactamente 0
       $_SESSION['tiempo_negras'] = 0;
     }
   }
 
-  // Verificar si la partida está terminada
+  /* Verificamos si la partida está terminada
+     Si existe una partida convertimos el objeto guardado en sesion a un objeto de PHP
+     So no existe, la variable $partidaObj le asignamos  null
+  */
   $partidaObj = isset($_SESSION['partida']) ? unserialize($_SESSION['partida']) : null;
+
+  // Asignamos a variable booleana ($partidaTerminada si la partida está terminada o no
   $partidaTerminada = ($partidaObj && $partidaObj->estaTerminada()) ? true : false;
 
+  // Imprimimos los tiempos actuales en formato JSON
   echo json_encode([
     'tiempo_blancas' => $_SESSION['tiempo_blancas'],
     'tiempo_negras' => $_SESSION['tiempo_negras'],
@@ -80,9 +114,355 @@ function procesarAjaxActualizarRelojes()
     'sin_partida' => false,
     'partida_terminada' => $partidaTerminada
   ]);
+  // Guarda los cambios de sesión y cierra la conexión
   session_write_close();
+
+  // Terminamos la ejecución del script
   exit;
 }
+
+// Para aplicar configuración por defecto si no existe en session
+function aplicarConfigPredeterminada()
+{
+  // Configuración por defecto
+  $configDefecto = [
+    'tiempo_inicial' => 600, // 10 minutos
+    'incremento' => 0, // Sin incremento
+    'mostrar_coordenadas' => true, // Mostramos coordenadas del tablero
+    'mostrar_capturas' => true // Mostramos piezas capturadas
+  ];
+
+  // Si la configuración no existe en la session, la creamos con los valores por defecto ($configDefecto )
+  if (!isset($_SESSION['config'])) $_SESSION['config'] = $configDefecto;
+
+  // Si hay una partida en curso pero no existe el indicador de pausa
+  if (isset($_SESSION['partida']) && !isset($_SESSION['pausa'])) {
+
+    // lo inicializamos en false
+    $_SESSION['pausa'] = false;
+  }
+}
+
+/*
+ Resuelve todas las acciones de la solicitud y prepara el estado para la vista
+ Devuelve un array asociativo con los datos necesarios para renderizar
+ */
+function resolverAcciones()
+{
+
+  // Estado inicial por defecto
+  $estado = [
+    'mostrarModalReiniciar' => false,
+    'mostrarModalRevancha' => false,
+    'mostrarModalGuardar' => false,
+    'nombrePartidaSugerido' => '',
+    'mostrarModalPromocion' => false,
+    'mostrarModalEnroque' => false,
+    'mostrarModalCargar' => false,
+    'partidasGuardadas' => [],
+    'partida' => null,
+    'jugadores' => null,
+    'marcador' => null,
+    'mensaje' => null,
+    'turno' => null,
+    'casillaSeleccionada' => null,
+    'piezasCapturadas' => ['blancas' => [], 'negras' => []],
+    'partidasGuardadasInicio' => []
+  ];
+
+  // Pausar desde configuración (respuesta JSON)
+  if (isset($_POST['pausar_desde_configuracion'])) {
+
+    // Si la partida no estaba pausada, la pausamos
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) $_SESSION['pausa'] = true;
+
+
+    // Si ya estaba pausada, no hacemos nada, reseteamos el contador de tiempo
+    if (isset($_SESSION['ultimo_tick']))  $_SESSION['ultimo_tick'] = time();
+
+    // Enviamos la respuesta
+    header('Content-Type: application/json');
+
+    // Devolvemos el estado de pausa
+    echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
+
+    // Terminamos la ejecución del script
+    exit;
+  }
+
+  // Reanudar desde configuración (respuesta JSON)
+  if (isset($_POST['reanudar_desde_configuracion']) && !isset($_POST['guardar_configuracion'])) {
+
+    $_SESSION['pausa'] = false; // Quitamos la partida de pausa
+
+    $_SESSION['ultimo_tick'] = time(); // Reseteamos el contador de tiempo
+
+    header('Content-Type: application/json'); // Indicamos que devolvemos JSON
+
+    // Devolvemos el estado de pausa
+    echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
+
+    // Terminamos la ejecución del script
+    exit;
+  }
+
+  // Guardamos los cambios de configuración
+  if (isset($_POST['guardar_configuracion'])) {
+
+    procesarGuardarConfiguracion(); // Guardamos los cambios de configuración
+
+    // Si se pidió reanudar...
+    if (isset($_POST['reanudar_desde_configuracion'])) {
+
+      $_SESSION['pausa'] = false; // Quitamos la partida de pausa
+
+      $_SESSION['ultimo_tick'] = time(); // Reseteamos el contador de tiempo
+    }
+  }
+
+  // Si se pidió iniciar una nueva partida, creamos una nueva partida
+  if (isset($_POST['iniciar_partida'])) iniciarPartida();
+
+  // Cargar/eliminar desde pantalla inicial
+  // Si se pidió cargar una partida desde la pantalla inicial
+  if (isset($_POST['cargar_partida_inicial']) && isset($_POST['archivo_partida'])) {
+
+    $partidaCargada = cargarPartida($_POST['archivo_partida']); // Cargamos la partida
+
+    // Si se cargó correctamente
+    if ($partidaCargada) {
+
+      $_SESSION['partida'] = serialize($partidaCargada); // Guardamos la partida en sesión
+
+      $_SESSION['nombres_configurados'] = true; // Marcamos que ya se configuraron los nombres
+    }
+  }
+
+  // Si se pidió eliminar una partida desde la pantalla inicial, la eliminamos
+  if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida'])) eliminarPartida($_POST['archivo_partida']);
+
+
+  // Pausa/reanudar manual
+  // si se pidió pausar, alternamos la pausa
+  if (isset($_POST['alternar_pausa'])) procesarTogglePausa();
+
+  // Modales de reinicio y revancha
+  // Si se pidió abrir el modal de reinicio
+  if (isset($_POST['abrir_modal_reiniciar'])) {
+
+    // Si la partida no estaba pausada, la pausamos
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) $_SESSION['pausa'] = true;
+
+    $estado['mostrarModalReiniciar'] = true; // Mostramos el modal de reinicio
+  }
+
+  // Si se pidió abrir el modal de revancha
+  if (isset($_POST['abrir_modal_revancha'])) {
+
+    // Si la partida no estaba pausada, la pausamos
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) $_SESSION['pausa'] = true; // Pausamos la partida si no lo estaba
+
+    // Mostramos el modal de revancha
+    $estado['mostrarModalRevancha'] = true; // Mostramos el modal de revancha
+  }
+
+  // Cancelar cualquier modal
+  // Si se pidió cancelar cualquier modal (guardar, cargar, reiniciar, revancha, promoción, enroque)
+  if (isset($_POST['cancelar_modal'])) {
+
+    // Si la partida estaba pausada, la reanudamos
+    if (isset($_SESSION['pausa']) && $_SESSION['pausa']) $_SESSION['pausa'] = false;
+  }
+
+  // Si se confirmó el reinicio de la partida, la reiniciamos
+  if (isset($_POST['confirmar_reiniciar'])) reiniciarPartida();
+
+  // Si se confirmó la revancha, iniciamos una nueva partida con los mismos jugadores
+  if (isset($_POST['confirmar_revancha'])) revanchaPartida();
+
+
+  // Modal Guardar
+  // Si se pidió abrir el modal de guardar partida
+  if (isset($_POST['abrir_modal_guardar']) && isset($_SESSION['partida'])) {
+
+    $partidaTmp = unserialize($_SESSION['partida']); // Obtenemos la partida desde sesión
+
+    $jugadoresTmp = $partidaTmp->getJugadores(); // Obtenemos los jugadores
+
+    // Preparamos un nombre sugerido para la partida
+    $estado['nombrePartidaSugerido'] = $jugadoresTmp['blancas']->getNombre() . ' vs ' . $jugadoresTmp['negras']->getNombre() . ' - ' . date('d/m/Y H:i');
+
+    $estado['mostrarModalGuardar'] = true; // Mostramos el modal de guardar
+  }
+
+  // Si se confirmó guardar la partida
+  if (isset($_POST['confirmar_guardar']) && isset($_POST['nombre_partida']) && isset($_SESSION['partida'])) {
+
+    $partidaTmp = unserialize($_SESSION['partida']); // Obtenemos la partida desde sesión
+
+    guardarPartida($partidaTmp, $_POST['nombre_partida']); // Guardamos la partida
+
+    $estado['mostrarModalGuardar'] = false; // Ocultamos el modal de guardar
+  }
+
+  // Promoción de peón
+  // si se pidió abrir el modal de promoción, mostramos el modal
+  if (isset($_SESSION['promocion_en_curso'])) $estado['mostrarModalPromocion'] = true;
+
+  // Si se confirmó la promoción del peón
+  if (isset($_POST['confirmar_promocion']) && isset($_POST['tipo_promocion'])) {
+
+    procesarConfirmarPromocion(); // Procesamos la promoción
+
+    $estado['mostrarModalPromocion'] = false; // Ocultamos el modal de promoción
+  }
+
+  // Enroque
+  // Si hay un enroque pendiente, mostramos el modal
+  if (isset($_SESSION['enroque_pendiente'])) {
+
+    // Si la partida no estaba pausada, la pausamos
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) $_SESSION['pausa'] = true;
+
+    $estado['mostrarModalEnroque'] = true; // Mostramos el modal de enroque
+  }
+
+  // Si se confirmó el enroque
+  if (isset($_POST['confirmar_enroque'])) {
+
+    procesarConfirmarEnroque(); // Procesamos el enroque
+
+    $estado['mostrarModalEnroque'] = false; // Ocultamos el modal de enroque
+  }
+
+  // Si se canceló el enroque
+  if (isset($_POST['cancelar_enroque'])) {
+
+    procesarCancelarEnroque(); // Procesamos la cancelación del enroque
+
+    $estado['mostrarModalEnroque'] = false; // Ocultamos el modal de enroque
+  }
+
+  // Modal Cargar
+  // Si se pidió abrir el modal de cargar partida
+  if (isset($_POST['abrir_modal_cargar'])) {
+
+    // Si la partida no estaba pausada, la pausamos
+    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) $_SESSION['pausa'] = true;
+
+    $estado['partidasGuardadas'] = listarPartidas(); // Listamos las partidas guardadas
+
+    $estado['mostrarModalCargar'] = true; // Mostramos el modal de cargar
+  }
+
+  // Si se pidió cargar una partida
+  if (isset($_POST['cargar_partida']) && isset($_POST['archivo_partida'])) {
+
+    // Cargamos la partida
+    $partidaCargada = cargarPartida($_POST['archivo_partida']);
+
+    // Si se cargó correctamente
+    if ($partidaCargada) {
+
+      $estado['partida'] = $partidaCargada; // Asignamos la partida al estado
+
+      $_SESSION['partida'] = serialize($estado['partida']); // Guardamos la partida en sesión
+    }
+  }
+
+  // Si se pidió eliminar una partida
+  if (isset($_POST['eliminar_partida']) && isset($_POST['archivo_partida'])) {
+
+    eliminarPartida($_POST['archivo_partida']); // Eliminamos la partida
+
+    $estado['partidasGuardadas'] = listarPartidas(); // Actualizamos la lista de partidas guardadas
+
+    $estado['mostrarModalCargar'] = true; // Mostramos el modal de cargar
+  }
+
+  // Procesamiento del juego si hay partida
+  // Si hay una partida en sesión, la procesamos
+  if (isset($_SESSION['partida'])) {
+
+    // Convertimos la partida guardada en sesión a un objeto de PHP
+    $estado['partida'] = unserialize($_SESSION['partida']);
+
+    procesarJugada($estado['partida']); // Procesamos la jugada si se pidió
+
+    $_SESSION['partida'] = serialize($estado['partida']); // Guardamos la partida actualizada en sesión
+
+    // Si se pidió deshacer la última jugada, la deshacemos
+    if (isset($_POST['deshacer'])) deshacerJugada($estado['partida']);
+
+    // Si se pidió guardar la partida, la guardamos
+    if (isset($_POST['guardar'])) guardarPartida($estado['partida']);
+
+    // Si se pidió cargar la partida
+    if (isset($_POST['cargar'])) {
+
+      $partidaCargada = cargarPartida(); // Cargamos la partida
+
+      // Si se cargó correctamente
+      if ($partidaCargada) $estado['partida'] = $partidaCargada;
+    }
+
+    // Si la partida terminó por agotamiento de tiempo, actualizamos el mensaje y terminamos la partida
+    if (isset($_SESSION['partida_terminada_por_tiempo'])) {
+
+      $ganador = $_SESSION['partida_terminada_por_tiempo']; // Obtenemos el ganador
+
+      $jugadoresLocal = $estado['partida']->getJugadores(); // Obtenemos los jugadores
+
+      // Si ganaron las blancas, actualizamos el mensaje de victoria (htmlspecialchars para evitar inyección XSS,)
+      if ($ganador === 'blancas') $estado['partida']->setMensaje('⏰ ¡Tiempo agotado para las negras! ' . $jugadoresLocal['blancas']->getNombre() . ' ha ganado.');
+
+      // Si ganaron las negras, actualizamos el mensaje de victoria
+      else $estado['partida']->setMensaje('⏰ ¡Tiempo agotado para las blancas! ' . $jugadoresLocal['negras']->getNombre() . ' ha ganado.');
+
+      $estado['partida']->terminar(); // Terminamos la partida
+
+      $_SESSION['partida'] = serialize($estado['partida']); // Guardamos la partida actualizada en sesión
+
+      unset($_SESSION['partida_terminada_por_tiempo']); // Quitamos el indicador de tiempo agotado
+    }
+
+    $estado['casillaSeleccionada'] = $_SESSION['casilla_seleccionada']; // Obtenemos la casilla seleccionada
+
+    $estado['marcador'] = $estado['partida']->marcador(); // Obtenemos el marcador
+
+    $estado['mensaje'] = $estado['partida']->getMensaje(); // Obtenemos el mensaje de la partida
+
+    $estado['turno'] = $estado['partida']->getTurno(); // Obtenemos el turno actual
+
+    $estado['jugadores'] = $estado['partida']->getJugadores(); // Obtenemos los jugadores
+
+    // Obtenemos las piezas capturadas de ambos jugadores
+
+    // Recorremos las piezas de las blancas
+    foreach ($estado['jugadores']['blancas']->getPiezas() as $pieza) {
+
+      // Si la pieza estuvo capturada, la agregamos a la lista
+      if ($pieza->estCapturada()) $estado['piezasCapturadas']['blancas'][] = $pieza;
+    }
+
+    // Recorremos las piezas de las negras
+    foreach ($estado['jugadores']['negras']->getPiezas() as $pieza) {
+
+      // Si la pieza estuvo capturada, la agregamos a la lista
+      if ($pieza->estCapturada()) $estado['piezasCapturadas']['negras'][] = $pieza;
+    }
+  }
+
+  // Partidas guardadas para la pantalla inicial
+  $estado['partidasGuardadasInicio'] = listarPartidas();
+
+  // Retornamos el estado preparado para la vista
+  return $estado;
+}
+
+
+
+
 
 /**
  * Guarda los ajustes que el usuario cambió en el modal de configuración
@@ -653,248 +1033,4 @@ function manejarSubidaAvatar($inputName, $color)
   }
 
   return null;
-}
-
-/**
- * Aplica configuración por defecto si no existe en sesión
- */
-function aplicarConfigPredeterminada()
-{
-  $configDefecto = [
-    'tiempo_inicial' => 600,
-    'incremento' => 0,
-    'mostrar_coordenadas' => true,
-    'mostrar_capturas' => true
-  ];
-
-  if (!isset($_SESSION['config'])) {
-    $_SESSION['config'] = $configDefecto;
-  }
-
-  if (isset($_SESSION['partida']) && !isset($_SESSION['pausa'])) {
-    $_SESSION['pausa'] = false;
-  }
-}
-
-/**
- * Resuelve todas las acciones de la solicitud y prepara el estado para la vista
- * Devuelve un array asociativo con los datos necesarios para renderizar
- */
-function resolverAcciones()
-{
-  $estado = [
-    'mostrarModalReiniciar' => false,
-    'mostrarModalRevancha' => false,
-    'mostrarModalGuardar' => false,
-    'nombrePartidaSugerido' => '',
-    'mostrarModalPromocion' => false,
-    'mostrarModalEnroque' => false,
-    'mostrarModalCargar' => false,
-    'partidasGuardadas' => [],
-    'partida' => null,
-    'jugadores' => null,
-    'marcador' => null,
-    'mensaje' => null,
-    'turno' => null,
-    'casillaSeleccionada' => null,
-    'piezasCapturadas' => ['blancas' => [], 'negras' => []],
-    'partidasGuardadasInicio' => []
-  ];
-
-  // Pausar desde configuración (respuesta JSON)
-  if (isset($_POST['pausar_desde_configuracion'])) {
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      $_SESSION['pausa'] = true;
-    }
-    if (isset($_SESSION['ultimo_tick'])) {
-      $_SESSION['ultimo_tick'] = time();
-    }
-    header('Content-Type: application/json');
-    echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
-    exit;
-  }
-
-  // Reanudar desde configuración (respuesta JSON)
-  if (isset($_POST['reanudar_desde_configuracion']) && !isset($_POST['guardar_configuracion'])) {
-    $_SESSION['pausa'] = false;
-    $_SESSION['ultimo_tick'] = time();
-    header('Content-Type: application/json');
-    echo json_encode(['ok' => true, 'pausa' => $_SESSION['pausa']]);
-    exit;
-  }
-
-  // Guardar configuración y, si procede, reanudar
-  if (isset($_POST['guardar_configuracion'])) {
-    procesarGuardarConfiguracion();
-    if (isset($_POST['reanudar_desde_configuracion'])) {
-      $_SESSION['pausa'] = false;
-      $_SESSION['ultimo_tick'] = time();
-    }
-  }
-
-  // Iniciar partida nueva
-  if (isset($_POST['iniciar_partida'])) {
-    iniciarPartida();
-  }
-
-  // Cargar/eliminar desde pantalla inicial
-  if (isset($_POST['cargar_partida_inicial']) && isset($_POST['archivo_partida'])) {
-    $partidaCargada = cargarPartida($_POST['archivo_partida']);
-    if ($partidaCargada) {
-      $_SESSION['partida'] = serialize($partidaCargada);
-      $_SESSION['nombres_configurados'] = true;
-    }
-  }
-
-  if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida'])) {
-    eliminarPartida($_POST['archivo_partida']);
-  }
-
-  // Pausa/reanudar manual
-  if (isset($_POST['alternar_pausa'])) {
-    procesarTogglePausa();
-  }
-
-  // Modales de reinicio y revancha
-  if (isset($_POST['abrir_modal_reiniciar'])) {
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      $_SESSION['pausa'] = true;
-    }
-    $estado['mostrarModalReiniciar'] = true;
-  }
-
-  if (isset($_POST['abrir_modal_revancha'])) {
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      $_SESSION['pausa'] = true;
-    }
-    $estado['mostrarModalRevancha'] = true;
-  }
-
-  // Cancelar cualquier modal
-  if (isset($_POST['cancelar_modal'])) {
-    if (isset($_SESSION['pausa']) && $_SESSION['pausa']) {
-      $_SESSION['pausa'] = false;
-    }
-  }
-
-  // Confirmaciones que redirigen
-  if (isset($_POST['confirmar_reiniciar'])) {
-    reiniciarPartida(); // redirige y exit
-  }
-  if (isset($_POST['confirmar_revancha'])) {
-    revanchaPartida(); // redirige y exit
-  }
-
-  // Modal Guardar
-  if (isset($_POST['abrir_modal_guardar']) && isset($_SESSION['partida'])) {
-    $partidaTmp = unserialize($_SESSION['partida']);
-    $jugadoresTmp = $partidaTmp->getJugadores();
-    $estado['nombrePartidaSugerido'] = $jugadoresTmp['blancas']->getNombre() . ' vs ' . $jugadoresTmp['negras']->getNombre() . ' - ' . date('d/m/Y H:i');
-    $estado['mostrarModalGuardar'] = true;
-  }
-
-  if (isset($_POST['confirmar_guardar']) && isset($_POST['nombre_partida']) && isset($_SESSION['partida'])) {
-    $partidaTmp = unserialize($_SESSION['partida']);
-    guardarPartida($partidaTmp, $_POST['nombre_partida']);
-    $estado['mostrarModalGuardar'] = false;
-  }
-
-  // Promoción
-  if (isset($_SESSION['promocion_en_curso'])) {
-    $estado['mostrarModalPromocion'] = true;
-  }
-  if (isset($_POST['confirmar_promocion']) && isset($_POST['tipo_promocion'])) {
-    procesarConfirmarPromocion();
-    $estado['mostrarModalPromocion'] = false;
-  }
-
-  // Enroque
-  if (isset($_SESSION['enroque_pendiente'])) {
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      $_SESSION['pausa'] = true;
-    }
-    $estado['mostrarModalEnroque'] = true;
-  }
-  if (isset($_POST['confirmar_enroque'])) {
-    procesarConfirmarEnroque();
-    $estado['mostrarModalEnroque'] = false;
-  }
-  if (isset($_POST['cancelar_enroque'])) {
-    procesarCancelarEnroque();
-    $estado['mostrarModalEnroque'] = false;
-  }
-
-  // Modal Cargar
-  if (isset($_POST['abrir_modal_cargar'])) {
-    if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
-      $_SESSION['pausa'] = true;
-    }
-    $estado['partidasGuardadas'] = listarPartidas();
-    $estado['mostrarModalCargar'] = true;
-  }
-  if (isset($_POST['cargar_partida']) && isset($_POST['archivo_partida'])) {
-    $partidaCargada = cargarPartida($_POST['archivo_partida']);
-    if ($partidaCargada) {
-      $estado['partida'] = $partidaCargada;
-      $_SESSION['partida'] = serialize($estado['partida']);
-    }
-  }
-  if (isset($_POST['eliminar_partida']) && isset($_POST['archivo_partida'])) {
-    eliminarPartida($_POST['archivo_partida']);
-    $estado['partidasGuardadas'] = listarPartidas();
-    $estado['mostrarModalCargar'] = true;
-  }
-
-  // Procesamiento del juego si hay partida
-  if (isset($_SESSION['partida'])) {
-    $estado['partida'] = unserialize($_SESSION['partida']);
-
-    procesarJugada($estado['partida']);
-    $_SESSION['partida'] = serialize($estado['partida']);
-
-    if (isset($_POST['deshacer'])) {
-      deshacerJugada($estado['partida']);
-    }
-    if (isset($_POST['guardar'])) {
-      guardarPartida($estado['partida']);
-    }
-    if (isset($_POST['cargar'])) {
-      $partidaCargada = cargarPartida();
-      if ($partidaCargada) {
-        $estado['partida'] = $partidaCargada;
-      }
-    }
-
-    if (isset($_SESSION['partida_terminada_por_tiempo'])) {
-      $ganador = $_SESSION['partida_terminada_por_tiempo'];
-      $jugadoresLocal = $estado['partida']->getJugadores();
-      if ($ganador === 'blancas') {
-        $estado['partida']->setMensaje('⏰ ¡Tiempo agotado para las negras! ' . htmlspecialchars($jugadoresLocal['blancas']->getNombre()) . ' ha ganado.');
-      } else {
-        $estado['partida']->setMensaje('⏰ ¡Tiempo agotado para las blancas! ' . htmlspecialchars($jugadoresLocal['negras']->getNombre()) . ' ha ganado.');
-      }
-      $estado['partida']->terminar();
-      $_SESSION['partida'] = serialize($estado['partida']);
-      unset($_SESSION['partida_terminada_por_tiempo']);
-    }
-
-    $estado['casillaSeleccionada'] = $_SESSION['casilla_seleccionada'];
-    $estado['marcador'] = $estado['partida']->marcador();
-    $estado['mensaje'] = $estado['partida']->getMensaje();
-    $estado['turno'] = $estado['partida']->getTurno();
-    $estado['jugadores'] = $estado['partida']->getJugadores();
-
-    // Piezas capturadas
-    foreach ($estado['jugadores']['blancas']->getPiezas() as $pieza) {
-      if ($pieza->estCapturada()) $estado['piezasCapturadas']['blancas'][] = $pieza;
-    }
-    foreach ($estado['jugadores']['negras']->getPiezas() as $pieza) {
-      if ($pieza->estCapturada()) $estado['piezasCapturadas']['negras'][] = $pieza;
-    }
-  }
-
-  // Partidas guardadas para la pantalla inicial
-  $estado['partidasGuardadasInicio'] = listarPartidas();
-
-  return $estado;
 }
