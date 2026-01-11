@@ -377,10 +377,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // GESTIÓN DE AVATARES PERSONALIZADOS
   // ========================================
   // Obtenemos los selectores de avatar para ambos jugadores
-  const selectBlancas = document.querySelector('select[name="avatar_blancas"]');
-  const selectNegras = document.querySelector('select[name="avatar_negras"]');
-  const inputBlancas = document.getElementById("avatar_custom_blancas");
-  const inputNegras = document.getElementById("avatar_custom_negras");
+  const selectBlancas = document.querySelector("select[name=\"avatar_blancas\"]");
+  const selectNegras = document.querySelector("select[name=\"avatar_negras\"]");
+  const inputBlancas = document.getElementById("avatar_personalizado_blancas");
+  const inputNegras = document.getElementById("avatar_personalizado_negras");
 
   // Función para validar que el archivo sea una imagen válida
   function validarArchivo(file) {
@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // MANEJO DE AVATARES DEL JUGADOR BLANCO
   if (selectBlancas && inputBlancas) {
     const contenedorBlancas = document.getElementById(
-      "contenedor-custom-blancas"
+      "contenedor-personalizado-blancas"
     );
     const nombreArchivoBlancas = document.getElementById(
       "nombre-archivo-blancas"
@@ -446,7 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cuando se selecciona un avatar del dropdown
     selectBlancas.addEventListener("change", function () {
-      if (this.value === "custom") {
+      if (this.value === "personalizado") {
         // Si elige "personalizado", mostramos el input de archivo
         if (contenedorBlancas) contenedorBlancas.style.display = "block";
       } else {
@@ -473,7 +473,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // MANEJO DE AVATARES DEL JUGADOR NEGRO
   if (selectNegras && inputNegras) {
     const contenedorNegras = document.getElementById(
-      "contenedor-custom-negras"
+      "contenedor-personalizado-negras"
     );
     const nombreArchivoNegras = document.getElementById(
       "nombre-archivo-negras"
@@ -481,7 +481,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cuando se selecciona un avatar del dropdown
     selectNegras.addEventListener("change", function () {
-      if (this.value === "custom") {
+      if (this.value === "personalizado") {
         // Si elige "personalizado", mostramos el input de archivo
         if (contenedorNegras) contenedorNegras.style.display = "block";
       } else {

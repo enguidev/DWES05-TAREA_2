@@ -1,10 +1,9 @@
 <?php
-// Funciones de controladores para la aplicación de ajedrez
 
 /*
- Actualiza los relojes de la partida en tiempo real
+Para actualizar los relojes de la partida en tiempo real
 Recibe peticiones AJAX desde JavaScript para mantener los tiempos sincronizados
- */
+*/
 function procesarAjaxActualizarRelojes()
 {
   // Le decimos al navegador que vamos a devolver JSON (no HTML)
@@ -121,6 +120,7 @@ function procesarAjaxActualizarRelojes()
   exit;
 }
 
+
 /**
  * Para aplicar configuración por defecto si no existe en session
  */
@@ -128,28 +128,26 @@ function aplicarConfigPredeterminada()
 {
   // Configuración por defecto
   $configDefecto = [
-    'tiempo_inicial' => 600, // 10 minutos
-    'incremento' => 0, // Sin incremento
-    'mostrar_coordenadas' => true, // Mostramos coordenadas del tablero
-    'mostrar_capturas' => true // Mostramos piezas capturadas
+    "tiempo_inicial" => 600, // 10 minutos
+    "incremento" => 0, // Sin incremento
+    "mostrar_coordenadas" => true, // Mostramos coordenadas del tablero
+    "mostrar_capturas" => true // Mostramos piezas capturadas
   ];
 
   // Si la configuración no existe en la session, la creamos con los valores por defecto ($configDefecto )
-  if (!isset($_SESSION['config'])) $_SESSION['config'] = $configDefecto;
+  if (!isset($_SESSION["config"])) $_SESSION["config"] = $configDefecto;
 
   // Si hay una partida en curso pero no existe el indicador de pausa
-  if (isset($_SESSION['partida']) && !isset($_SESSION['pausa'])) {
+  if (isset($_SESSION["partida"]) && !isset($_SESSION["pausa"])) {
 
-    // lo inicializamos en false
-    $_SESSION['pausa'] = false;
+    $_SESSION["pausa"] = false; // lo inicializamos en false
   }
 }
 
-
-/**
- * Resuelve todas las acciones de la solicitud y prepara el estado para la vista
- * Devuelve un array asociativo con los datos necesarios para renderizar
- */
+/*
+ Condiciones de todas las acciones de la solicitud y prepara el estado para la vista
+ Retorna un array asociativo con los datos necesarios para renderizar
+*/
 function resolverAcciones()
 {
 
@@ -463,43 +461,51 @@ function resolverAcciones()
   return $estado;
 }
 
-/**
- * Guarda los ajustes que el usuario cambió en el modal de configuración
- */
+
+ // Para guardar los ajustes que el usuario cambió en el modal de configuración
 function procesarGuardarConfiguracion()
 {
   // Guardamos si mostrar o no las coordenadas del tablero
   $_SESSION['config']['mostrar_coordenadas'] = isset($_POST['mostrar_coordenadas']);
+
   // Guardamos si mostrar o no las piezas capturadas
   $_SESSION['config']['mostrar_capturas'] = isset($_POST['mostrar_capturas']);
 }
 
-/**
- * Crea una nueva partida con los jugadores y configuración elegida
- */
+
+//  Crea una nueva partida con los jugadores y configuración que el usuario ha elegido
 function iniciarPartida()
 {
   // Obtenemos los nombres de los jugadores, eliminando espacios al principio y final
+  // Si no se proporcionan nombres, usamos "Jugador 1" y "Jugador 2" por defecto
+  // htmlspecialchars para evitar inyección XSS
+  // trim para eliminar espacios en blanco al inicio y final
   $nombreBlancas = !empty($_POST['nombre_blancas']) ? htmlspecialchars(trim($_POST['nombre_blancas'])) : "Jugador 1";
   $nombreNegras = !empty($_POST['nombre_negras']) ? htmlspecialchars(trim($_POST['nombre_negras'])) : "Jugador 2";
 
-  // Procesamos los avatares que eligieron los jugadores
+  // Gestionamos los avatares que se eligieron
+
+  // Inicializamos las variables de avatar en null
   $avatarBlancas = null;
   $avatarNegras = null;
 
-  if (!empty($_POST['avatar_blancas'])) {
-    if ($_POST['avatar_blancas'] === 'custom') {
-      $avatarBlancas = manejarSubidaAvatar('avatar_custom_blancas', 'blancas');
-    } elseif ($_POST['avatar_blancas'] !== 'default') {
-      $avatarBlancas = $_POST['avatar_blancas'];
+  // Gestionamos el avatar de las blancas
+  // Si se eligió un avatar personalizado o uno predefinido distinto al por defecto
+  if (!empty($_POST["avatar_blancas"])) {
+
+    // Si se eligió un avatar personalizado
+    if ($_POST["avatar_blancas"] === "personalizado") {
+      $avatarBlancas = manejarSubidaAvatar("avatar_personalizado_blancas", "blancas");
+    } elseif ($_POST["avatar_blancas"] !== "predeterminado") {
+      $avatarBlancas = $_POST["avatar_blancas"];
     }
   }
 
-  if (!empty($_POST['avatar_negras'])) {
-    if ($_POST['avatar_negras'] === 'custom') {
-      $avatarNegras = manejarSubidaAvatar('avatar_custom_negras', 'negras');
-    } elseif ($_POST['avatar_negras'] !== 'default') {
-      $avatarNegras = $_POST['avatar_negras'];
+  if (!empty($_POST["avatar_negras"])) {
+    if ($_POST["avatar_negras"] === "personalizado") {
+      $avatarNegras = manejarSubidaAvatar("avatar_personalizado_negras", "negras");
+    } elseif ($_POST["avatar_negras"] !== "predeterminado") {
+      $avatarNegras = $_POST["avatar_negras"];
     }
   }
 
@@ -848,3 +854,58 @@ function procesarCancelarEnroque()
       $_SESSION['partida'] = serialize($partida);
     }
   }
+/**
+ * Maneja la subida de un archivo de avatar personalizado
+ * @param string $inputName Nombre del campo de archivo
+ * @param string $color Color del jugador ('blancas' o 'negras')
+ * @return string|null Ruta relativa del archivo subido o null si no se subió
+ */
+function manejarSubidaAvatar($inputName, $color)
+{
+  if (!isset($_FILES[$inputName]) || $_FILES[$inputName]["error"] !== UPLOAD_ERR_OK) {
+    return null;
+  }
+
+  $file = $_FILES[$inputName];
+  $allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+  $maxSize = 5 * 1024 * 1024; // 5MB
+
+  // Validar tipo de archivo
+  // Revisar MIME real con finfo para evitar suplantación
+  $finfo = new finfo(FILEINFO_MIME_TYPE);
+  $realType = $finfo->file($file["tmp_name"]);
+  if (!in_array($realType, $allowedTypes)) {
+    return null;
+  }
+
+  // Validar tamaño
+  if ($file["size"] > $maxSize) {
+    return null;
+  }
+
+  // Crear directorio si no existe
+  $uploadDir = __DIR__ . "/../public/imagenes/avatares/";
+  if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+  }
+
+  // Eliminar avatares personalizados previos del mismo color
+  $pattern = $uploadDir . "avatar_" . $color . "_*";
+  foreach (glob($pattern) as $oldFile) {
+    if (is_file($oldFile)) {
+      unlink($oldFile);
+    }
+  }
+
+  // Generar nombre único
+  $extension = pathinfo($file["name"], PATHINFO_EXTENSION);
+  $fileName = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension;
+  $filePath = $uploadDir . $fileName;
+
+  // Mover archivo
+  if (move_uploaded_file($file["tmp_name"], $filePath)) {
+    return "public/imagenes/avatares/" . $fileName;
+  }
+
+  return null;
+}

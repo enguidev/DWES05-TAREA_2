@@ -836,7 +836,7 @@ h1 {
 }
 
 /* Estilos para input de archivo de avatar personalizado */
-input[type="file"][id^="avatar_custom"] {
+input[type="file"][id^="avatar_personalizado"] {
   display: none !important;
 }
 

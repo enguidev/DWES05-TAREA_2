@@ -52,7 +52,7 @@ function renderConfigForm($partidasGuardadas = [])
           <label>Avatar:</label>
           <!-- Selector de avatar (pieza o imagen personalizada) -->
           <select name="avatar_blancas" class="select-avatar">
-            <option value="default">Sin avatar</option>
+            <option value="predeterminado">Sin avatar</option>
             <option value="public/imagenes/fichas_blancas/rey_blanca.png">Rey</option>
             <option value="public/imagenes/fichas_blancas/dama_blanca.png">Dama</option>
             <option value="public/imagenes/fichas_blancas/torre_blanca.png">Torre</option>
@@ -60,12 +60,12 @@ function renderConfigForm($partidasGuardadas = [])
             <option value="public/imagenes/fichas_blancas/alfil_blanca.png">Alfil</option>
             <option value="public/imagenes/fichas_blancas/peon_blanca.png">Peón</option>
             <option value="public/imagenes/avatares/user_white.png">Usuario Blanco</option>
-            <option value="custom">Subir imagen personalizada</option>
+            <option value="personalizado">Subir imagen personalizada</option>
           </select>
           <!-- Si elige imagen personalizada, mostrar input de archivo -->
-          <div id="contenedor-custom-blancas" style="display: none; margin-top: 10px;">
-            <input type="file" name="avatar_custom_blancas" id="avatar_custom_blancas" style="display: none;" accept="image/*">
-            <label for="avatar_custom_blancas" class="btn-elegir-archivo">
+          <div id="contenedor-personalizado-blancas" style="display: none; margin-top: 10px;">
+            <input type="file" name="avatar_personalizado_blancas" id="avatar_personalizado_blancas" style="display: none;" accept="image/*">
+            <label for="avatar_personalizado_blancas" class="btn-elegir-archivo">
               📁 Elegir imagen
             </label>
             <span id="nombre-archivo-blancas" class="nombre-archivo">Ningún archivo seleccionado</span>
@@ -85,7 +85,7 @@ function renderConfigForm($partidasGuardadas = [])
           <label>Avatar:</label>
           <!-- Selector de avatar (pieza o imagen personalizada) -->
           <select name="avatar_negras" class="select-avatar">
-            <option value="default">Sin avatar</option>
+            <option value="predeterminado">Sin avatar</option>
             <option value="public/imagenes/fichas_negras/rey_negra.png">Rey</option>
             <option value="public/imagenes/fichas_negras/dama_negra.png">Dama</option>
             <option value="public/imagenes/fichas_negras/torre_negra.png">Torre</option>
@@ -93,12 +93,12 @@ function renderConfigForm($partidasGuardadas = [])
             <option value="public/imagenes/fichas_negras/alfil_negra.png">Alfil</option>
             <option value="public/imagenes/fichas_negras/peon_negra.png">Peón</option>
             <option value="public/imagenes/avatares/user_black.png">Usuario Negro</option>
-            <option value="custom">Subir imagen personalizada</option>
+            <option value="personalizado">Subir imagen personalizada</option>
           </select>
           <!-- Si elige imagen personalizada, mostrar input de archivo -->
-          <div id="contenedor-custom-negras" style="display: none; margin-top: 10px;">
-            <input type="file" name="avatar_custom_negras" id="avatar_custom_negras" style="display: none;" accept="image/*">
-            <label for="avatar_custom_negras" class="btn-elegir-archivo">
+          <div id="contenedor-personalizado-negras" style="display: none; margin-top: 10px;">
+            <input type="file" name="avatar_personalizado_negras" id="avatar_personalizado_negras" style="display: none;" accept="image/*">
+            <label for="avatar_personalizado_negras" class="btn-elegir-archivo">
               📁 Elegir imagen
             </label>
             <span id="nombre-archivo-negras" class="nombre-archivo">Ningún archivo seleccionado</span>
