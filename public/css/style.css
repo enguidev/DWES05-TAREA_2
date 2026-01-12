@@ -1024,6 +1024,17 @@ hr {
   font-size: 1.3em;
 }
 
+.config-description {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.config-note {
+  color: #999;
+  display: block;
+  margin-top: 10px;
+}
+
 .config-info {
   background: #f8f9fa;
   padding: 20px;
