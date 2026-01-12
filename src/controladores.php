@@ -1195,7 +1195,9 @@ function manejarSubidaAvatar($nombreCampo, $color)
   // Validar tipo de archivo
 
   $infoArchivo = new finfo(FILEINFO_MIME_TYPE); // Objeto finfo para obtener el tipo MIME
+
   $tipoReal = $infoArchivo->file($archivo["tmp_name"]); // Tipo MIME real del archivo
+
   if (!in_array($tipoReal, $tiposPermitidos))  return null; // Si el tipo no es permitido, retornamos null
 
   // Validar tamaño
@@ -1204,28 +1206,42 @@ function manejarSubidaAvatar($nombreCampo, $color)
   if ($archivo["size"] > $tamañoMaximo) return null;
 
   // Crear directorio si no existe
-  $directorioSubida = __DIR__ . "/../public/imagenes/avatares/";
-  if (!is_dir($directorioSubida)) {
-    mkdir($directorioSubida, 0755, true);
-  }
+
+  $directorioSubida = __DIR__ . "/../public/imagenes/avatares/"; // Directorio de subida de avatares
+
+  //Si el directorio no existe, lo creamos
+  /* mkdir($directorioSubida, 0755, true):
+    - 0755 son los permisos del directorio (lectura, escritura y ejecución para el propietario; lectura y ejecución para grupo y otros)
+    - true indica que se deben crear directorios padres si no existen
+  */
+  if (!is_dir($directorioSubida))  mkdir($directorioSubida, 0755, true);
 
   // Eliminar avatares personalizados previos del mismo color
-  $patron = $directorioSubida . "avatar_" . $color . "_*";
-  foreach (glob($patron) as $archivoAnterior) {
-    if (is_file($archivoAnterior)) {
-      unlink($archivoAnterior);
-    }
-  }
+
+  $patron = $directorioSubida . "avatar_" . $color . "_*"; // Patrón para buscar archivos previos
+
+  // Recorremos los archivos que coinciden con el patrón, si el archivo existe, lo eliminamos
+  foreach (glob($patron) as $archivoAnterior) if (is_file($archivoAnterior)) unlink($archivoAnterior);
+  
 
   // Generar nombre único
-  $extension = pathinfo($archivo["name"], PATHINFO_EXTENSION);
-  $nombreArchivo = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension;
-  $rutaArchivo = $directorioSubida . $nombreArchivo;
+
+  $extension = pathinfo($archivo["name"], PATHINFO_EXTENSION); // Obtenemos la extensión del archivo original
+
+  // Nombre único para el archivo
+  /* $color es "blancas" o "negras" según el jugador
+     time() devuelve el timestamp actual
+     uniqid() genera un ID único basado en el tiempo actual en microsegundos
+     $extension es la extensión del archivo original  
+  */
+  $nombreArchivo = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension; 
+
+  $rutaArchivo = $directorioSubida . $nombreArchivo; // Ruta completa del archivo a guardar
 
   // Mover archivo
-  if (move_uploaded_file($archivo["tmp_name"], $rutaArchivo)) {
-    return "public/imagenes/avatares/" . $nombreArchivo;
-  }
 
-  return null;
+  // Si se mueve el archivo subido a la ruta destino, retornamos la ruta relativa del avatar
+  if (move_uploaded_file($archivo["tmp_name"], $rutaArchivo)) return "public/imagenes/avatares/" . $nombreArchivo;
+  
+  return null; // 
 }
