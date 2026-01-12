@@ -1181,50 +1181,50 @@ function procesarCancelarEnroque()
 
 
 // Para gestionar la subida de un archivo de avatar personalizado
-function manejarSubidaAvatar($inputName, $color)
+function manejarSubidaAvatar($nombreCampo, $color)
 {
   // Si no se subió ningún archivo o hubo un error en la subida, retornamos null
-  if (!isset($_FILES[$inputName]) || $_FILES[$inputName]["error"] !== UPLOAD_ERR_OK) return null;
+  if (!isset($_FILES[$nombreCampo]) || $_FILES[$nombreCampo]["error"] !== UPLOAD_ERR_OK) return null;
 
-  $file = $_FILES[$inputName]; // Archivo subido
+  $archivo = $_FILES[$nombreCampo]; // Archivo subido
 
-  $allowedTypes = ["image/jpeg", "image/png", "image/gif"]; // Tipos MIME permitidos
+  $tiposPermitidos = ["image/jpeg", "image/png", "image/gif"]; // Tipos MIME permitidos
 
-  $maxSize = 5 * 1024 * 1024; // Tamaño máximo permitido (5 MB)
+  $tamañoMaximo = 5 * 1024 * 1024; // Tamaño máximo permitido (5 MB)
 
   // Validar tipo de archivo
 
-  $finfo = new finfo(FILEINFO_MIME_TYPE); // Objeto finfo para obtener el tipo MIME
-  $realType = $finfo->file($file["tmp_name"]); // Tipo MIME real del archivo
-  if (!in_array($realType, $allowedTypes))  return null; // Si el tipo no es permitido, retornamos null
+  $infoArchivo = new finfo(FILEINFO_MIME_TYPE); // Objeto finfo para obtener el tipo MIME
+  $tipoReal = $infoArchivo->file($archivo["tmp_name"]); // Tipo MIME real del archivo
+  if (!in_array($tipoReal, $tiposPermitidos))  return null; // Si el tipo no es permitido, retornamos null
 
   // Validar tamaño
 
   // Si el tamaño del archivo excede el máximo permitido, retornamos null
-  if ($file["size"] > $maxSize) return null;
+  if ($archivo["size"] > $tamañoMaximo) return null;
 
   // Crear directorio si no existe
-  $uploadDir = __DIR__ . "/../public/imagenes/avatares/";
-  if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0755, true);
+  $directorioSubida = __DIR__ . "/../public/imagenes/avatares/";
+  if (!is_dir($directorioSubida)) {
+    mkdir($directorioSubida, 0755, true);
   }
 
   // Eliminar avatares personalizados previos del mismo color
-  $pattern = $uploadDir . "avatar_" . $color . "_*";
-  foreach (glob($pattern) as $oldFile) {
-    if (is_file($oldFile)) {
-      unlink($oldFile);
+  $patron = $directorioSubida . "avatar_" . $color . "_*";
+  foreach (glob($patron) as $archivoAnterior) {
+    if (is_file($archivoAnterior)) {
+      unlink($archivoAnterior);
     }
   }
 
   // Generar nombre único
-  $extension = pathinfo($file["name"], PATHINFO_EXTENSION);
-  $fileName = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension;
-  $filePath = $uploadDir . $fileName;
+  $extension = pathinfo($archivo["name"], PATHINFO_EXTENSION);
+  $nombreArchivo = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension;
+  $rutaArchivo = $directorioSubida . $nombreArchivo;
 
   // Mover archivo
-  if (move_uploaded_file($file["tmp_name"], $filePath)) {
-    return "public/imagenes/avatares/" . $fileName;
+  if (move_uploaded_file($archivo["tmp_name"], $rutaArchivo)) {
+    return "public/imagenes/avatares/" . $nombreArchivo;
   }
 
   return null;
