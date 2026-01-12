@@ -1,5 +1,4 @@
 <?php
-// Funciones auxiliares para la aplicación de ajedrez
 
 // Para devolver la ruta de la imagen de una pieza
 function obtenerImagenPieza($pieza)
@@ -24,7 +23,7 @@ function obtenerImagenPieza($pieza)
     'Peon' => 'peon'
   ];
 
-  $tipoPieza = get_class($pieza); // Obtenemos la clase de la pieza (por ejemplo "Torre")
+  $tipoPieza = get_class($pieza); // Obtenemos la clase (get_class) de la pieza (por ejemplo "Torre")
 
   // Si no encontramos esa pieza, devolvemos vacío
   if (!isset($piezaNombres[$tipoPieza])) return '';
@@ -32,7 +31,7 @@ function obtenerImagenPieza($pieza)
   // Construimos el nombre del archivo (por ejemplo "torre_blanca.png")
   $nombreArchivo = $piezaNombres[$tipoPieza] . '_' . $colorNombre . '.png';
 
-  return $carpeta . '/' . $nombreArchivo; // Devolvemos la ruta completa a la imagen
+  return $carpeta . '/' . $nombreArchivo; // Retornamos la ruta completa a la imagen
 }
 
 // Para buscar si hay una pieza en una posición del tablero
@@ -42,20 +41,34 @@ function obtenerPiezaEnCasilla($posicion, $partida)
 
   $pieza = $jugadores['blancas']->getPiezaEnPosicion($posicion); // Buscamos en las piezas blancas
 
-  // Si encontramos la pieza, la devolvemos
-  if ($pieza) return $pieza;
+  if ($pieza) return $pieza; // Si encontramos la pieza, la retornamos
 
   $pieza = $jugadores['negras']->getPiezaEnPosicion($posicion); // Buscamos en las piezas negras
 
-  return $pieza ?: null; // Devolvemos la pieza (o null si no hay)
+  return $pieza ?: null; // Retornamos la pieza (o null si no hay)
 }
 
 // Para convertir segundos a formato MM:SS (minutos:segundos)
 function formatearTiempo($segundos)
 {
-  $minutos = floor($segundos / 60); // Dividimos los segundos entre 60 para obtener minutos
+  /* Dividimos los segundos entre 60 para obtener minutos
+    floor() redondea hacia abajo al entero
+  */
+  $minutos = floor($segundos / 60);
 
-  $segs = $segundos % 60; // Obtenemos los segundos que quedan después de contar minutos
+  /* Obtenemos los segundos que quedan después de contar minutos
+    % 60 obtiene el resto de segundos que no llegan a un minuto
+  */
+  $segs = $segundos % 60;
 
-  return sprintf("%02d:%02d", $minutos, $segs); // Devolvemos el tiempo formateado con ceros a la izquierda
+  /* Retornamos el tiempo formateado con ceros a la izquierda
+  sprintf() formatea la cadena según el patrón dado y devuelve la cadena formateada
+  02d significa:
+    %  indica que es aquí va un valor
+    0  indica que se rellena con ceros si es necesario
+    2  indica que el ancho mínimo es de 2 dígitos
+    d  indica que es un número entero decimal
+    : Separador entre minutos y segundos
+  */
+  return sprintf("%02d:%02d", $minutos, $segs);
 }
