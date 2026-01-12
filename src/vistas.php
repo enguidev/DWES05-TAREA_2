@@ -18,30 +18,41 @@ function normalizarRutaAvatar($ruta)
 function mostrarFormularioConfig($partidasGuardadas = [])
 {
 ?>
+  <!-- Contenedor principal -->
   <div class="container">
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
-      <!-- Sección inicial: Cargar partida guardada -->
+      <!-- Sección inicial (cargar partida guardada) -->
       <div class="seccion-cargar-inicio">
         <p>¿Deseas continuar con una partida anterior?</p>
-        <?php if (!empty($partidasGuardadas)): ?>
-          <!-- Si hay partidas guardadas, mostramos botón para cargar -->
+
+        <?php
+        // Si hay partidas guardadas
+        if (!empty($partidasGuardadas)):
+        ?>
+          <!-- Mostramos un botón para cargar una partida guardada -->
           <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()">📁 Cargar Partida Guardada</button>
+          <!-- Texto alternativo -->
           <p class="texto-alternativa">O crea una nueva partida a continuación</p>
-        <?php else: ?>
-          <!-- Si no hay partidas, lo indicamos -->
+        <?php
+        // Si no hay partidas guardadas
+        else: ?>
+          <!-- Lo indicamos -->
           <p class="texto-sin-partidas">No hay partidas guardadas. Crea una nueva partida.</p>
         <?php endif; ?>
       </div>
 
+      <!-- Linea horizontal separadora -->
       <hr class="linea-horizontal">
 
+      <!-- Formulario de configuración de nombres, avatares y tiempo -->
+      <!--enctype="multipart/form-data" para subir archivos e imágenes-->
       <form method="post" enctype="multipart/form-data" class="config-form">
         <p class="configuracion-inicial"><strong>Configuración de los jugadores</strong></p>
 
         <!-- Configuración del jugador de blancas -->
         <div class="jugador-config blancas-config">
-          <div class="icono-configuracion-nombres-jugadores">♔</div>
+          <div class="icono-configuracion-nombres-jugadores" id="avatar-display-blancas">♔</div>
           <label><strong>Jugador Blancas:</strong></label>
           <!-- Campo de nombre para el jugador con piezas blancas -->
           <input type="text" name="nombre_blancas" placeholder="Nombre del jugador 1..." maxlength="20" class="input-nombre" autofocus>
@@ -66,6 +77,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               📁 Elegir imagen
             </label>
             <span id="nombre-archivo-blancas" class="nombre-archivo">Ningún archivo seleccionado</span>
+            <p style="font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic;">La imagen aparecerá arriba automáticamente</p>
           </div>
         </div>
 
@@ -74,7 +86,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
 
         <!-- Configuración del jugador de negras -->
         <div class="jugador-config negras-config">
-          <div class="icono-configuracion-nombres-jugadores">♚</div>
+          <div class="icono-configuracion-nombres-jugadores" id="avatar-display-negras">♚</div>
           <label><strong>Jugador Negras:</strong></label>
           <!-- Campo de nombre para el jugador con piezas negras -->
           <input type="text" name="nombre_negras" placeholder="Nombre del jugador 2..." maxlength="20" class="input-nombre">
@@ -99,6 +111,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               📁 Elegir imagen
             </label>
             <span id="nombre-archivo-negras" class="nombre-archivo">Ningún archivo seleccionado</span>
+            <p style="font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic;">La imagen aparecerá arriba automáticamente</p>
           </div>
         </div>
 

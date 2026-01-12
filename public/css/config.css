@@ -53,9 +53,23 @@
 
 /* Icono de configuración de jugadores */
 .icono-configuracion-nombres-jugadores {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 4.5em;
   text-align: center;
-  margin-bottom: 10px;
+  border-radius: 50%;
+  border: 3px solid #5568d3;
+  box-shadow: 0 4px 10px rgba(85, 104, 211, 0.2);
+  background: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.jugador-config:hover .icono-configuracion-nombres-jugadores {
+  box-shadow: 0 6px 15px rgba(85, 104, 211, 0.3);
 }
 
 /* Línea de separación horizontal */
@@ -365,6 +379,17 @@ input[type="file"][id^="avatar_personalizado"] {
   color: #333;
 }
 
+/* Estilos para imágenes en avatar display */
+#avatar-display-blancas img,
+#avatar-display-negras img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #5568d3;
+  box-shadow: 0 4px 10px rgba(85, 104, 211, 0.3);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .config-wrapper {
@@ -373,6 +398,12 @@ input[type="file"][id^="avatar_personalizado"] {
 
   .jugador-config {
     padding: 20px 15px;
+  }
+
+  .icono-configuracion-nombres-jugadores {
+    width: 120px;
+    height: 120px;
+    font-size: 3.5em;
   }
 
   .btn-iniciar-partida {

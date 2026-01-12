@@ -403,35 +403,59 @@ document.addEventListener("DOMContentLoaded", function () {
     return true;
   }
 
-  // Función para mostrar una previsualización de la imagen seleccionada
-  function mostrarPrevisualizacion(input, previewId) {
+  // Función para mostrar una previsualización de la imagen seleccionada en el avatar display
+  function mostrarPrevisualizacionAvatar(input, avatarDisplayId) {
     const file = input.files[0];
     // Si hay archivo y es válido
     if (file && validarArchivo(file)) {
       // Leemos el archivo como URL de datos
       const reader = new FileReader();
       reader.onload = function (e) {
-        // Intentamos obtener la previsualización existente
-        let preview = document.getElementById(previewId);
-        if (!preview) {
-          // Si no existe, creamos un nuevo elemento de imagen
-          preview = document.createElement("img");
-          preview.id = previewId;
-          preview.className = "avatar-preview";
-          preview.style.maxWidth = "120px";
-          preview.style.maxHeight = "120px";
-          preview.style.borderRadius = "50%";
-          preview.style.marginLeft = "10px";
-          preview.style.border = "3px solid #5568d3";
-          preview.style.boxShadow = "0 4px 10px rgba(85, 104, 211, 0.3)";
-          // Lo añadimos junto al input
-          input.parentNode.appendChild(preview);
+        // Obtenemos el elemento donde mostraremos el avatar
+        const avatarDisplay = document.getElementById(avatarDisplayId);
+        if (avatarDisplay) {
+          // Limpiamos el contenido anterior
+          avatarDisplay.innerHTML = '';
+          // Creamos la imagen
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.borderRadius = "50%";
+          img.style.objectFit = "cover";
+          img.style.border = "3px solid #5568d3";
+          img.style.boxShadow = "0 4px 10px rgba(85, 104, 211, 0.3)";
+          // La añadimos al avatar display
+          avatarDisplay.appendChild(img);
         }
-        // Mostramos la imagen
-        preview.src = e.target.result;
       };
       // Leemos el archivo
       reader.readAsDataURL(file);
+    }
+  }
+
+  // Función para actualizar el avatar display con una imagen predefinida
+  function actualizarAvatarDisplay(rutaImagen, avatarDisplayId) {
+    const avatarDisplay = document.getElementById(avatarDisplayId);
+    if (avatarDisplay && rutaImagen && rutaImagen !== "predeterminado") {
+      // Limpiamos el contenido anterior
+      avatarDisplay.innerHTML = '';
+      // Creamos la imagen
+      const img = document.createElement("img");
+      img.src = rutaImagen;
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.borderRadius = "50%";
+      img.style.objectFit = "cover";
+      img.style.border = "3px solid #5568d3";
+      img.style.boxShadow = "0 4px 10px rgba(85, 104, 211, 0.3)";
+      // La añadimos al avatar display
+      avatarDisplay.appendChild(img);
+    } else if (avatarDisplay && (!rutaImagen || rutaImagen === "predeterminado")) {
+      // Si se selecciona "Sin avatar", volvemos al símbolo
+      const esBlancas = avatarDisplayId === "avatar-display-blancas";
+      avatarDisplay.innerHTML = esBlancas ? '♔' : '♚';
+      avatarDisplay.style.display = '';
     }
   }
 
@@ -450,11 +474,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // Si elige "personalizado", mostramos el input de archivo
         if (contenedorBlancas) contenedorBlancas.style.display = "block";
       } else {
-        // Si elige un avatar predefinido, ocultamos el input
+        // Si elige un avatar predefinido, ocultamos el input y mostramos la imagen
         if (contenedorBlancas) contenedorBlancas.style.display = "none";
-        // Eliminamos la previsualización
-        const preview = document.getElementById("preview_blancas");
-        if (preview) preview.remove();
+        // Actualizamos el avatar display con la imagen seleccionada
+        actualizarAvatarDisplay(this.value, "avatar-display-blancas");
       }
     });
 
@@ -464,8 +487,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Mostramos el nombre del archivo
         if (nombreArchivoBlancas)
           nombreArchivoBlancas.textContent = this.files[0].name;
-        // Mostramos la previsualización
-        mostrarPrevisualizacion(this, "preview_blancas");
+        // Mostramos la previsualización en el avatar display
+        mostrarPrevisualizacionAvatar(this, "avatar-display-blancas");
       }
     });
   }
@@ -485,11 +508,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // Si elige "personalizado", mostramos el input de archivo
         if (contenedorNegras) contenedorNegras.style.display = "block";
       } else {
-        // Si elige un avatar predefinido, ocultamos el input
+        // Si elige un avatar predefinido, ocultamos el input y mostramos la imagen
         if (contenedorNegras) contenedorNegras.style.display = "none";
-        // Eliminamos la previsualización
-        const preview = document.getElementById("preview_negras");
-        if (preview) preview.remove();
+        // Actualizamos el avatar display con la imagen seleccionada
+        actualizarAvatarDisplay(this.value, "avatar-display-negras");
       }
     });
 
@@ -499,8 +521,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Mostramos el nombre del archivo
         if (nombreArchivoNegras)
           nombreArchivoNegras.textContent = this.files[0].name;
-        // Mostramos la previsualización
-        mostrarPrevisualizacion(this, "preview_negras");
+        // Mostramos la previsualización en el avatar display
+        mostrarPrevisualizacionAvatar(this, "avatar-display-negras");
       }
     });
   }
