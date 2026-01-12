@@ -22,15 +22,15 @@ function mostrarFormularioConfig($partidasGuardadas = [])
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
       <!-- Sección inicial: Cargar partida guardada -->
-      <div class="seccion-cargar-inicio" style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">renderConfigForm
-        <p style="margin: 0 0 15px 0; font-size: 1.1em; font-weight: bold;">¿Deseas continuar con una partida anterior?</p>
+      <div class="seccion-cargar-inicio">
+        <p>¿Deseas continuar con una partida anterior?</p>
         <?php if (!empty($partidasGuardadas)): ?>
           <!-- Si hay partidas guardadas, mostramos botón para cargar -->
-          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()" style="margin-bottom: 15px;">📁 Cargar Partida Guardada</button>
-          <p style="margin: 10px 0 0 0; color: #666; font-size: 0.9em;">O crea una nueva partida a continuación</p>
+          <button type="button" class="btn-cargar-inicial" onclick="abrirModalCargarInicial()">📁 Cargar Partida Guardada</button>
+          <p class="texto-alternativa">O crea una nueva partida a continuación</p>
         <?php else: ?>
           <!-- Si no hay partidas, lo indicamos -->
-          <p style="margin: 0; color: #999; font-style: italic;">No hay partidas guardadas. Crea una nueva partida.</p>
+          <p class="texto-sin-partidas">No hay partidas guardadas. Crea una nueva partida.</p>
         <?php endif; ?>
       </div>
 
@@ -131,7 +131,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               <option value="5">+5 segundos</option>
               <option value="10">+10 segundos</option>
             </select>
-            <small style="display: block; margin-top: 5px;">Incrementar tiempo adicional al mover</small>
+            <small class="texto-ayuda-incremento">Incrementar tiempo adicional al mover</small>
           </div>
         </div>
 
@@ -274,7 +274,7 @@ function mostrarModalConfirmarRevancha()
       <h2>🔁 Confirmar revancha</h2>
       <p>¿Deseas iniciar una revancha? Se mantendrán los jugadores y la configuración.</p>
       <!-- Información sobre qué se mantiene y qué se reinicia -->
-      <p style="color: #667eea; font-weight: 600; margin-top: 10px;">ℹ️ El tablero se reiniciará a la posición inicial manteniendo jugadores y configuración.</p>
+      <p class="info-revancha">ℹ️ El tablero se reiniciará a la posición inicial manteniendo jugadores y configuración.</p>
       <div class="modal-buttons">
         <form method="post" style="display: inline;">
           <!-- Botón para confirmar la revancha -->
@@ -299,13 +299,13 @@ function mostrarModalPromocion()
   // Si no hay datos, no mostramos nada
   if (!$color || !$pos) return;
 ?>
-  <div id="modalPromocion" class="modal-overlay" style="display: flex !important;">
+  <div id="modalPromocion" class="modal-overlay modal-promocion-visible">
     <div class="modal-content">
       <h2>👑 Elegir pieza de promoción</h2>
       <!-- Explicamos que peón es el que se promociona -->
       <p>El peón de <?php echo htmlspecialchars($color); ?> en <?php echo htmlspecialchars($pos); ?> puede promoverse. Elige la pieza:</p>
       <form method="post" class="form-promocion">
-        <div class="opciones-promocion" style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="opciones-promocion">
           <!-- Botones para elegir Dama -->
           <button type="submit" name="confirmar_promocion" value="1" class="btn-confirmar" onclick="this.form.tipo_promocion.value='Dama'">♛ Dama</button>
           <!-- Botones para elegir Torre -->
@@ -317,7 +317,7 @@ function mostrarModalPromocion()
         </div>
         <!-- Input oculto que se rellena al hacer clic en un botón -->
         <input type="hidden" name="tipo_promocion" value="">
-        <div class="modal-buttons" style="margin-top:12px;">
+        <div class="modal-buttons modal-buttons-promocion">
           <form method="post" style="display:inline;">
             <button type="submit" name="cancelar_modal" class="btn-cancelar">✖️ Cancelar</button>
           </form>
@@ -689,27 +689,27 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
       <!-- HISTORIAL DE MOVIMIENTOS - Mostramos todos los movimientos realizados en la partida -->
       <div class="historial-movimientos">
         <!-- Encabezado del historial (clickeable para expandir/contraer) -->
-        <div class="historial-header" onclick="toggleHistorial()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
+        <div class="historial-header" onclick="toggleHistorial()">
           <span><strong>Historial de movimientos</strong></span>
-          <span id="historial-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
+          <span id="historial-toggle" class="historial-toggle">▼</span>
         </div>
         <!-- Contenido del historial (inicialmente oculto) -->
-        <div id="historial-contenido" class="historial-contenido" style="display: none; padding: 10px; background: #fafafa; border-radius: 5px; margin-top: 5px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd;">
+        <div id="historial-contenido" class="historial-contenido" style="display: none;">
           <?php
           // Obtenemos el historial de movimientos desde la partida
           $historial = $partida->getHistorialMovimientos();
           if (empty($historial)):
           ?>
             <!-- Si no hay movimientos, mostramos un mensaje -->
-            <p style="color: #999; text-align: center; margin: 0;">No hay movimientos registrados</p>
+            <p class="mensaje-sin-movimientos">No hay movimientos registrados</p>
           <?php else: ?>
             <!-- Si hay movimientos, los mostramos en una grilla de dos columnas -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+            <div class="historial-grid">
               <?php foreach ($historial as $mov): ?>
                 <!-- Cada movimiento en su propia caja -->
-                <div style="padding: 5px; background: white; border-radius: 3px; border-left: 3px solid <?php echo ($mov['color'] === 'blancas') ? '#ddd' : '#333'; ?>;">
+                <div class="movimiento-item <?php echo ($mov['color'] === 'blancas') ? 'movimiento-blancas' : 'movimiento-negras'; ?>">
                   <!-- Número del movimiento (formato estándar de ajedrez: 1., 2., etc) -->
-                  <small style="color: #666; font-weight: bold;">
+                  <small class="numero-movimiento">
                     <?php
                     // Calculamos el número del movimiento (2 medios movimientos = 1 movimiento completo)
                     $numeroMov = ceil($mov['numero'] / 2);
@@ -723,12 +723,12 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
                     ?>
                   </small>
                   <!-- Notación del movimiento en formato algebraico -->
-                  <span style="font-weight: bold; font-size: 1.05em; color: <?php echo ($mov['color'] === 'blancas') ? '#333' : '#666'; ?>;">
+                  <span class="notacion-movimiento <?php echo ($mov['color'] === 'blancas') ? 'notacion-blancas' : 'notacion-negras'; ?>">
                     <?php echo htmlspecialchars($mov['notacion']); ?>
                   </span>
                   <!-- Si fue una captura, mostramos una X roja -->
                   <?php if ($mov['captura']): ?>
-                    <small style="color: #c33;">✕</small>
+                    <small class="icono-captura">✕</small>
                   <?php endif; ?>
                 </div>
               <?php endforeach; ?>
@@ -738,16 +738,16 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
       </div>
 
       <!-- SECCIÓN DE INSTRUCCIONES Y CONTROLES -->
-      <div class="instrucciones" style="margin-top: 25px;">
+      <div class="instrucciones">
         <!-- Encabezado de instrucciones (clickeable para expandir/contraer) -->
-        <div class="instrucciones-header" onclick="toggleInstrucciones()" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 15px; border-radius: 5px; user-select: none;">
+        <div class="instrucciones-header" onclick="toggleInstrucciones()">
           <span><strong>Reglas y Controles</strong></span>
-          <span id="instrucciones-toggle" style="font-size: 1.2em; transition: transform 0.3s;">▼</span>
+          <span id="instrucciones-toggle" class="instrucciones-toggle">▼</span>
         </div>
         <!-- Contenido de instrucciones (inicialmente oculto) -->
-        <div id="instrucciones-contenido" class="instrucciones-contenido" style="display: none; padding: 15px; background: #fafafa; border-radius: 5px; margin-top: 5px;">
+        <div id="instrucciones-contenido" class="instrucciones-contenido" style="display: none;">
           <!-- SECCIÓN: Cómo jugar -->
-          <h4 style="margin-top: 0; color: #333;">Cómo jugar:</h4>
+          <h4 class="titulo-seccion">Cómo jugar:</h4>
           <ol>
             <li><strong>Pausa/Reanudar</strong>: Usa el botón superior (⏸️/▶️) para pausar la partida</li>
             <li><strong>Reloj</strong>: Solo corre el reloj del jugador en turno</li>
@@ -757,8 +757,8 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
           </ol>
 
           <!-- SECCIÓN: Gestión de partida -->
-          <h4 style="margin-top: 15px; color: #333;">Gestión de partida:</h4>
-          <ul style="list-style: none; padding-left: 0;">
+          <h4 class="titulo-seccion-separado">Gestión de partida:</h4>
+          <ul class="lista-sin-estilo">
             <li><strong>-Guardar</strong>: Guarda la partida actual para continuarla posteriormente (solo posible si pausas la partida)</li>
             <li><strong>-Cargar</strong>: Carga una partida guardada anteriormente</li>
             <li><strong>-Nueva partida</strong>: Inicia una nueva partida desde el principio</li>
@@ -766,8 +766,8 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
           </ul>
 
           <!-- SECCIÓN: Configuración -->
-          <h4 style="margin-top: 15px; color: #333;">Configuración:</h4>
-          <ul style="list-style: none; padding-left: 0;">
+          <h4 class="titulo-seccion-separado">Configuración:</h4>
+          <ul class="lista-sin-estilo">
             <li><strong>-Avatares</strong>: Personaliza la imagen de los jugadores</li>
             <li><strong>-Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
             <li><strong>-Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
@@ -808,12 +808,12 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
                   <!-- Botones de acción para cada partida -->
                   <div class="acciones-partida">
                     <!-- Botón para cargar la partida -->
-                    <form method="post" style="display: inline;">
+                    <form method="post" class="formulario-inline">
                       <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
                       <button type="submit" name="cargar_partida_inicial" class="btn-cargar-item">📂 Cargar</button>
                     </form>
                     <!-- Botón para eliminar la partida -->
-                    <form method="post" style="display: inline;">
+                    <form method="post" class="formulario-inline">
                       <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
                       <button type="button" class="btn-eliminar-item" onclick="abrirModalConfirmarEliminar('<?php echo htmlspecialchars(addslashes($partida['nombre'])); ?>', '<?php echo htmlspecialchars($partida['archivo']); ?>', true)">🗑️</button>
                     </form>
@@ -845,7 +845,7 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
           <!-- Advertencia de que la acción es irreversible -->
           <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
           <div class="modal-buttons">
-            <form method="post" style="display: inline;">
+            <form method="post" class="formulario-inline">
               <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($archivoPartida); ?>">
               <button type="submit" name="<?php echo $desdeInicio ? 'eliminar_partida_inicial' : 'eliminar_partida'; ?>" class="btn-confirmar btn-eliminar">🗑️ Eliminar</button>
             </form>

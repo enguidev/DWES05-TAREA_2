@@ -1,0 +1,382 @@
+/* ============================================
+   MODALES - ESTILOS GENERALES
+   ============================================ */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.3s;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 0;
+  border: none;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 15px 15px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.close-modal {
+  color: white;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  line-height: 1;
+}
+
+.close-modal:hover {
+  transform: rotate(90deg);
+  color: #ffeb3b;
+}
+
+.modal-form {
+  padding: 30px;
+}
+
+.modal-content h2 {
+  color: #5568d3;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-content input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  margin-bottom: 20px;
+  transition: border-color 0.3s;
+}
+
+.modal-content input[type="text"]:focus {
+  outline: none;
+  border-color: #5568d3;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.modal-buttons-promocion {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.btn-guardar-config,
+.btn-cancelar-config {
+  flex: 1;
+  padding: 15px 30px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-guardar-config {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-guardar-config:hover:not(:disabled):not(.btn-disabled) {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-guardar-config:disabled,
+.btn-guardar-config.btn-disabled {
+  background: #b5b5b5;
+  color: #f8f8f8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-cancelar-config {
+  background: #f44336;
+  color: white;
+}
+
+.btn-cancelar-config:hover {
+  background: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+}
+
+.btn-confirmar,
+.btn-cancelar {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-confirmar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-confirmar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cancelar {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-cancelar:hover {
+  background: #d0d0d0;
+}
+
+/* Modal lista de partidas */
+.modal-lista {
+  max-width: 700px;
+  min-width: 500px;
+}
+
+.lista-partidas {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.item-partida {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.3s;
+}
+
+.item-partida:hover {
+  border-color: #5568d3;
+  background: #f8f9ff;
+}
+
+.info-partida {
+  flex: 1;
+}
+
+.nombre-partida {
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.fecha-partida {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.acciones-partida {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-cargar-item,
+.btn-eliminar-item {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cargar-item {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-cargar-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-eliminar-item {
+  background: #ff4757;
+  color: white;
+}
+
+.btn-eliminar-item:hover {
+  background: #ff3838;
+  transform: translateY(-2px);
+}
+
+.mensaje-vacio {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 1.1em;
+}
+
+/* Estilos para botones en modales de confirmación */
+.btn-eliminar {
+  background: linear-gradient(135deg, #ff6b6b 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-eliminar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.btn-reiniciar-confirm {
+  background: linear-gradient(135deg, #ffa502 0%, #ff6b02 100%);
+  color: white;
+}
+
+.btn-reiniciar-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 165, 2, 0.4);
+}
+
+.btn-revancha-confirm {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.btn-revancha-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+}
+
+.btn-cargar-confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-cargar-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.texto-advertencia {
+  color: #f5576c;
+  font-size: 0.95em;
+  margin-top: 10px;
+}
+
+/* Modal de promoción */
+.modal-promocion-visible {
+  display: flex !important;
+}
+
+.opciones-promocion {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 15% auto;
+  }
+
+  .modal-form {
+    padding: 20px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

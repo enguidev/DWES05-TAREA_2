@@ -48,6 +48,11 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
   <title>Partida de Ajedrez</title>
   <!-- Importamos los estilos CSS -->
   <link rel="stylesheet" href="public/css/style.css">
+  <link rel="stylesheet" href="public/css/config.css">
+  <link rel="stylesheet" href="public/css/modal.css">
+  <link rel="stylesheet" href="public/css/tablero.css">
+  <link rel="stylesheet" href="public/css/relojes.css">
+  <link rel="stylesheet" href="public/css/historial.css">
   <!-- Importamos el script de JavaScript para las interacciones -->
   <script src="public/script.js" defer></script>
 </head>

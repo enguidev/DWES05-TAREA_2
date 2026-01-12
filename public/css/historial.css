@@ -1,0 +1,175 @@
+/* ============================================
+   HISTORIAL E INSTRUCCIONES
+   ============================================ */
+
+/* Historial de movimientos */
+.historial-movimientos {
+  margin-bottom: 25px;
+}
+
+.historial-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f0f0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.historial-header:hover {
+  background: #e8e8e8;
+}
+
+.historial-toggle {
+  font-size: 1.2em;
+  transition: transform 0.3s;
+}
+
+.historial-contenido {
+  padding: 10px;
+  background: #fafafa;
+  border-radius: 5px;
+  margin-top: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+}
+
+.historial-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.movimiento-item {
+  padding: 5px;
+  background: white;
+  border-radius: 3px;
+}
+
+.movimiento-blancas {
+  border-left: 3px solid #ddd;
+}
+
+.movimiento-negras {
+  border-left: 3px solid #333;
+}
+
+.numero-movimiento {
+  color: #666;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.notacion-movimiento {
+  font-weight: bold;
+  font-size: 1.05em;
+}
+
+.notacion-blancas {
+  color: #333;
+}
+
+.notacion-negras {
+  color: #666;
+}
+
+.icono-captura {
+  color: #c33;
+  font-size: 0.9em;
+}
+
+.mensaje-sin-movimientos {
+  color: #999;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
+}
+
+/* Instrucciones */
+.instrucciones {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+  border-right: 4px solid #667eea;
+}
+
+.instrucciones-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f0f0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.instrucciones-header:hover {
+  background: #e8e8e8;
+}
+
+.instrucciones-toggle {
+  font-size: 1.2em;
+  transition: transform 0.3s;
+}
+
+.instrucciones-contenido {
+  padding: 15px;
+  background: #fafafa;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.instrucciones h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+  font-size: 1.1em;
+}
+
+.instrucciones p {
+  margin-bottom: 10px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.instrucciones ol {
+  margin-left: 20px;
+  color: #555;
+}
+
+.instrucciones li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.instrucciones ul {
+  margin-left: 20px;
+  color: #555;
+  list-style-type: disc;
+}
+
+.titulo-seccion {
+  margin-top: 0;
+  color: #333;
+}
+
+.titulo-seccion-separado {
+  margin-top: 15px;
+  color: #333;
+}
+
+.lista-sin-estilo {
+  list-style: none;
+  padding-left: 0;
+}
+
+.formulario-inline {
+  display: inline;
+}

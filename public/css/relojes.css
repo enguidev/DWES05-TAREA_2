@@ -1,0 +1,121 @@
+/* ============================================
+   RELOJES DE AJEDREZ
+   ============================================ */
+
+/* Relojes de ajedrez */
+.relojes-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.reloj {
+  flex: 1;
+  max-width: 300px;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 4px solid transparent;
+}
+
+.reloj-blancas {
+  background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+  border-color: #999;
+}
+
+.reloj-negras {
+  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+  color: white;
+  border-color: #666;
+}
+
+.reloj-activo {
+  border-color: #4CAF50 !important;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  transform: scale(1.05);
+}
+
+.reloj-inactivo {
+  opacity: 0.7;
+}
+
+.reloj-jugador {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-circular {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.reloj-tiempo {
+  font-size: 3em;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.reloj-negras .reloj-tiempo {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tiempo-critico {
+  color: #e74c3c !important;
+  animation: parpadeo-critico 1s infinite;
+}
+
+@keyframes parpadeo-critico {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.reloj-puntos {
+  font-size: 1em;
+  opacity: 0.8;
+}
+
+.reloj-separador {
+  font-size: 3em;
+  color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .relojes-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .reloj {
+    max-width: 100%;
+  }
+
+  .reloj-tiempo {
+    font-size: 2.5em;
+  }
+}

@@ -1,0 +1,382 @@
+/* ============================================
+   CONFIGURACIÓN INICIAL
+   ============================================ */
+
+.config-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.configuracion-inicial {
+  text-align: center;
+  font-size: 2em;
+  color: #555;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.jugador-config {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 15px;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.jugador-config:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.blancas-config {
+  border-color: #999;
+  background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+}
+
+.negras-config {
+  border-color: #666;
+  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+  color: white;
+}
+
+.negras-config label,
+.negras-config small {
+  color: white;
+}
+
+/* Icono de configuración de jugadores */
+.icono-configuracion-nombres-jugadores {
+  font-size: 4.5em;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Línea de separación horizontal */
+.linea-horizontal {
+  margin: 30px 0;
+  border: none;
+  border-top: 2px solid #e0e0e0;
+}
+
+.jugador-config label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.input-nombre {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1.1em;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.input-nombre:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.jugador-config small {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.vs-separator {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  color: #667eea;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px 0;
+}
+
+.btn-iniciar-partida {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 1.3em;
+  font-weight: bold;
+  padding: 18px 40px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  margin-top: 10px;
+}
+
+.btn-iniciar-partida:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-iniciar-partida:active {
+  transform: translateY(0);
+}
+
+/* Botones iniciales */
+.botones-inicio {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-cargar-inicial {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  font-size: 1.3em;
+  font-weight: bold;
+  padding: 18px 40px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+}
+
+.btn-cargar-inicial:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+.btn-cargar-inicial:active {
+  transform: translateY(0);
+}
+
+/* Sección de cargar partida en inicio */
+.seccion-cargar-inicio {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 10px;
+}
+
+.seccion-cargar-inicio > p:first-of-type {
+  margin: 0 0 15px 0;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.seccion-cargar-inicio .btn-cargar-inicial {
+  margin-bottom: 15px;
+}
+
+.seccion-cargar-inicio .texto-alternativa {
+  margin: 10px 0 0 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.seccion-cargar-inicio .texto-sin-partidas {
+  margin: 0;
+  color: #999;
+  font-style: italic;
+}
+
+/* Secciones de configuración */
+.config-section-inicio {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.config-option {
+  margin-bottom: 15px;
+}
+
+.config-option label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.texto-ayuda-incremento {
+  display: block;
+  margin-top: 5px;
+}
+
+.select-tiempo {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1em;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.select-tiempo:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.select-avatar {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.9em;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+/* Estilos para input de archivo de avatar personalizado */
+input[type="file"][id^="avatar_personalizado"] {
+  display: none !important;
+}
+
+/* Botón personalizado para seleccionar archivo */
+.btn-elegir-archivo {
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95em;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+  text-align: center;
+}
+
+.btn-elegir-archivo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.btn-elegir-archivo:active {
+  transform: translateY(0);
+}
+
+/* Nombre del archivo seleccionado */
+.nombre-archivo {
+  display: inline-block;
+  margin-left: 10px;
+  color: #666;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.avatar-preview {
+  display: inline-block;
+  margin-top: 10px;
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 50%;
+  border: 3px solid #667eea;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+  object-fit: cover;
+}
+
+.config-option.checkbox label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.config-option.checkbox label:hover {
+  background: #e9ecef;
+}
+
+.config-option.checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+/* ============================================
+   MODAL DE CONFIGURACIÓN DURANTE PARTIDA
+   ============================================ */
+
+.config-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.config-section:last-of-type {
+  border-bottom: none;
+}
+
+.config-section h3 {
+  color: #667eea;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+.config-description {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.config-note {
+  color: #999;
+  display: block;
+  margin-top: 10px;
+}
+
+.info-revancha {
+  color: #667eea;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.config-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.config-info h3 {
+  color: #667eea;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
+.config-info p {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .config-wrapper {
+    padding: 15px;
+  }
+
+  .jugador-config {
+    padding: 20px 15px;
+  }
+
+  .btn-iniciar-partida {
+    font-size: 1.1em;
+    padding: 15px 30px;
+  }
+}
