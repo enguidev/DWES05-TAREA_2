@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const avatarDisplay = document.getElementById(avatarDisplayId);
         if (avatarDisplay) {
           // Limpiamos el contenido anterior
-          avatarDisplay.innerHTML = '';
+          avatarDisplay.innerHTML = "";
           // Creamos la imagen
           const img = document.createElement("img");
           img.src = e.target.result;
@@ -439,7 +439,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const avatarDisplay = document.getElementById(avatarDisplayId);
     if (avatarDisplay && rutaImagen && rutaImagen !== "predeterminado") {
       // Limpiamos el contenido anterior
-      avatarDisplay.innerHTML = '';
+      avatarDisplay.innerHTML = "";
       // Creamos la imagen
       const img = document.createElement("img");
       img.src = rutaImagen;
@@ -451,11 +451,14 @@ document.addEventListener("DOMContentLoaded", function () {
       img.style.boxShadow = "0 4px 10px rgba(85, 104, 211, 0.3)";
       // La añadimos al avatar display
       avatarDisplay.appendChild(img);
-    } else if (avatarDisplay && (!rutaImagen || rutaImagen === "predeterminado")) {
+    } else if (
+      avatarDisplay &&
+      (!rutaImagen || rutaImagen === "predeterminado")
+    ) {
       // Si se selecciona "Sin avatar", volvemos al símbolo
       const esBlancas = avatarDisplayId === "avatar-display-blancas";
-      avatarDisplay.innerHTML = esBlancas ? '♔' : '♚';
-      avatarDisplay.style.display = '';
+      avatarDisplay.innerHTML = esBlancas ? "♔" : "♚";
+      avatarDisplay.style.display = "";
     }
   }
 
