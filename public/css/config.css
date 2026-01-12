@@ -166,7 +166,7 @@
   border-radius: 10px;
 }
 
-.seccion-cargar-inicio > p:first-of-type {
+.seccion-cargar-inicio>p:first-of-type {
   margin: 0 0 15px 0;
   font-size: 1.1em;
   font-weight: bold;
