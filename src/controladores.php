@@ -380,6 +380,7 @@ function resolverAcciones()
   }
 
   // Procesamiento del juego si hay partida
+
   // Si hay una partida en sesión, la procesamos
   if (isset($_SESSION['partida'])) {
 
@@ -455,8 +456,7 @@ function resolverAcciones()
   // Partidas guardadas para la pantalla inicial
   $estado['partidasGuardadasInicio'] = listarPartidas();
 
-  // Retornamos el estado preparado para la vista
-  return $estado;
+  return $estado; // Retornamos el estado preparado para la vista
 }
 
 
@@ -543,7 +543,11 @@ function iniciarPartida()
   $_SESSION['pausa'] = false; // La partida no está pausada al inicio
 
   // Guardamos los avatares elegidos de ambos jugadores
+
+  // Avatar de las blancas
   $_SESSION['avatar_blancas'] = $avatarBlancas;
+
+  // Avatar de las negras
   $_SESSION['avatar_negras'] = $avatarNegras;
 }
 
@@ -849,151 +853,225 @@ function guardarPartida($partida, $nombrePartida = null)
 }
 
 
-// Devuelve la lista de partidas guardadas ordenadas por fecha descendente
+// Para obtener la lista de partidas guardadas ordenadas por fecha descendente
 function listarPartidas()
 {
+  // Directorio donde se guardan las partidas
   $directorio = __DIR__ . '/../data/partidas';
 
+  // Si el directorio no existe, retornamos un array vacio
   if (!is_dir($directorio)) return [];
 
+  // Obtenemos todos los archivos JSON en el directorio
   $archivos = glob($directorio . '/*.json');
 
+  // Si no hay archivos, retornamos un array vacio
   if (!$archivos) return [];
 
+  // Creamos un array para almacenar las partidas
   $partidas = [];
 
+  // Recorremos los archivos y extraemos la información relevante
   foreach ($archivos as $rutaArchivo) {
 
+    // Si no es un archivo, continuamos con el siguiente archivo
     if (!is_file($rutaArchivo)) continue;
 
+    // Leemos el contenido del archivo JSON
     $contenido = json_decode(file_get_contents($rutaArchivo), true);
 
+    // Si el contenido no es un array, continuamos con el siguiente archivo
     if (!is_array($contenido)) continue;
 
+    // Obtenemos el timestamp del archivo o de la información guardada
+    // Si no existe en el contenido, usamos la fecha de modificación del archivo para obtener el timestamp
     $timestamp = isset($contenido['timestamp']) ? (int)$contenido['timestamp'] : filemtime($rutaArchivo);
 
+    // Agregamos la información de la partida al array
     $partidas[] = [
 
+      // Si no existe el nombre, usamos el nombre del archivo
       'nombre' => isset($contenido['nombre']) ? $contenido['nombre'] : basename($rutaArchivo, '.json'),
 
+      // Si no existe la fecha, usamos la fecha de modificación del archivo
       'fecha' => isset($contenido['fecha']) ? $contenido['fecha'] : date('Y-m-d H:i:s', $timestamp),
 
+      // Nombre del archivo sin la ruta, solo el nombre (basename($rutaArchivo))
       'archivo' => basename($rutaArchivo),
 
+      // Timestamp para ordenar
       'timestamp' => $timestamp
     ];
   }
 
-  // Ordenamos de la más reciente a la más antigua
+  // Ordenamos (usort()) el array de la más reciente a la más antigua 
   usort($partidas, function ($a, $b) {
 
-    return $b['timestamp'] <=> $a['timestamp'];
+    /* (<=>) Operador spaceship compara dos valores ($a y $b) y devuelve 
+      -0 si son iguales
+      -1 si el primero es menor
+      1 si el primero es mayor
+      compara $b con $a para orden descendente (al revés (orden ascendente) sería $a <=> $b)
+    */
+    return $b['timestamp'] <=> $a['timestamp']; // Orden descendente por timestamp
   });
 
-  return $partidas;
+  return $partidas; // Retornamos el array de partidas ordenadas por fecha
 }
 
 
-// Carga una partida guardada desde JSON y restaura la sesión
+// Para cargar una partida guardada desde JSON y restaura la sesión
 function cargarPartida($archivo = null)
 {
+  // Ruta del archivo a cargar
+
+  // Si se proporciona un archivo, usamos la ruta /../data/partidas/ + el nombre del archivo
+  // Si no se proporciona un archivo, cargamos el archivo de partida guardada por defecto
+  // _DIR_ (constante de PHP) es la ruta del directorio actual (src)
+  // basename() obtiene el nombre del archivo (partida_guardada.json) sin la ruta 
   $rutaArchivo = $archivo
     ? __DIR__ . '/../data/partidas/' . basename($archivo)
     : __DIR__ . '/../data/partida_guardada.json';
 
-  if (!file_exists($rutaArchivo)) return false;
+  if (!file_exists($rutaArchivo)) return false; // Si el archivo no existe, retornamos false
 
+  // Leemos el contenido del archivo
+  // json_decode() convierte el JSON a un array/objeto
+  // file_get_contents() lee el contenido del archivo como una cadena (string)
+  // $rutaArchivo es la ruta completa del archivo
+  // true en json_decode() para obtener un array asociativo en lugar de un objeto
   $contenido = json_decode(file_get_contents($rutaArchivo), true);
 
+  // Si el contenido no es un array o no tiene la clave 'partida', retornamos false
   if (!is_array($contenido) || !isset($contenido['partida'])) return false;
 
+  // Deserializamos (objetos de la clase Partida) la partida
   $partida = unserialize($contenido['partida']);
 
-  // Restaura valores básicos de sesión
+  // Restauramos la sesión con los datos de la partida cargada
   $_SESSION['partida'] = $contenido['partida'];
 
+  // Si hay historial de movimientos, lo restauramos
   $_SESSION['casilla_seleccionada'] = isset($contenido['casilla_seleccionada']) ? $contenido['casilla_seleccionada'] : null;
 
+  // Si hay tiempos guardados para las blancas, los restauramos
   $_SESSION['tiempo_blancas'] = isset($contenido['tiempo_blancas']) ? (int)$contenido['tiempo_blancas'] : 0;
 
+  // Si hay tiempos guardados para las negras, los restauramos
   $_SESSION['tiempo_negras'] = isset($contenido['tiempo_negras']) ? (int)$contenido['tiempo_negras'] : 0;
 
+  // Si hay reloj activo guardado, lo restauramos
   $_SESSION['reloj_activo'] = isset($contenido['reloj_activo']) ? $contenido['reloj_activo'] : 'blancas';
 
+  // Si hay configuración guardada, la restauramos
   $_SESSION['config'] = isset($contenido['config']) && is_array($contenido['config']) ? $contenido['config'] : [];
 
+  // Si hay estado de pausa guardado, lo restauramos
   $_SESSION['pausa'] = isset($contenido['pausa']) ? (bool)$contenido['pausa'] : false;
 
+  // Asignamos true a nombres_configurados para indicar que ya hay una partida cargada
   $_SESSION['nombres_configurados'] = true;
 
+  // Actualizamos el último tick al momento de cargar la partida
   $_SESSION['ultimo_tick'] = time();
 
   // Restauramos avatares, priorizando los que se guardaron en disco
   $_SESSION['avatar_blancas'] = restaurarAvatarGuardado($contenido, 'blancas');
 
+  // Restauramos avatares, priorizando los que se guardaron en disco
   $_SESSION['avatar_negras'] = restaurarAvatarGuardado($contenido, 'negras');
 
-  return $partida;
+  return $partida; // Retornamos la partida cargada
 }
 
 
-// Elimina una partida guardada y sus avatares asociados
+// Para eliminar una partida guardada y sus avatares asociados
 function eliminarPartida($archivo)
 {
+  // Ruta del archivo a eliminar 
   $rutaArchivo = __DIR__ . '/../data/partidas/' . basename($archivo);
 
+  // Si el archivo no existe, retornamos false
   if (!file_exists($rutaArchivo)) return false;
 
+  // Leemos el contenido del archivo
   $contenido = json_decode(file_get_contents($rutaArchivo), true);
 
-  // Eliminamos avatares personalizados guardados
+  // Eliminamos los avatares asociados si existen
   foreach (['blancas', 'negras'] as $color) {
 
+    // Campo del avatar guardado
     $campoAvatar = 'avatar_' . $color . '_guardado';
 
+    // Si existe el campo y tiene un valor
     if (isset($contenido[$campoAvatar]) && $contenido[$campoAvatar]) {
 
+      // Ruta completa del avatar
       $rutaAvatar = __DIR__ . '/../data/partidas/avatares/' . basename($contenido[$campoAvatar]);
 
+      // Si el archivo del avatar existe en la ruta $rutaAvatar, lo eliminamos
       if (file_exists($rutaAvatar)) unlink($rutaAvatar);
     }
   }
 
+  // Eliminamos el archivo de la partida
   unlink($rutaArchivo);
 
-  return true;
+  return true; // Retornamos true (para indicar que se eliminó correctamente)
 }
 
 
-// Copia un avatar guardado a la carpeta pública y devuelve la ruta relativa
+// Para restaurar el avatar guardado si existe, o devolver el avatar original
 function restaurarAvatarGuardado($contenido, $color)
 {
+  // Campo del avatar guardado
   $campoGuardado = 'avatar_' . $color . '_guardado';
 
+  // Campo del avatar original en la partida
   $campoOriginal = 'avatar_' . $color;
 
+  // Directorio de avatares publicos
   $directorioPublico = __DIR__ . '/../public/imagenes/avatares/';
 
+  // Si existe un avatar guardado, lo copiamos al directorio público y devolvemos su ruta
   if (isset($contenido[$campoGuardado]) && $contenido[$campoGuardado]) {
 
+    // Obtenemos el nombre del archivo 
     $archivo = basename($contenido[$campoGuardado]);
 
+    // Ruta del archivo de origen
     $origen = __DIR__ . '/../data/partidas/avatares/' . $archivo;
 
+    // Si el archivo de origen existe
     if (file_exists($origen)) {
 
+      // Si el directorio público no existe, lo creamos
+      /*mkdir($directorioPublico, 0755, true):
+        - 0755 son los permisos del directorio (lectura, escritura y ejecución para el propietario; lectura y ejecución para grupo y otros)
+        - true indica que se deben crear directorios padres si no existen
+      */
       if (!is_dir($directorioPublico)) mkdir($directorioPublico, 0755, true);
 
       // Limpiamos avatares previos del mismo color
-      foreach (glob($directorioPublico . 'avatar_' . $color . '_*') as $anterior) if (is_file($anterior)) unlink($anterior);
+      /* glob devuelve un array con los nombres de los archivos que coinciden con la expresión regular
+        - is_file verifica que el elemento es un archivo (y no un directorio)
+        - unlink elimina el archivo
+      */
+      foreach (glob($directorioPublico . 'avatar_' . $color . '_*') as $ruta) if (is_file($ruta)) unlink($ruta);
 
+      // Copiamos el archivo al directorio público
+      /* copy copia el archivo de origen al destino
+        - $origen: ruta del archivo de origen
+        - $directorioPublico . $archivo: ruta del archivo de destino
+      */
       copy($origen, $directorioPublico . $archivo);
 
+      // Retornamos la ruta relativa del avatar copiado
       return 'public/imagenes/avatares/' . $archivo;
     }
   }
-
-  // Si no hay avatar guardado, devolvemos el que estuviera en la partida
+  // Si no hay avatar guardado, devolvemos el avatar original (si existe)
+  // $contenido[$campoOriginal] es el valor que estaba guardado en el JSON bajo la clave 'avatar_blancas' o 'avatar_negras'
   return isset($contenido[$campoOriginal]) ? $contenido[$campoOriginal] : null;
 }
 
@@ -1040,34 +1118,37 @@ function procesarConfirmarPromocion()
   $_SESSION['ultimo_tick'] = time(); // Actualizamos el último tick
 }
 
-/**
- * Procesa la confirmación de enroque
- */
+
+// Para gestionar la confirmación del enroque
 function procesarConfirmarEnroque()
 {
-  if (!isset($_SESSION['enroque_pendiente']) || !isset($_SESSION['partida'])) {
-    return;
-  }
+  // Si no hay un enroque pendiente o no hay partida, salimos de la función
+  if (!isset($_SESSION['enroque_pendiente']) || !isset($_SESSION['partida'])) return;
 
+  // Obtenemos los datos del formulario
+
+  // Si no existe alguno de los campos, lo asignamos a null
   $origen = isset($_POST['origen_enroque']) ? $_POST['origen_enroque'] : null;
   $destino = isset($_POST['destino_enroque']) ? $_POST['destino_enroque'] : null;
   $tipo = isset($_POST['tipo_enroque']) ? $_POST['tipo_enroque'] : null;
 
-  if (!$origen || !$destino || !$tipo || !in_array($tipo, ['corto', 'largo'])) {
-    return;
-  }
+  // Si falta algún dato o el tipo no es válido, salimos de la función
+  if (!$origen || !$destino || !$tipo || !in_array($tipo, ['corto', 'largo'])) return;
 
+  // Recuperamos la partida desde la sesión
   $partida = unserialize($_SESSION['partida']);
 
   // Ejecutar el enroque
-  if ($partida->ejecutarEnroque($origen, $destino, $tipo)) {
-    $_SESSION['partida'] = serialize($partida);
-  }
+  // Si el enroque se ejecuta correctamente, guardamos la partida en sesión
+  if ($partida->ejecutarEnroque($origen, $destino, $tipo)) $_SESSION['partida'] = serialize($partida);
 
   // Limpiar enroque pendiente y reanudar la partida
-  unset($_SESSION['enroque_pendiente']);
-  $_SESSION['pausa'] = false;
-  $_SESSION['ultimo_tick'] = time();
+
+  unset($_SESSION['enroque_pendiente']); // Limpiamos el enroque pendiente
+
+  $_SESSION['pausa'] = false; // Reanudamos la partida
+
+  $_SESSION['ultimo_tick'] = time(); // Actualizamos el último tick
 }
 
 
@@ -1097,34 +1178,30 @@ function procesarCancelarEnroque()
     }
   }
 }
-/**
- * Maneja la subida de un archivo de avatar personalizado
- * @param string $inputName Nombre del campo de archivo
- * @param string $color Color del jugador ('blancas' o 'negras')
- * @return string|null Ruta relativa del archivo subido o null si no se subió
- */
+
+
+// Para gestionar la subida de un archivo de avatar personalizado
 function manejarSubidaAvatar($inputName, $color)
 {
-  if (!isset($_FILES[$inputName]) || $_FILES[$inputName]["error"] !== UPLOAD_ERR_OK) {
-    return null;
-  }
+  // Si no se subió ningún archivo o hubo un error en la subida, retornamos null
+  if (!isset($_FILES[$inputName]) || $_FILES[$inputName]["error"] !== UPLOAD_ERR_OK) return null;
 
-  $file = $_FILES[$inputName];
-  $allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-  $maxSize = 5 * 1024 * 1024; // 5MB
+  $file = $_FILES[$inputName]; // Archivo subido
+
+  $allowedTypes = ["image/jpeg", "image/png", "image/gif"]; // Tipos MIME permitidos
+
+  $maxSize = 5 * 1024 * 1024; // Tamaño máximo permitido (5 MB)
 
   // Validar tipo de archivo
-  // Revisar MIME real con finfo para evitar suplantación
-  $finfo = new finfo(FILEINFO_MIME_TYPE);
-  $realType = $finfo->file($file["tmp_name"]);
-  if (!in_array($realType, $allowedTypes)) {
-    return null;
-  }
+
+  $finfo = new finfo(FILEINFO_MIME_TYPE); // Objeto finfo para obtener el tipo MIME
+  $realType = $finfo->file($file["tmp_name"]); // Tipo MIME real del archivo
+  if (!in_array($realType, $allowedTypes))  return null; // Si el tipo no es permitido, retornamos null
 
   // Validar tamaño
-  if ($file["size"] > $maxSize) {
-    return null;
-  }
+
+  // Si el tamaño del archivo excede el máximo permitido, retornamos null
+  if ($file["size"] > $maxSize) return null;
 
   // Crear directorio si no existe
   $uploadDir = __DIR__ . "/../public/imagenes/avatares/";
