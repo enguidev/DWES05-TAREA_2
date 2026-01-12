@@ -56,48 +56,48 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
   <!-- Si todavía no se han puesto nombres a los jugadores... -->
   <?php if (!isset($_SESSION['nombres_configurados'])): ?>
     <!-- ...mostramos el formulario de inicio -->
-    <?php renderConfigForm($partidasGuardadasInicio); ?>
+    <?php mostrarFormularioConfig($partidasGuardadasInicio); ?>
 
     <!-- Modal para cargar una partida anterior desde la pantalla de inicio -->
     <?php if (!empty($partidasGuardadasInicio)): ?>
-      <?php renderModalCargarInicial($partidasGuardadasInicio); ?>
+      <?php mostrarModalCargarInicial($partidasGuardadasInicio); ?>
     <?php endif; ?>
     <!-- Si ya se han configurado los nombres... -->
   <?php else: ?>
     <!-- ...mostramos el tablero y la partida -->
     <div class="container">
       <!-- Modal para cambiar los ajustes del juego -->
-      <?php renderModalConfig(); ?>
+      <?php mostrarModalConfig(); ?>
 
       <!-- Modales de guardar, cargar y opciones de partida -->
       <?php if ($mostrarModalGuardar): ?>
-        <?php renderModalGuardarPartida($nombrePartidaSugerido); ?>
+        <?php mostrarModalGuardarPartida($nombrePartidaSugerido); ?>
       <?php endif; ?>
 
       <?php if ($mostrarModalCargar): ?>
-        <?php renderModalCargarPartida($partidasGuardadas); ?>
+        <?php mostrarModalCargarPartida($partidasGuardadas); ?>
       <?php endif; ?>
 
       <?php if ($mostrarModalReiniciar): ?>
-        <?php renderModalConfirmarReiniciar(); ?>
+        <?php mostrarModalConfirmarReiniciar(); ?>
       <?php endif; ?>
 
       <?php if ($mostrarModalRevancha): ?>
-        <?php renderModalConfirmarRevancha(); ?>
+        <?php mostrarModalConfirmarRevancha(); ?>
       <?php endif; ?>
 
       <!-- Modal cuando un peón llega al final y se puede promocionar -->
       <?php if ($mostrarModalPromocion): ?>
-        <?php renderModalPromocion(); ?>
+        <?php mostrarModalPromocion(); ?>
       <?php endif; ?>
 
       <!-- Modal para confirmar el enroque (movimiento especial del rey) -->
       <?php if ($mostrarModalEnroque): ?>
-        <?php renderModalEnroque(); ?>
+        <?php mostrarModalEnroque(); ?>
       <?php endif; ?>
 
       <!-- Cabecera con los nombres de los jugadores y opciones -->
-      <?php renderGameHeader($partida); ?>
+      <?php mostrarCabeceraJuego($partida); ?>
 
       <!-- Mostrar el estado del juego (pausado, en curso, terminado) -->
       <div class="mensaje <?php
@@ -129,10 +129,10 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
       </div>
 
       <!-- Los relojes de cada jugador -->
-      <?php renderRelojes($jugadores, $marcador); ?>
+      <?php mostrarRelojes($jugadores, $marcador); ?>
 
       <!-- El tablero de ajedrez con todas las piezas -->
-      <?php renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas); ?>
+      <?php mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas); ?>
     </div>
   <?php endif; ?>
 </body>

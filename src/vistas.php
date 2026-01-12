@@ -1,31 +1,28 @@
 <?php
 
-// Funciones de renderizado para la aplicación de ajedrez
-
-/**
- * Convierte rutas de avatares para que se carguen correctamente desde cualquier carpeta
- */
+// Para normalizar la ruta del avatar (si es personalizada o URL completa) 
 function normalizarRutaAvatar($ruta)
 {
-  // Si no hay ruta, no devolvemos nada
-  if (!$ruta) return null;
-  // Si ya es una URL completa (http/https), la dejamos igual
+  if (!$ruta) return null; // Si no hay ruta, retornamos null
+
+  /* preg_match verifica si la cadena empieza con "http://" o "https://"
+     Si es así, devolvemos la ruta tal cual
+  */
   if (preg_match('/^https?:\/\//', $ruta)) return $ruta;
+
   // Si no, le añadimos "./" al principio y quitamos "/" del principio
   return './' . ltrim($ruta, '/');
 }
 
-/**
- * Muestra el formulario donde se eligen nombres, avatares y configuración de tiempo
- */
-function renderConfigForm($partidasGuardadas = [])
+// Para mostrar el formulario donde se eligen nombres, avatares y configuración de tiempo
+function mostrarFormularioConfig($partidasGuardadas = [])
 {
 ?>
   <div class="container">
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
       <!-- Sección inicial: Cargar partida guardada -->
-      <div class="seccion-cargar-inicio" style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+      <div class="seccion-cargar-inicio" style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">renderConfigForm
         <p style="margin: 0 0 15px 0; font-size: 1.1em; font-weight: bold;">¿Deseas continuar con una partida anterior?</p>
         <?php if (!empty($partidasGuardadas)): ?>
           <!-- Si hay partidas guardadas, mostramos botón para cargar -->
@@ -165,19 +162,15 @@ function renderConfigForm($partidasGuardadas = [])
 <?php
 }
 
-/**
- * Carga el modal de configuración desde un archivo aparte
- */
-function renderModalConfig()
+// Para cargar el modal de configuración desde un archivo aparte
+function mostrarModalConfig()
 {
   // Incluimos el archivo con el HTML del modal
   include 'src/modal_config.php';
 }
 
-/**
- * Muestra el modal para guardar la partida actual con un nombre
- */
-function renderModalGuardarPartida($nombreSugerido)
+// Para mostrar el modal para guardar la partida actual con un nombre
+function mostrarModalGuardarPartida($nombreSugerido)
 {
 ?>
   <div id="modalGuardar" class="modal-overlay">
@@ -199,10 +192,8 @@ function renderModalGuardarPartida($nombreSugerido)
 <?php
 }
 
-/**
- * Muestra el modal con lista de partidas guardadas para cargar una
- */
-function renderModalCargarPartida($partidas)
+// Para mostrar el modal con lista de partidas guardadas para cargar una
+function mostrarModalCargarPartida($partidas)
 {
 ?>
   <div id="modalCargar" class="modal-overlay">
@@ -249,10 +240,8 @@ function renderModalCargarPartida($partidas)
 <?php
 }
 
-/**
- * Muestra modal para confirmar si el usuario quiere reiniciar la partida
- */
-function renderModalConfirmarReiniciar()
+// Para mostrar modal para confirmar si el usuario quiere reiniciar la partida
+function mostrarModalConfirmarReiniciar()
 {
 ?>
   <div id="modalConfirmarReiniciar" class="modal-overlay">
@@ -276,10 +265,8 @@ function renderModalConfirmarReiniciar()
 <?php
 }
 
-/**
- * Muestra modal para confirmar si quiere jugar revancha (nueva partida manteniendo jugadores)
- */
-function renderModalConfirmarRevancha()
+// Para mostrar modal para confirmar si quiere jugar revancha (nueva partida manteniendo jugadores)
+function mostrarModalConfirmarRevancha()
 {
 ?>
   <div id="modalConfirmarRevancha" class="modal-overlay">
@@ -303,10 +290,8 @@ function renderModalConfirmarRevancha()
 <?php
 }
 
-/**
- * Muestra el modal para elegir a qué pieza se promociona el peón
- */
-function renderModalPromocion()
+// Para mostrar el modal para elegir a qué pieza se promociona el peón
+function mostrarModalPromocion()
 {
   // Obtenemos los datos de la promoción de la sesión
   $color = isset($_SESSION['promocion_en_curso']['color']) ? $_SESSION['promocion_en_curso']['color'] : null;
@@ -343,10 +328,8 @@ function renderModalPromocion()
 <?php
 }
 
-/**
- * Muestra el modal para confirmar si quiere hacer enroque
- */
-function renderModalEnroque()
+// Para mostrar el modal para confirmar si quiere hacer enroque
+function mostrarModalEnroque()
 {
   // Obtenemos los datos del enroque pendiente
   $tipo = isset($_SESSION['enroque_pendiente']['tipo']) ? $_SESSION['enroque_pendiente']['tipo'] : null;
@@ -386,10 +369,8 @@ function renderModalEnroque()
 <?php
 }
 
-/**
- * Muestra la cabecera del juego con título y botones de pausa/configuración
- */
-function renderGameHeader($partida)
+// Para mostrar la cabecera del juego con título y botones de pausa/configuración
+function mostrarCabeceraJuego($partida)
 {
 ?>
   <div class="header-juego">
@@ -408,7 +389,7 @@ function renderGameHeader($partida)
 <?php
 }
 
-function renderBotonesControl($partida)
+function mostrarBotonesControl($partida)
 {
 ?>
   <!-- Botones de control durante la partida -->
@@ -433,10 +414,8 @@ function renderBotonesControl($partida)
 <?php
 }
 
-/**
- * Renderiza los relojes
- */
-function renderRelojes($jugadores, $marcador)
+// Para mostrar los relojes
+function mostrarRelojes($jugadores, $marcador)
 {
 ?>
   <!-- RELOJES - Mostramos los tiempos y nombres de ambos jugadores -->
@@ -495,10 +474,8 @@ function renderRelojes($jugadores, $marcador)
 <?php
 }
 
-/**
- * Renderiza el tablero
- */
-function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas)
+// Para mostrar el tablero
+function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas)
 {
 ?>
   <!-- TABLERO - El corazón del juego, aquí mostramos el tablero de ajedrez con todas las piezas -->
@@ -706,8 +683,8 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
       <?php endif; ?>
       </div>
 
-      <!-- Llamamos a la función para renderizar los botones de control -->
-      <?php renderBotonesControl($partida); ?>
+      <!-- Llamamos a la función para mostrar los botones de control -->
+      <?php mostrarBotonesControl($partida); ?>
 
       <!-- HISTORIAL DE MOVIMIENTOS - Mostramos todos los movimientos realizados en la partida -->
       <div class="historial-movimientos">
@@ -802,8 +779,8 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
     <?php
   }
 
-  // Modal para cargar una partida guardada desde la pantalla de inicio
-  function renderModalCargarInicial($partidas)
+  // Para mostrar modal para cargar una partida guardada desde la pantalla de inicio
+  function mostrarModalCargarInicial($partidas)
   {
     ?>
       <!-- Overlay que cubre toda la pantalla y modal centrado -->
@@ -854,8 +831,8 @@ function renderTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas
     <?php
   }
 
-  // Modal para confirmar la eliminación de una partida guardada
-  function renderModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
+  // Para mostrar modal para confirmar la eliminación de una partida guardada
+  function mostrarModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
   {
     ?>
       <!-- Modal de confirmación con overlay oscuro de fondo -->
