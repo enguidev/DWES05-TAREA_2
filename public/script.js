@@ -377,14 +377,24 @@ document.addEventListener("DOMContentLoaded", function () {
   // GESTIÓN DE AVATARES PERSONALIZADOS
   // ========================================
   // Obtenemos los selectores de avatar (nueva estructura)
-  const tipoBlancas = document.querySelector('select[name="tipo_avatar_blancas"]');
-  const tipoNegras = document.querySelector('select[name="tipo_avatar_negras"]');
-  const fichaBlancas = document.querySelector('select[name="avatar_ficha_blancas"]');
-  const fichaNegras = document.querySelector('select[name="avatar_ficha_negras"]');
-  const gifBlancas = document.querySelector('select[name="avatar_gif_blancas"]');
+  const tipoBlancas = document.querySelector(
+    'select[name="tipo_avatar_blancas"]'
+  );
+  const tipoNegras = document.querySelector(
+    'select[name="tipo_avatar_negras"]'
+  );
+  const fichaBlancas = document.querySelector(
+    'select[name="avatar_ficha_blancas"]'
+  );
+  const fichaNegras = document.querySelector(
+    'select[name="avatar_ficha_negras"]'
+  );
+  const gifBlancas = document.querySelector(
+    'select[name="avatar_gif_blancas"]'
+  );
   const gifNegras = document.querySelector('select[name="avatar_gif_negras"]');
-  const hiddenBlancas = document.getElementById('avatar_blancas_hidden');
-  const hiddenNegras = document.getElementById('avatar_negras_hidden');
+  const hiddenBlancas = document.getElementById("avatar_blancas_hidden");
+  const hiddenNegras = document.getElementById("avatar_negras_hidden");
   const inputBlancas = document.getElementById("avatar_personalizado_blancas");
   const inputNegras = document.getElementById("avatar_personalizado_negras");
 
@@ -475,58 +485,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // MANEJO DE AVATARES DEL JUGADOR BLANCO (nueva estructura)
   if (tipoBlancas && inputBlancas && hiddenBlancas) {
-    const contenedorBlancas = document.getElementById("contenedor-personalizado-blancas");
-    const nombreArchivoBlancas = document.getElementById("nombre-archivo-blancas");
-    const contFichaBlancas = document.getElementById('opciones-ficha-blancas');
-    const contGifBlancas = document.getElementById('opciones-gif-blancas');
+    const contenedorBlancas = document.getElementById(
+      "contenedor-personalizado-blancas"
+    );
+    const nombreArchivoBlancas = document.getElementById(
+      "nombre-archivo-blancas"
+    );
+    const contFichaBlancas = document.getElementById("opciones-ficha-blancas");
+    const contGifBlancas = document.getElementById("opciones-gif-blancas");
 
     function setAvatarBlancas(valor) {
-      hiddenBlancas.value = valor || 'predeterminado';
+      hiddenBlancas.value = valor || "predeterminado";
       actualizarAvatarDisplay(valor, "avatar-display-blancas");
     }
 
-    tipoBlancas.addEventListener('change', function() {
+    tipoBlancas.addEventListener("change", function () {
       const v = this.value;
       // Reset visibilidad
-      if (contFichaBlancas) contFichaBlancas.style.display = 'none';
-      if (contGifBlancas) contGifBlancas.style.display = 'none';
-      if (contenedorBlancas) contenedorBlancas.style.display = 'none';
+      if (contFichaBlancas) contFichaBlancas.style.display = "none";
+      if (contGifBlancas) contGifBlancas.style.display = "none";
+      if (contenedorBlancas) contenedorBlancas.style.display = "none";
 
-      if (v === 'predeterminado') {
-        setAvatarBlancas('predeterminado');
-      } else if (v === 'usuario') {
-        setAvatarBlancas('public/imagenes/avatares/user_white.png');
-      } else if (v === 'ficha') {
-        if (contFichaBlancas) contFichaBlancas.style.display = 'block';
+      if (v === "predeterminado") {
+        setAvatarBlancas("predeterminado");
+      } else if (v === "usuario") {
+        setAvatarBlancas("public/imagenes/avatares/user_white.png");
+      } else if (v === "ficha") {
+        if (contFichaBlancas) contFichaBlancas.style.display = "block";
         if (fichaBlancas) {
           setAvatarBlancas(fichaBlancas.value);
         }
-      } else if (v === 'gif') {
-        if (contGifBlancas) contGifBlancas.style.display = 'block';
+      } else if (v === "gif") {
+        if (contGifBlancas) contGifBlancas.style.display = "block";
         if (gifBlancas) {
           setAvatarBlancas(gifBlancas.value);
         }
-      } else if (v === 'personalizado') {
+      } else if (v === "personalizado") {
         // Mostrar input de archivo y marcar como personalizado
-        if (contenedorBlancas) contenedorBlancas.style.display = 'block';
-        hiddenBlancas.value = 'personalizado';
+        if (contenedorBlancas) contenedorBlancas.style.display = "block";
+        hiddenBlancas.value = "personalizado";
       }
     });
 
     if (fichaBlancas) {
-      fichaBlancas.addEventListener('change', function() {
+      fichaBlancas.addEventListener("change", function () {
         setAvatarBlancas(this.value);
       });
     }
     if (gifBlancas) {
-      gifBlancas.addEventListener('change', function() {
+      gifBlancas.addEventListener("change", function () {
         setAvatarBlancas(this.value);
       });
     }
 
     inputBlancas.addEventListener("change", function () {
       if (this.files && this.files[0]) {
-        if (nombreArchivoBlancas) nombreArchivoBlancas.textContent = this.files[0].name;
+        if (nombreArchivoBlancas)
+          nombreArchivoBlancas.textContent = this.files[0].name;
         mostrarPrevisualizacionAvatar(this, "avatar-display-blancas");
       }
     });
@@ -534,44 +549,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // MANEJO DE AVATARES DEL JUGADOR NEGRO (nueva estructura)
   if (tipoNegras && inputNegras && hiddenNegras) {
-    const contenedorNegras = document.getElementById("contenedor-personalizado-negras");
-    const nombreArchivoNegras = document.getElementById("nombre-archivo-negras");
-    const contFichaNegras = document.getElementById('opciones-ficha-negras');
-    const contGifNegras = document.getElementById('opciones-gif-negras');
+    const contenedorNegras = document.getElementById(
+      "contenedor-personalizado-negras"
+    );
+    const nombreArchivoNegras = document.getElementById(
+      "nombre-archivo-negras"
+    );
+    const contFichaNegras = document.getElementById("opciones-ficha-negras");
+    const contGifNegras = document.getElementById("opciones-gif-negras");
 
     function setAvatarNegras(valor) {
-      hiddenNegras.value = valor || 'predeterminado';
+      hiddenNegras.value = valor || "predeterminado";
       actualizarAvatarDisplay(valor, "avatar-display-negras");
     }
 
-    tipoNegras.addEventListener('change', function() {
+    tipoNegras.addEventListener("change", function () {
       const v = this.value;
-      if (contFichaNegras) contFichaNegras.style.display = 'none';
-      if (contGifNegras) contGifNegras.style.display = 'none';
-      if (contenedorNegras) contenedorNegras.style.display = 'none';
+      if (contFichaNegras) contFichaNegras.style.display = "none";
+      if (contGifNegras) contGifNegras.style.display = "none";
+      if (contenedorNegras) contenedorNegras.style.display = "none";
 
-      if (v === 'predeterminado') {
-        setAvatarNegras('predeterminado');
-      } else if (v === 'usuario') {
-        setAvatarNegras('public/imagenes/avatares/user_black.png');
-      } else if (v === 'ficha') {
-        if (contFichaNegras) contFichaNegras.style.display = 'block';
+      if (v === "predeterminado") {
+        setAvatarNegras("predeterminado");
+      } else if (v === "usuario") {
+        setAvatarNegras("public/imagenes/avatares/user_black.png");
+      } else if (v === "ficha") {
+        if (contFichaNegras) contFichaNegras.style.display = "block";
         if (fichaNegras) setAvatarNegras(fichaNegras.value);
-      } else if (v === 'gif') {
-        if (contGifNegras) contGifNegras.style.display = 'block';
+      } else if (v === "gif") {
+        if (contGifNegras) contGifNegras.style.display = "block";
         if (gifNegras) setAvatarNegras(gifNegras.value);
-      } else if (v === 'personalizado') {
-        if (contenedorNegras) contenedorNegras.style.display = 'block';
-        hiddenNegras.value = 'personalizado';
+      } else if (v === "personalizado") {
+        if (contenedorNegras) contenedorNegras.style.display = "block";
+        hiddenNegras.value = "personalizado";
       }
     });
 
-    if (fichaNegras) fichaNegras.addEventListener('change', function(){ setAvatarNegras(this.value); });
-    if (gifNegras) gifNegras.addEventListener('change', function(){ setAvatarNegras(this.value); });
+    if (fichaNegras)
+      fichaNegras.addEventListener("change", function () {
+        setAvatarNegras(this.value);
+      });
+    if (gifNegras)
+      gifNegras.addEventListener("change", function () {
+        setAvatarNegras(this.value);
+      });
 
     inputNegras.addEventListener("change", function () {
       if (this.files && this.files[0]) {
-        if (nombreArchivoNegras) nombreArchivoNegras.textContent = this.files[0].name;
+        if (nombreArchivoNegras)
+          nombreArchivoNegras.textContent = this.files[0].name;
         mostrarPrevisualizacionAvatar(this, "avatar-display-negras");
       }
     });
