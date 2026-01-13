@@ -14,6 +14,50 @@ function normalizarRutaAvatar($ruta)
   return './' . ltrim($ruta, '/');
 }
 
+// Para mostrar la pantalla principal con el GIF del tablero y botones
+function mostrarPantallaPrincipal($partidasGuardadas = [])
+{
+?>
+  <!-- Pantalla principal a pantalla completa tipo arcade -->
+  <div class="pantalla-arcade">
+    <!-- Título arcade -->
+    <div class="titulo-arcade">
+      <img src="public/imagenes/inicio/caballo_negro_girando.gif" alt="Caballo" class="icono-titulo">
+      <div class="titulo-contenedor">
+        <h1>PHP CHESS</h1>
+        <p class="subtitulo-arcade">DWES - Tarea 5</p>
+      </div>
+      <img src="public/imagenes/inicio/caballo_negro_girando.gif" alt="Caballo" class="icono-titulo">
+    </div>
+
+    <!-- GIF del tablero de ajedrez pantalla completa -->
+    <img src="public/imagenes/inicio/tablero_animado.gif" alt="Ajedrez" class="gif-arcade-fondo">
+
+    <!-- Overlay semi-transparente para los botones -->
+    <div class="overlay-botones"></div>
+
+    <!-- Botones de acción superpuestos -->
+    <div class="botones-arcade">
+      <!-- Botón para cargar partida guardada (habilitado solo si hay) -->
+      <form method="post" style="display: inline;">
+        <button type="submit" name="abrir_modal_cargar_inicial"
+          class="btn-arcade btn-cargar-arcade"
+          <?php echo empty($partidasGuardadas) ? 'disabled' : ''; ?>>
+          📁 Cargar Partida
+        </button>
+      </form>
+
+      <!-- Botón para crear nueva partida -->
+      <form method="post" style="display: inline;">
+        <button type="submit" name="iniciar_nueva_partida" class="btn-arcade btn-nueva-arcade">
+          ♟️ Nueva Partida
+        </button>
+      </form>
+    </div>
+  </div>
+<?php
+}
+
 // Para mostrar el formulario donde se eligen nombres, avatares y configuración de tiempo
 function mostrarFormularioConfig($partidasGuardadas = [])
 {
@@ -64,6 +108,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
             <option value="ficha">Ficha de ajedrez</option>
             <option value="usuario">Usuario</option>
             <option value="gif">GIFs predeterminados</option>
+            <option value="campeones">Campeones de Ajedrez</option>
             <option value="personalizado">Imagen o GIF personalizado</option>
           </select>
           <!-- Subselect: fichas de ajedrez (blancas) -->
@@ -86,6 +131,18 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               <option value="public/imagenes/avatares/gifs/ajedrez/caballo_baila.gif">Caballo baila</option>
               <option value="public/imagenes/avatares/gifs/ajedrez/reloj_tictac.gif">Reloj tic-tac</option>
               <option value="public/imagenes/avatares/gifs/ajedrez/apertura.gif">Apertura</option>
+            </select>
+          </div>
+          <!-- Subselect: Campeones de ajedrez -->
+          <div id="opciones-campeones-blancas" class="subselect-container" style="display:none;">
+            <label>Campeón:</label>
+            <select name="avatar_campeon_blancas" class="select-avatar">
+              <option value="public/imagenes/avatares/campeones/magnus_carlsen_1.jpg">Magnus Carlsen</option>
+              <option value="public/imagenes/avatares/campeones/garry _gasparov.jpg">Garry Kasparov</option>
+              <option value="public/imagenes/avatares/campeones/bobby_fischer.jpg">Bobby Fischer</option>
+              <option value="public/imagenes/avatares/campeones/anatoly_karpov.png">Anatoly Karpov</option>
+              <option value="public/imagenes/avatares/campeones/viswanathan_anand.jpg">Viswanathan Anand</option>
+              <option value="public/imagenes/avatares/campeones/judit_polgar.jpg">Judit Polgar</option>
             </select>
           </div>
           <!-- Hidden para mantener compatibilidad backend -->
@@ -118,6 +175,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
             <option value="ficha">Ficha de ajedrez</option>
             <option value="usuario">Usuario</option>
             <option value="gif">GIFs predeterminados</option>
+            <option value="campeones">Campeones de Ajedrez</option>
             <option value="personalizado">Imagen o GIF personalizado</option>
           </select>
           <!-- Subselect: fichas de ajedrez (negras) -->
@@ -140,6 +198,18 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               <option value="public/imagenes/avatares/gifs/ajedrez/caballo_baila.gif">Caballo baila</option>
               <option value="public/imagenes/avatares/gifs/ajedrez/reloj_tictac.gif">Reloj tic-tac</option>
               <option value="public/imagenes/avatares/gifs/ajedrez/apertura.gif">Apertura</option>
+            </select>
+          </div>
+          <!-- Subselect: Campeones de ajedrez -->
+          <div id="opciones-campeones-negras" class="subselect-container" style="display:none;">
+            <label>Campeón:</label>
+            <select name="avatar_campeon_negras" class="select-avatar">
+              <option value="public/imagenes/avatares/campeones/magnus_carlsen_1.jpg">Magnus Carlsen</option>
+              <option value="public/imagenes/avatares/campeones/garry _gasparov.jpg">Garry Kasparov</option>
+              <option value="public/imagenes/avatares/campeones/bobby_fischer.jpg">Bobby Fischer</option>
+              <option value="public/imagenes/avatares/campeones/anatoly_karpov.png">Anatoly Karpov</option>
+              <option value="public/imagenes/avatares/campeones/viswanathan_anand.jpg">Viswanathan Anand</option>
+              <option value="public/imagenes/avatares/campeones/judit_polgar.jpg">Judit Polgar</option>
             </select>
           </div>
           <!-- Hidden para mantener compatibilidad backend -->

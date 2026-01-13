@@ -219,6 +219,16 @@ function resolverAcciones()
     }
   }
 
+  // Si se pidió iniciar nueva partida desde pantalla principal, marcamos que se mostró
+  if (isset($_POST['iniciar_nueva_partida'])) {
+    $_SESSION['pantalla_principal_mostrada'] = true;
+  }
+
+  // Si se pidió cargar desde pantalla principal, marcamos que se mostró
+  if (isset($_POST['abrir_modal_cargar_inicial'])) {
+    $_SESSION['pantalla_principal_mostrada'] = true;
+  }
+
   // Si se pidió iniciar una nueva partida, creamos una nueva partida
   if (isset($_POST['iniciar_partida'])) iniciarPartida();
 
@@ -585,6 +595,8 @@ function reiniciarPartida()
   unset($_SESSION['ultimo_tick']); // Borramos el último tick
 
   unset($_SESSION['nombres_configurados']); // Borramos el indicador de nombres configurados
+
+  unset($_SESSION['pantalla_principal_mostrada']); // Borramos el indicador de pantalla principal
 
   unset($_SESSION['pausa']); // Borramos el estado de pausa
 

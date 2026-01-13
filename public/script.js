@@ -493,6 +493,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     const contFichaBlancas = document.getElementById("opciones-ficha-blancas");
     const contGifBlancas = document.getElementById("opciones-gif-blancas");
+    const contCampeonesBlancas = document.getElementById("opciones-campeones-blancas");
 
     function setAvatarBlancas(valor) {
       hiddenBlancas.value = valor || "predeterminado";
@@ -504,6 +505,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Reset visibilidad
       if (contFichaBlancas) contFichaBlancas.style.display = "none";
       if (contGifBlancas) contGifBlancas.style.display = "none";
+      if (contCampeonesBlancas) contCampeonesBlancas.style.display = "none";
       if (contenedorBlancas) contenedorBlancas.style.display = "none";
 
       if (v === "predeterminado") {
@@ -520,6 +522,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (gifBlancas) {
           setAvatarBlancas(gifBlancas.value);
         }
+      } else if (v === "campeones") {
+        if (contCampeonesBlancas) contCampeonesBlancas.style.display = "block";
+        const campeonBlancas = document.querySelector('select[name="avatar_campeon_blancas"]');
+        if (campeonBlancas) {
+          setAvatarBlancas(campeonBlancas.value);
+        }
       } else if (v === "personalizado") {
         // Mostrar input de archivo y marcar como personalizado
         if (contenedorBlancas) contenedorBlancas.style.display = "block";
@@ -534,6 +542,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (gifBlancas) {
       gifBlancas.addEventListener("change", function () {
+        setAvatarBlancas(this.value);
+      });
+    }
+    const campeonBlancas = document.querySelector('select[name="avatar_campeon_blancas"]');
+    if (campeonBlancas) {
+      campeonBlancas.addEventListener("change", function () {
         setAvatarBlancas(this.value);
       });
     }
@@ -557,6 +571,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     const contFichaNegras = document.getElementById("opciones-ficha-negras");
     const contGifNegras = document.getElementById("opciones-gif-negras");
+    const contCampeonesNegras = document.getElementById("opciones-campeones-negras");
 
     function setAvatarNegras(valor) {
       hiddenNegras.value = valor || "predeterminado";
@@ -567,6 +582,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const v = this.value;
       if (contFichaNegras) contFichaNegras.style.display = "none";
       if (contGifNegras) contGifNegras.style.display = "none";
+      if (contCampeonesNegras) contCampeonesNegras.style.display = "none";
       if (contenedorNegras) contenedorNegras.style.display = "none";
 
       if (v === "predeterminado") {
@@ -579,6 +595,12 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (v === "gif") {
         if (contGifNegras) contGifNegras.style.display = "block";
         if (gifNegras) setAvatarNegras(gifNegras.value);
+      } else if (v === "campeones") {
+        if (contCampeonesNegras) contCampeonesNegras.style.display = "block";
+        const campeonNegras = document.querySelector('select[name="avatar_campeon_negras"]');
+        if (campeonNegras) {
+          setAvatarNegras(campeonNegras.value);
+        }
       } else if (v === "personalizado") {
         if (contenedorNegras) contenedorNegras.style.display = "block";
         hiddenNegras.value = "personalizado";
@@ -593,6 +615,12 @@ document.addEventListener("DOMContentLoaded", function () {
       gifNegras.addEventListener("change", function () {
         setAvatarNegras(this.value);
       });
+    const campeonNegras = document.querySelector('select[name="avatar_campeon_negras"]');
+    if (campeonNegras) {
+      campeonNegras.addEventListener("change", function () {
+        setAvatarNegras(this.value);
+      });
+    }
 
     inputNegras.addEventListener("change", function () {
       if (this.files && this.files[0]) {

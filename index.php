@@ -58,17 +58,17 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
 </head>
 
 <body>
-  <!-- Si todavía no se han puesto nombres a los jugadores... -->
-  <?php if (!isset($_SESSION['nombres_configurados'])): ?>
-    <!-- ...mostramos el formulario de inicio -->
-    <?php mostrarFormularioConfig($partidasGuardadasInicio); ?>
+  <!-- Si NO se ha decidido si mostrar pantalla principal o configuración... -->
+  <?php if (!isset($_SESSION['pantalla_principal_mostrada'])): ?>
+    <!-- ...mostramos la pantalla principal -->
+    <?php mostrarPantallaPrincipal($partidasGuardadasInicio); ?>
 
-    <!-- Modal para cargar una partida anterior desde la pantalla de inicio -->
+    <!-- Modal para cargar una partida desde la pantalla principal -->
     <?php if (!empty($partidasGuardadasInicio)): ?>
       <?php mostrarModalCargarInicial($partidasGuardadasInicio); ?>
     <?php endif; ?>
-    <!-- Si ya se han configurado los nombres... -->
-  <?php else: ?>
+  <!-- Si ya se han puesto nombres a los jugadores... -->
+  <?php elseif (isset($_SESSION['nombres_configurados'])): ?>
     <!-- ...mostramos el tablero y la partida -->
     <div class="container">
       <!-- Modal para cambiar los ajustes del juego -->
@@ -139,6 +139,15 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
       <!-- El tablero de ajedrez con todas las piezas -->
       <?php mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas); ?>
     </div>
+  <!-- Si la pantalla principal ya se mostró pero no hay nombres configurados, mostrar formulario -->
+  <?php else: ?>
+    <!-- ...mostramos el formulario de configuración -->
+    <?php mostrarFormularioConfig($partidasGuardadasInicio); ?>
+
+    <!-- Modal para cargar una partida anterior desde la pantalla de configuración -->
+    <?php if (!empty($partidasGuardadasInicio)): ?>
+      <?php mostrarModalCargarInicial($partidasGuardadasInicio); ?>
+    <?php endif; ?>
   <?php endif; ?>
 </body>
 
