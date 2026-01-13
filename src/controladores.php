@@ -1234,7 +1234,7 @@ function manejarSubidaAvatar($nombreCampo, $color)
 
   // Recorremos los archivos que coinciden con el patrón, si el archivo existe, lo eliminamos
   foreach (glob($patron) as $archivoAnterior) if (is_file($archivoAnterior)) unlink($archivoAnterior);
-  
+
 
   // Generar nombre único
 
@@ -1246,7 +1246,7 @@ function manejarSubidaAvatar($nombreCampo, $color)
      uniqid() genera un ID único basado en el tiempo actual en microsegundos
      $extension es la extensión del archivo original  
   */
-  $nombreArchivo = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension; 
+  $nombreArchivo = "avatar_" . $color . "_" . time() . "_" . uniqid() . "." . $extension;
 
   $rutaArchivo = $directorioSubida . $nombreArchivo; // Ruta completa del archivo a guardar
 
@@ -1254,6 +1254,6 @@ function manejarSubidaAvatar($nombreCampo, $color)
 
   // Si se mueve el archivo subido a la ruta destino, retornamos la ruta relativa del avatar
   if (move_uploaded_file($archivo["tmp_name"], $rutaArchivo)) return "public/imagenes/avatares/" . $nombreArchivo;
-  
+
   return null; // 
 }

@@ -310,9 +310,12 @@ body:has(.pantalla-arcade) {
 }
 
 @keyframes float-chess {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -325,7 +328,7 @@ body:has(.pantalla-arcade) {
   margin: 0;
   letter-spacing: 8px;
   text-transform: uppercase;
-  text-shadow: 
+  text-shadow:
     3px 3px 0px #000,
     6px 6px 0px rgba(0, 0, 0, 0.5),
     0 0 20px rgba(100, 120, 255, 0.8);
@@ -333,14 +336,17 @@ body:has(.pantalla-arcade) {
 }
 
 @keyframes elegant-glow {
-  0%, 100% {
-    text-shadow: 
+
+  0%,
+  100% {
+    text-shadow:
       3px 3px 0px #000,
       6px 6px 0px rgba(0, 0, 0, 0.5),
       0 0 20px rgba(100, 120, 255, 0.8);
   }
+
   50% {
-    text-shadow: 
+    text-shadow:
       3px 3px 0px #000,
       6px 6px 0px rgba(0, 0, 0, 0.5),
       0 0 30px rgba(150, 170, 255, 1);

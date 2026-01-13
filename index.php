@@ -67,7 +67,7 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
     <?php if (!empty($partidasGuardadasInicio)): ?>
       <?php mostrarModalCargarInicial($partidasGuardadasInicio); ?>
     <?php endif; ?>
-  <!-- Si ya se han puesto nombres a los jugadores... -->
+    <!-- Si ya se han puesto nombres a los jugadores... -->
   <?php elseif (isset($_SESSION['nombres_configurados'])): ?>
     <!-- ...mostramos el tablero y la partida -->
     <div class="container">
@@ -139,7 +139,7 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
       <!-- El tablero de ajedrez con todas las piezas -->
       <?php mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas); ?>
     </div>
-  <!-- Si la pantalla principal ya se mostró pero no hay nombres configurados, mostrar formulario -->
+    <!-- Si la pantalla principal ya se mostró pero no hay nombres configurados, mostrar formulario -->
   <?php else: ?>
     <!-- ...mostramos el formulario de configuración -->
     <?php mostrarFormularioConfig($partidasGuardadasInicio); ?>

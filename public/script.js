@@ -493,7 +493,9 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     const contFichaBlancas = document.getElementById("opciones-ficha-blancas");
     const contGifBlancas = document.getElementById("opciones-gif-blancas");
-    const contCampeonesBlancas = document.getElementById("opciones-campeones-blancas");
+    const contCampeonesBlancas = document.getElementById(
+      "opciones-campeones-blancas"
+    );
 
     function setAvatarBlancas(valor) {
       hiddenBlancas.value = valor || "predeterminado";
@@ -524,7 +526,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } else if (v === "campeones") {
         if (contCampeonesBlancas) contCampeonesBlancas.style.display = "block";
-        const campeonBlancas = document.querySelector('select[name="avatar_campeon_blancas"]');
+        const campeonBlancas = document.querySelector(
+          'select[name="avatar_campeon_blancas"]'
+        );
         if (campeonBlancas) {
           setAvatarBlancas(campeonBlancas.value);
         }
@@ -545,7 +549,9 @@ document.addEventListener("DOMContentLoaded", function () {
         setAvatarBlancas(this.value);
       });
     }
-    const campeonBlancas = document.querySelector('select[name="avatar_campeon_blancas"]');
+    const campeonBlancas = document.querySelector(
+      'select[name="avatar_campeon_blancas"]'
+    );
     if (campeonBlancas) {
       campeonBlancas.addEventListener("change", function () {
         setAvatarBlancas(this.value);
@@ -571,7 +577,9 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     const contFichaNegras = document.getElementById("opciones-ficha-negras");
     const contGifNegras = document.getElementById("opciones-gif-negras");
-    const contCampeonesNegras = document.getElementById("opciones-campeones-negras");
+    const contCampeonesNegras = document.getElementById(
+      "opciones-campeones-negras"
+    );
 
     function setAvatarNegras(valor) {
       hiddenNegras.value = valor || "predeterminado";
@@ -597,7 +605,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (gifNegras) setAvatarNegras(gifNegras.value);
       } else if (v === "campeones") {
         if (contCampeonesNegras) contCampeonesNegras.style.display = "block";
-        const campeonNegras = document.querySelector('select[name="avatar_campeon_negras"]');
+        const campeonNegras = document.querySelector(
+          'select[name="avatar_campeon_negras"]'
+        );
         if (campeonNegras) {
           setAvatarNegras(campeonNegras.value);
         }
@@ -615,7 +625,9 @@ document.addEventListener("DOMContentLoaded", function () {
       gifNegras.addEventListener("change", function () {
         setAvatarNegras(this.value);
       });
-    const campeonNegras = document.querySelector('select[name="avatar_campeon_negras"]');
+    const campeonNegras = document.querySelector(
+      'select[name="avatar_campeon_negras"]'
+    );
     if (campeonNegras) {
       campeonNegras.addEventListener("change", function () {
         setAvatarNegras(this.value);
