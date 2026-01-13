@@ -445,7 +445,8 @@ document.addEventListener("DOMContentLoaded", function () {
       img.src = rutaImagen;
       // Fallback: si la imagen no carga, restaurar símbolo por defecto
       img.onerror = () => {
-        avatarDisplay.innerHTML = (avatarDisplayId === "avatar-display-blancas") ? "♔" : "♚";
+        avatarDisplay.innerHTML =
+          avatarDisplayId === "avatar-display-blancas" ? "♔" : "♚";
       };
       img.style.width = "100%";
       img.style.height = "100%";
