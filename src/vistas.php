@@ -58,24 +58,38 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           <input type="text" name="nombre_blancas" placeholder="Nombre del jugador 1..." maxlength="20" class="input-nombre" autofocus>
           <small>Por defecto será jugador 1</small>
           <label>Avatar:</label>
-          <!-- Selector de avatar blanco (pieza o imagen personalizada) -->
-          <select name="avatar_blancas" class="select-avatar">
+          <!-- Selector principal de tipo de avatar -->
+          <select name="tipo_avatar_blancas" class="select-avatar" id="tipo_avatar_blancas">
             <option value="predeterminado">Sin avatar</option>
-            <option value="public/imagenes/fichas_blancas/rey_blanca.png">Rey</option>
-            <option value="public/imagenes/fichas_blancas/dama_blanca.png">Dama</option>
-            <option value="public/imagenes/fichas_blancas/torre_blanca.png">Torre</option>
-            <option value="public/imagenes/fichas_blancas/caballo_blanca.png">Caballo</option>
-            <option value="public/imagenes/fichas_blancas/alfil_blanca.png">Alfil</option>
-            <option value="public/imagenes/fichas_blancas/peon_blanca.png">Peón</option>
-            <option value="public/imagenes/avatares/user_white.png">Usuario Blanco</option>
-            <optgroup label="GIFs divertidos">
-              <option value="public/imagenes/avatares/gifs/party_parrot.gif">Party Parrot</option>
-              <option value="public/imagenes/avatares/gifs/trophy.gif">Trofeo animado</option>
-              <option value="public/imagenes/avatares/gifs/lol.gif">LOL</option>
-              <option value="public/imagenes/avatares/gifs/coffee.gif">Café ☕</option>
-            </optgroup>
-            <option value="personalizado">Subir imagen personalizada</option>
+            <option value="ficha">Ficha de ajedrez</option>
+            <option value="usuario">Usuario</option>
+            <option value="gif">GIFs predeterminados</option>
+            <option value="personalizado">Imagen o GIF personalizado</option>
           </select>
+          <!-- Subselect: fichas de ajedrez (blancas) -->
+          <div id="opciones-ficha-blancas" class="subselect-container" style="display:none;">
+            <label>Ficha blanca:</label>
+            <select name="avatar_ficha_blancas" class="select-avatar">
+              <option value="public/imagenes/fichas_blancas/rey_blanca.png">Rey</option>
+              <option value="public/imagenes/fichas_blancas/dama_blanca.png">Dama</option>
+              <option value="public/imagenes/fichas_blancas/torre_blanca.png">Torre</option>
+              <option value="public/imagenes/fichas_blancas/caballo_blanca.png">Caballo</option>
+              <option value="public/imagenes/fichas_blancas/alfil_blanca.png">Alfil</option>
+              <option value="public/imagenes/fichas_blancas/peon_blanca.png">Peón</option>
+            </select>
+          </div>
+          <!-- Subselect: GIFs predeterminados de ajedrez -->
+          <div id="opciones-gif-blancas" class="subselect-container" style="display:none;">
+            <label>GIF ajedrez:</label>
+            <select name="avatar_gif_blancas" class="select-avatar">
+              <option value="public/imagenes/avatares/gifs/ajedrez/jaque_mate.gif">Jaque Mate</option>
+              <option value="public/imagenes/avatares/gifs/ajedrez/caballo_baila.gif">Caballo baila</option>
+              <option value="public/imagenes/avatares/gifs/ajedrez/reloj_tictac.gif">Reloj tic-tac</option>
+              <option value="public/imagenes/avatares/gifs/ajedrez/apertura.gif">Apertura</option>
+            </select>
+          </div>
+          <!-- Hidden para mantener compatibilidad backend -->
+          <input type="hidden" name="avatar_blancas" id="avatar_blancas_hidden" value="predeterminado">
           <!-- Si elige imagen personalizada, mostrar input de archivo -->
           <div id="contenedor-personalizado-blancas" style="display: none; margin-top: 10px;">
             <input type="file" name="avatar_personalizado_blancas" id="avatar_personalizado_blancas" style="display: none;" accept="image/*">
@@ -98,24 +112,38 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           <input type="text" name="nombre_negras" placeholder="Nombre del jugador 2..." maxlength="20" class="input-nombre">
           <small>Por defecto sería jugador 2</small>
           <label>Avatar:</label>
-          <!-- Selector de avatar negro (pieza o imagen personalizada) -->
-          <select name="avatar_negras" class="select-avatar">
+          <!-- Selector principal de tipo de avatar -->
+          <select name="tipo_avatar_negras" class="select-avatar" id="tipo_avatar_negras">
             <option value="predeterminado">Sin avatar</option>
-            <option value="public/imagenes/fichas_negras/rey_negra.png">Rey</option>
-            <option value="public/imagenes/fichas_negras/dama_negra.png">Dama</option>
-            <option value="public/imagenes/fichas_negras/torre_negra.png">Torre</option>
-            <option value="public/imagenes/fichas_negras/caballo_negra.png">Caballo</option>
-            <option value="public/imagenes/fichas_negras/alfil_negra.png">Alfil</option>
-            <option value="public/imagenes/fichas_negras/peon_negra.png">Peón</option>
-            <option value="public/imagenes/avatares/user_black.png">Usuario Negro</option>
-            <optgroup label="GIFs divertidos">
-              <option value="public/imagenes/avatares/gifs/party_parrot.gif">Party Parrot</option>
-              <option value="public/imagenes/avatares/gifs/trophy.gif">Trofeo animado</option>
-              <option value="public/imagenes/avatares/gifs/lol.gif">LOL</option>
-              <option value="public/imagenes/avatares/gifs/coffee.gif">Café ☕</option>
-            </optgroup>
-            <option value="personalizado">Subir imagen personalizada</option>
+            <option value="ficha">Ficha de ajedrez</option>
+            <option value="usuario">Usuario</option>
+            <option value="gif">GIFs predeterminados</option>
+            <option value="personalizado">Imagen o GIF personalizado</option>
           </select>
+          <!-- Subselect: fichas de ajedrez (negras) -->
+          <div id="opciones-ficha-negras" class="subselect-container" style="display:none;">
+            <label>Ficha negra:</label>
+            <select name="avatar_ficha_negras" class="select-avatar">
+              <option value="public/imagenes/fichas_negras/rey_negra.png">Rey</option>
+              <option value="public/imagenes/fichas_negras/dama_negra.png">Dama</option>
+              <option value="public/imagenes/fichas_negras/torre_negra.png">Torre</option>
+              <option value="public/imagenes/fichas_negras/caballo_negra.png">Caballo</option>
+              <option value="public/imagenes/fichas_negras/alfil_negra.png">Alfil</option>
+              <option value="public/imagenes/fichas_negras/peon_negra.png">Peón</option>
+            </select>
+          </div>
+          <!-- Subselect: GIFs predeterminados de ajedrez -->
+          <div id="opciones-gif-negras" class="subselect-container" style="display:none;">
+            <label>GIF ajedrez:</label>
+            <select name="avatar_gif_negras" class="select-avatar">
+              <option value="public/imagenes/avatares/gifs/ajedrez/jaque_mate.gif">Jaque Mate</option>
+              <option value="public/imagenes/avatares/gifs/ajedrez/caballo_baila.gif">Caballo baila</option>
+              <option value="public/imagenes/avatares/gifs/ajedrez/reloj_tictac.gif">Reloj tic-tac</option>
+              <option value="public/imagenes/avatares/gifs/ajedrez/apertura.gif">Apertura</option>
+            </select>
+          </div>
+          <!-- Hidden para mantener compatibilidad backend -->
+          <input type="hidden" name="avatar_negras" id="avatar_negras_hidden" value="predeterminado">
           <!-- Si elige imagen personalizada, mostrar input de archivo -->
           <div id="contenedor-personalizado-negras" style="display: none; margin-top: 10px;">
             <input type="file" name="avatar_personalizado_negras" id="avatar_personalizado_negras" style="display: none;" accept="image/*">

@@ -113,6 +113,11 @@
   opacity: 0.8;
 }
 
+/* Contenedores de subselects de avatar */
+.subselect-container {
+  margin-top: 10px;
+}
+
 .vs-separator {
   text-align: center;
   font-size: 2em;
