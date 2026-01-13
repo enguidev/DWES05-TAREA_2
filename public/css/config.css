@@ -51,6 +51,11 @@
   color: white;
 }
 
+/* Asegurar visibilidad del símbolo por defecto en negras */
+.negras-config .icono-configuracion-nombres-jugadores {
+  color: #333;
+}
+
 /* Icono de configuración de jugadores */
 .icono-configuracion-nombres-jugadores {
   width: 150px;

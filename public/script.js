@@ -443,6 +443,10 @@ document.addEventListener("DOMContentLoaded", function () {
       // Creamos la imagen
       const img = document.createElement("img");
       img.src = rutaImagen;
+      // Fallback: si la imagen no carga, restaurar símbolo por defecto
+      img.onerror = () => {
+        avatarDisplay.innerHTML = (avatarDisplayId === "avatar-display-blancas") ? "♔" : "♚";
+      };
       img.style.width = "100%";
       img.style.height = "100%";
       img.style.borderRadius = "50%";

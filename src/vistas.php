@@ -58,7 +58,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           <input type="text" name="nombre_blancas" placeholder="Nombre del jugador 1..." maxlength="20" class="input-nombre" autofocus>
           <small>Por defecto será jugador 1</small>
           <label>Avatar:</label>
-          <!-- Selector de avatar (pieza o imagen personalizada) -->
+          <!-- Selector de avatar blanco (pieza o imagen personalizada) -->
           <select name="avatar_blancas" class="select-avatar">
             <option value="predeterminado">Sin avatar</option>
             <option value="public/imagenes/fichas_blancas/rey_blanca.png">Rey</option>
@@ -68,6 +68,12 @@ function mostrarFormularioConfig($partidasGuardadas = [])
             <option value="public/imagenes/fichas_blancas/alfil_blanca.png">Alfil</option>
             <option value="public/imagenes/fichas_blancas/peon_blanca.png">Peón</option>
             <option value="public/imagenes/avatares/user_white.png">Usuario Blanco</option>
+            <optgroup label="GIFs divertidos">
+              <option value="public/imagenes/avatares/gifs/party_parrot.gif">Party Parrot</option>
+              <option value="public/imagenes/avatares/gifs/trophy.gif">Trofeo animado</option>
+              <option value="public/imagenes/avatares/gifs/lol.gif">LOL</option>
+              <option value="public/imagenes/avatares/gifs/coffee.gif">Café ☕</option>
+            </optgroup>
             <option value="personalizado">Subir imagen personalizada</option>
           </select>
           <!-- Si elige imagen personalizada, mostrar input de archivo -->
@@ -92,7 +98,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           <input type="text" name="nombre_negras" placeholder="Nombre del jugador 2..." maxlength="20" class="input-nombre">
           <small>Por defecto sería jugador 2</small>
           <label>Avatar:</label>
-          <!-- Selector de avatar (pieza o imagen personalizada) -->
+          <!-- Selector de avatar negro (pieza o imagen personalizada) -->
           <select name="avatar_negras" class="select-avatar">
             <option value="predeterminado">Sin avatar</option>
             <option value="public/imagenes/fichas_negras/rey_negra.png">Rey</option>
@@ -102,6 +108,12 @@ function mostrarFormularioConfig($partidasGuardadas = [])
             <option value="public/imagenes/fichas_negras/alfil_negra.png">Alfil</option>
             <option value="public/imagenes/fichas_negras/peon_negra.png">Peón</option>
             <option value="public/imagenes/avatares/user_black.png">Usuario Negro</option>
+            <optgroup label="GIFs divertidos">
+              <option value="public/imagenes/avatares/gifs/party_parrot.gif">Party Parrot</option>
+              <option value="public/imagenes/avatares/gifs/trophy.gif">Trofeo animado</option>
+              <option value="public/imagenes/avatares/gifs/lol.gif">LOL</option>
+              <option value="public/imagenes/avatares/gifs/coffee.gif">Café ☕</option>
+            </optgroup>
             <option value="personalizado">Subir imagen personalizada</option>
           </select>
           <!-- Si elige imagen personalizada, mostrar input de archivo -->
@@ -115,6 +127,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           </div>
         </div>
 
+        <!-- Linea horizontal separadora -->
         <hr class="linea-horizontal">
 
         <p class="configuracion-inicial"><strong>Configuración del tiempo</strong></p>
@@ -163,6 +176,8 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           </div>
 
         </div>
+
+        <!-- Linea horizontal separadora -->
         <hr class="linea-horizontal">
 
         <div class="botones-inicio">
