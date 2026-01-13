@@ -24,6 +24,7 @@ body {
   padding: 40px;
   max-width: 900px;
   width: 100%;
+  position: relative;
 }
 
 /* Header del juego */

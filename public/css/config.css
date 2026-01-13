@@ -150,6 +150,47 @@
   transform: translateY(0);
 }
 
+/* Boton salir de configuración (arriba) */
+.boton-salir-config-top {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.boton-salir-config-top form {
+  display: inline;
+}
+
+/* Boton salir de configuración */
+.boton-salir-config {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn-salir-config {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+  color: white;
+  font-size: 1.1em;
+  font-weight: 600;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+}
+
+.btn-salir-config:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
+  background: linear-gradient(135deg, #ee5a5a 0%, #d43f3f 100%);
+}
+
+.btn-salir-config:active {
+  transform: translateY(0);
+}
+
 /* Botones iniciales */
 .botones-inicio {
   display: flex;

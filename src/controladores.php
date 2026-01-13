@@ -229,6 +229,13 @@ function resolverAcciones()
     $_SESSION['pantalla_principal_mostrada'] = true;
   }
 
+  // Si se pidió salir de la configuración, volvemos a la pantalla principal
+  if (isset($_POST['salir_configuracion'])) {
+    unset($_SESSION['pantalla_principal_mostrada']);
+    header('Location: index.php');
+    exit();
+  }
+
   // Si se pidió iniciar una nueva partida, creamos una nueva partida
   if (isset($_POST['iniciar_partida'])) iniciarPartida();
 

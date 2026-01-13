@@ -62,14 +62,19 @@ function mostrarPantallaPrincipal($partidasGuardadas = [])
 function mostrarFormularioConfig($partidasGuardadas = [])
 {
 ?>
+  <!-- Botón de salir arriba a la derecha (fuera del container) -->
+  <div class="boton-salir-config-top">
+    <form method="post">
+      <button type="submit" name="salir_configuracion" class="btn-salir-config">← Volver al inicio</button>
+    </form>
+  </div>
+
   <!-- Contenedor principal -->
   <div class="container">
     <h1>Configuración de Partida</h1>
     <div class="config-wrapper">
       <!-- Sección inicial (cargar partida guardada) -->
       <div class="seccion-cargar-inicio">
-        <p>¿Deseas continuar con una partida anterior?</p>
-
         <?php
         // Si hay partidas guardadas
         if (!empty($partidasGuardadas)):
@@ -82,7 +87,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
         // Si no hay partidas guardadas
         else: ?>
           <!-- Lo indicamos -->
-          <p class="texto-sin-partidas">No hay partidas guardadas. Crea una nueva partida.</p>
+          <p class="texto-sin-partidas">No hay partidas guardadas</p>
         <?php endif; ?>
       </div>
 
@@ -123,21 +128,23 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               <option value="public/imagenes/fichas_blancas/peon_blanca.png">Peón</option>
             </select>
           </div>
-          <!-- Subselect: GIFs predeterminados de ajedrez -->
+          <!-- Subselect: GIFs predeterminados -->
           <div id="opciones-gif-blancas" class="subselect-container" style="display:none;">
-            <label>GIF ajedrez:</label>
+            <label>GIF predeterminado:</label>
             <select name="avatar_gif_blancas" class="select-avatar">
-              <option value="public/imagenes/avatares/gifs/ajedrez/jaque_mate.gif">Jaque Mate</option>
-              <option value="public/imagenes/avatares/gifs/ajedrez/caballo_baila.gif">Caballo baila</option>
-              <option value="public/imagenes/avatares/gifs/ajedrez/reloj_tictac.gif">Reloj tic-tac</option>
-              <option value="public/imagenes/avatares/gifs/ajedrez/apertura.gif">Apertura</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/alfil_cambia_color.gif">Alfil cambia color</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/anand_vs_kasparov.gif">Anand vs Kasparov</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/anciano.gif">Anciano</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/bart_simpson_multijugando.gif">Bart Simpson</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/figura_animada.gif">Figura animada</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/gato_moviendo_ficha.gif">Gato moviendo ficha</option>
             </select>
           </div>
           <!-- Subselect: Campeones de ajedrez -->
           <div id="opciones-campeones-blancas" class="subselect-container" style="display:none;">
             <label>Campeón:</label>
             <select name="avatar_campeon_blancas" class="select-avatar">
-              <option value="public/imagenes/avatares/campeones/magnus_carlsen_1.jpg">Magnus Carlsen</option>
+              <option value="public/imagenes/avatares/campeones/magnus_carlsen.jpg">Magnus Carlsen</option>
               <option value="public/imagenes/avatares/campeones/garry _gasparov.jpg">Garry Kasparov</option>
               <option value="public/imagenes/avatares/campeones/bobby_fischer.jpg">Bobby Fischer</option>
               <option value="public/imagenes/avatares/campeones/anatoly_karpov.png">Anatoly Karpov</option>
@@ -190,21 +197,23 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               <option value="public/imagenes/fichas_negras/peon_negra.png">Peón</option>
             </select>
           </div>
-          <!-- Subselect: GIFs predeterminados de ajedrez -->
+          <!-- Subselect: GIFs predeterminados -->
           <div id="opciones-gif-negras" class="subselect-container" style="display:none;">
-            <label>GIF ajedrez:</label>
+            <label>GIF predeterminado:</label>
             <select name="avatar_gif_negras" class="select-avatar">
-              <option value="public/imagenes/avatares/gifs/ajedrez/jaque_mate.gif">Jaque Mate</option>
-              <option value="public/imagenes/avatares/gifs/ajedrez/caballo_baila.gif">Caballo baila</option>
-              <option value="public/imagenes/avatares/gifs/ajedrez/reloj_tictac.gif">Reloj tic-tac</option>
-              <option value="public/imagenes/avatares/gifs/ajedrez/apertura.gif">Apertura</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/alfil_cambia_color.gif">Alfil cambia color</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/anand_vs_kasparov.gif">Anand vs Kasparov</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/anciano.gif">Anciano</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/bart_simpson_multijugando.gif">Bart Simpson</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/figura_animada.gif">Figura animada</option>
+              <option value="public/imagenes/avatares/gifs_predeterminados/gato_moviendo_ficha.gif">Gato moviendo ficha</option>
             </select>
           </div>
           <!-- Subselect: Campeones de ajedrez -->
           <div id="opciones-campeones-negras" class="subselect-container" style="display:none;">
             <label>Campeón:</label>
             <select name="avatar_campeon_negras" class="select-avatar">
-              <option value="public/imagenes/avatares/campeones/magnus_carlsen_1.jpg">Magnus Carlsen</option>
+              <option value="public/imagenes/avatares/campeones/magnus_carlsen.jpg">Magnus Carlsen</option>
               <option value="public/imagenes/avatares/campeones/garry _gasparov.jpg">Garry Kasparov</option>
               <option value="public/imagenes/avatares/campeones/bobby_fischer.jpg">Bobby Fischer</option>
               <option value="public/imagenes/avatares/campeones/anatoly_karpov.png">Anatoly Karpov</option>

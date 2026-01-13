@@ -58,7 +58,7 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
 </head>
 
 <body>
-  <!-- Si NO se ha decidido si mostrar pantalla principal o configuración... -->
+  <!-- Si no se ha decidido si mostrar pantalla principal o configuración... -->
   <?php if (!isset($_SESSION['pantalla_principal_mostrada'])): ?>
     <!-- ...mostramos la pantalla principal -->
     <?php mostrarPantallaPrincipal($partidasGuardadasInicio); ?>
