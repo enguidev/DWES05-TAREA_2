@@ -4,7 +4,7 @@
 function mostrarModalConfig()
 {
   // Incluimos el archivo con el HTML del modal
-  include 'src/modal_config.php';
+  include 'src/vistas/modal_config.php';
 }
 
 // Para mostrar el modal para guardar la partida actual con un nombre

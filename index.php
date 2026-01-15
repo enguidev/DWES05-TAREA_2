@@ -4,9 +4,9 @@ session_start();
 
 // Archivos necesarios
 require_once 'modelo/Partida.php';
-require_once 'src/funciones_auxiliares.php';
+require_once 'src/helpers/funciones_auxiliares.php';
 require_once 'src/vistas.php';
-require_once 'src/controladores.php';
+require_once 'src/controladores/controladores.php';
 
 // AJAX de relojes en tiempo real
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'actualizar_relojes') {

@@ -818,7 +818,7 @@ function guardarPartida($partida, $nombrePartida = null)
       $nombreAvatar = 'avatar_blancas_' . $timestamp . '.' . $extension; // Nuevo nombre del avatar
 
       // Ruta de destino
-      $rutaDestino = __DIR__ . '/../data/partidas/avatares/' . $nombreAvatar; // Ruta de destino
+      $rutaDestino = __DIR__ . '/../data/avatares_usuario/' . $nombreAvatar; // Ruta de destino
 
       copy($rutaOrigen, $rutaDestino); // Copiamos el archivo
 
@@ -838,7 +838,7 @@ function guardarPartida($partida, $nombrePartida = null)
 
       $nombreAvatar = 'avatar_negras_' . $timestamp . '.' . $extension; // Nuevo nombre del avatar
 
-      $rutaDestino = __DIR__ . '/../data/partidas/avatares/' . $nombreAvatar; // Ruta de destino
+      $rutaDestino = __DIR__ . '/../data/avatares_usuario/' . $nombreAvatar; // Ruta de destino
 
       copy($rutaOrigen, $rutaDestino); // Copiamos el archivo
 
@@ -1026,7 +1026,7 @@ function eliminarPartida($archivo)
     if (isset($contenido[$campoAvatar]) && $contenido[$campoAvatar]) {
 
       // Ruta completa del avatar
-      $rutaAvatar = __DIR__ . '/../data/partidas/avatares/' . basename($contenido[$campoAvatar]);
+      $rutaAvatar = __DIR__ . '/../data/avatares_usuario/' . basename($contenido[$campoAvatar]);
 
       // Si el archivo del avatar existe en la ruta $rutaAvatar, lo eliminamos
       if (file_exists($rutaAvatar)) unlink($rutaAvatar);
@@ -1059,7 +1059,7 @@ function restaurarAvatarGuardado($contenido, $color)
     $archivo = basename($contenido[$campoGuardado]);
 
     // Ruta del archivo de origen
-    $origen = __DIR__ . '/../data/partidas/avatares/' . $archivo;
+    $origen = __DIR__ . '/../data/avatares_usuario/' . $archivo;
 
     // Si el archivo de origen existe
     if (file_exists($origen)) {
