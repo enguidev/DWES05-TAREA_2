@@ -122,52 +122,51 @@
 .instrucciones-contenido {
   padding: 15px;
   background8px;
-  background: #ffffff
 
-.instrucciones h4 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  color: #333;
-  font-size: 1.1em;
-}
+  background: #ffffff .instrucciones h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #333;
+    font-size: 1.1em;
+  }
 
-.instrucciones p {
-  margin-bottom: 10px;
-  color: #333;
-  line-height: 1.6;
-}
+  .instrucciones p {
+    margin-bottom: 10px;
+    color: #333;
+    line-height: 1.6;
+  }
 
-.instrucciones ol {
-  margin-left: 20px;
-  color: #555;
-}
+  .instrucciones ol {
+    margin-left: 20px;
+    color: #555;
+  }
 
-.instrucciones li {
-  margin-bottom: 8px;
-  line-height: 1.6;
-}
+  .instrucciones li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
 
-.instrucciones ul {
-  margin-left: 20px;
-  color: #555;
-  list-style-type: disc;
-}
+  .instrucciones ul {
+    margin-left: 20px;
+    color: #555;
+    list-style-type: disc;
+  }
 
-.titulo-seccion {
-  margin-top: 0;
-  color: #333;
-}
+  .titulo-seccion {
+    margin-top: 0;
+    color: #333;
+  }
 
-.titulo-seccion-separado {
-  margin-top: 15px;
-  color: #333;
-}
+  .titulo-seccion-separado {
+    margin-top: 15px;
+    color: #333;
+  }
 
-.lista-sin-estilo {
-  list-style: none;
-  padding-left: 0;
-}
+  .lista-sin-estilo {
+    list-style: none;
+    padding-left: 0;
+  }
 
-.formulario-inline {
-  display: inline;
-}
+  .formulario-inline {
+    display: inline;
+  }

@@ -303,4 +303,4 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
         </div>
       </div>
     <?php
-}
+  }
