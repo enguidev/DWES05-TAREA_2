@@ -26,6 +26,7 @@ function mostrarPantallaPrincipal($partidasGuardadas = [])
       <img src="public/imagenes/inicio/caballo_negro_girando.gif" alt="Caballo" class="icono-titulo">
       <div class="titulo-contenedor">
         <h1>PHP CHESS</h1>
+        <p class="subtitulo-arcade">Carlos Engui García | 2º DAW</p>
         <p class="subtitulo-arcade">DWES - Tarea 5</p>
       </div>
       <img src="public/imagenes/inicio/caballo_negro_girando.gif" alt="Caballo" class="icono-titulo">
