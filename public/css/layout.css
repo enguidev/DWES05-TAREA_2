@@ -1,0 +1,53 @@
+/* ========================================
+   ESTILOS DE LAYOUT
+   ======================================== */
+
+/* Contenedor principal */
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+}
+
+/* Header del juego */
+.header-juego {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  perspective: 1000px;
+}
+
+/* Título */
+h1 {
+  font-size: 3.7em;
+  color: #5568d3;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  .header-juego {
+    flex-direction: column;
+    gap: 15px;
+  }
+}

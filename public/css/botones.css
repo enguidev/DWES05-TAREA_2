@@ -1,0 +1,160 @@
+/* ========================================
+   ESTILOS DE BOTONES GENERALES
+   ======================================== */
+
+/* Botón de configuración */
+.btn-configuracion {
+  font-size: 1.5em;
+  background: transparent;
+  color: #667eea;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-configuracion:hover {
+  transform: rotate(180deg);
+}
+
+/* Botón de pausa */
+.btn-pausa {
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #ff9800;
+  background: transparent;
+}
+
+.btn-pausa:hover {
+  background: #f57c00;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+}
+
+/* Botones de control del juego */
+.botones-control {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-reiniciar,
+.btn-deshacer,
+.btn-revancha,
+.btn-guardar,
+.btn-cargar {
+  font-size: 1.1em;
+  font-weight: bold;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+/* Botón reiniciar */
+.btn-reiniciar {
+  background: #e74c3c;
+}
+
+.btn-reiniciar:hover:not(:disabled):not(.btn-disabled) {
+  background: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+.btn-reiniciar:disabled,
+.btn-reiniciar.btn-disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Botón revancha */
+.btn-revancha {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.btn-revancha:hover {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+}
+
+/* Botón deshacer */
+.btn-deshacer {
+  background: #f39c12;
+}
+
+.btn-deshacer:hover {
+  background: #d68910;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+}
+
+/* Botón guardar */
+.btn-guardar {
+  background: #27ae60;
+}
+
+.btn-guardar:hover:not(:disabled):not(.btn-disabled) {
+  background: #229954;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.btn-guardar:disabled,
+.btn-guardar.btn-disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Botón cargar */
+.btn-cargar {
+  background: #3498db;
+}
+
+.btn-cargar:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Botones de guardar y cargar en header */
+.btn-guardar,
+.btn-cargar-header {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 1.3em;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+}
+
+.btn-guardar:hover,
+.btn-cargar-header:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+}
+
+.btn-cargar-header {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+}
+
+.btn-cargar-header:hover {
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+}

@@ -11,6 +11,7 @@ function normalizarRutaAvatar($ruta)
   if (preg_match('/^https?:\/\//', $ruta)) return $ruta;
 
   // Si no, le añadimos "./" al principio y quitamos "/" del principio
+  // ltrim($ruta, '/') elimina las barras iniciales
   return './' . ltrim($ruta, '/');
 }
 
