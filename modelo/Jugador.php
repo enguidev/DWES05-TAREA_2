@@ -17,17 +17,18 @@ class Jugador
   private $color;  // "blancas" o "negras"
   private $piezas; // Array de 16 piezas
 
-  /**
-   * Constructor del Jugador
-   * Inicializa todas las piezas en su posición inicial según el color
-   * @param string $nombre Nombre del jugador
-   * @param string $color Color de las piezas ("blancas" o "negras")
-   */
+  /*
+   Constructor del Jugador:
+   - Inicializa el nombre y color del jugador.
+   - Crea las 16 piezas en sus posiciones iniciales según el color.
+   - Blancas: piezas mayores en fila 1, peones en fila 2.
+   - Negras: piezas mayores en fila 8, peones en fila 7.
+  */
   public function __construct($nombre, $color)
   {
     $this->nombre = $nombre;
     $this->color = $color;
-    $this->piezas = [];
+    $this->piezas = []; // Inicializamos el array de piezas vacío
 
     // Determinar la fila inicial según el color
     // Blancas: piezas mayores en fila 1, peones en fila 2
@@ -40,7 +41,7 @@ class Jugador
       $filaPeones = 7;
     }
 
-    // Crear las piezas mayores
+    // Crear las piezas mayores en el orden estándar de ajedrez
     $this->piezas[] = new Torre("A" . $filaPiezasMayores, $color);    // Torre izquierda
     $this->piezas[] = new Caballo("B" . $filaPiezasMayores, $color);  // Caballo izquierdo
     $this->piezas[] = new Alfil("C" . $filaPiezasMayores, $color);    // Alfil izquierdo
@@ -50,7 +51,7 @@ class Jugador
     $this->piezas[] = new Caballo("G" . $filaPiezasMayores, $color);  // Caballo derecho
     $this->piezas[] = new Torre("H" . $filaPiezasMayores, $color);    // Torre derecha
 
-    // Crear los 8 peones
+    // Crear los 8 peones (uno en cada columna)
     $columnas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     foreach ($columnas as $columna) {
       $this->piezas[] = new Peon($columna . $filaPeones, $color);
@@ -138,22 +139,24 @@ class Jugador
     return $rey === null || $rey->estCapturada();
   }
 
-  /**
-   * Promueve un peón a otra pieza
-   * @param Peon $peon El peón a promover
-   * @param string $tipoPieza Tipo de pieza ('Dama', 'Torre', 'Alfil', 'Caballo')
-   * @return bool True si se promovió exitosamente
-   */
+  /*
+   Para promover un peón a otra pieza:
+   - Verificamos que sea un peón y que pueda promoverse (esté en última fila).
+   - Creamos la nueva pieza (Dama, Torre, Alfil o Caballo) en la misma posición.
+   - Reemplazamos el peón en el array de piezas por la nueva pieza.
+  */
   public function promoverPeon($peon, $tipoPieza = 'Dama')
   {
+    // Verificamos que sea un peón y que pueda promoverse
     if (!$peon instanceof Peon || !$peon->puedePromoverse()) {
-      return false;
+      return false; // No es válido para promoción
     }
 
+    // Obtenemos la posición y color del peón
     $posicion = $peon->getPosicion();
     $color = $peon->getColor();
 
-    // Crear la nueva pieza
+    // Crear la nueva pieza según el tipo solicitado
     switch ($tipoPieza) {
       case 'Dama':
         $nuevaPieza = new Dama($posicion, $color);
@@ -168,17 +171,17 @@ class Jugador
         $nuevaPieza = new Caballo($posicion, $color);
         break;
       default:
-        return false;
+        return false; // Tipo de pieza no válido
     }
 
     // Reemplazar el peón en la lista de piezas
     foreach ($this->piezas as $key => $pieza) {
-      if ($pieza === $peon) {
-        $this->piezas[$key] = $nuevaPieza;
-        return true;
+      if ($pieza === $peon) { // Comparación por referencia
+        $this->piezas[$key] = $nuevaPieza; // Reemplazamos
+        return true; // Promoción exitosa
       }
     }
 
-    return false;
+    return false; // No se encontró el peón
   }
 }

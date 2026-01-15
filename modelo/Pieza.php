@@ -94,36 +94,47 @@ class Pieza
     $this->haMovido = true;
   }
 
-  /**
-   * Convierte notación de ajedrez (A1-H8) a coordenadas de array [fila, columna]
-   * @param string $posicion Posición en notación de ajedrez (ej: "A1")
-   * @return array [fila, columna] o null si es inválida
-   */
+  /*
+   Convierte notación de ajedrez (A1-H8) a coordenadas de array [fila, columna]:
+   - ord() devuelve el código ASCII del carácter.
+   - Restamos ord('A') para obtener la columna: A=0, B=1, ..., H=7.
+   - Para la fila: 8 - número da el índice: 8=0, 7=1, ..., 1=7.
+   - Validamos que estén dentro del rango 0-7.
+  */
   protected function notacionACoords($posicion)
   {
+    // Verificamos que la posición tenga exactamente 2 caracteres
     if (strlen($posicion) != 2) return null;
 
+    // Convertimos la letra de columna a número (A=0, B=1, ..., H=7)
     $columna = ord(strtoupper($posicion[0])) - ord('A'); // A=0, B=1, ..., H=7
+
+    // Convertimos el número de fila a índice de array (8=0, 7=1, ..., 1=7)
     $fila = 8 - (int)$posicion[1]; // 8=0, 7=1, ..., 1=7
 
+    // Verificamos que las coordenadas estén dentro del tablero
     if ($columna < 0 || $columna > 7 || $fila < 0 || $fila > 7) {
-      return null;
+      return null; // Coordenadas inválidas
     }
 
-    return [$fila, $columna];
+    return [$fila, $columna]; // Retornamos el array con las coordenadas
   }
 
-  /**
-   * Convierte coordenadas de array a notación de ajedrez
-   * @param int $fila Fila (0-7)
-   * @param int $columna Columna (0-7)
-   * @return string Posición en notación de ajedrez (ej: "A1")
-   */
+  /*
+   Convierte coordenadas de array a notación de ajedrez:
+   - chr() convierte un código ASCII a carácter.
+   - Sumamos columna a ord('A') para obtener la letra: 0=A, 1=B, ..., 7=H.
+   - Para el número: 8 - fila da el número de fila: 0=8, 1=7, ..., 7=1.
+  */
   protected function coordsANotacion($fila, $columna)
   {
+    // Convertimos la columna (0-7) a letra (A-H)
     $letra = chr(ord('A') + $columna);
+
+    // Convertimos la fila (0-7) a número (8-1)
     $numero = 8 - $fila;
-    return $letra . $numero;
+
+    return $letra . $numero; // Concatenamos letra y número (ej: "A1", "H8")
   }
 
   /**
