@@ -31,12 +31,15 @@
 
 .modal-content {
   background-color: #fefefe;
-  margin: 10% auto;
-  padding: 0;
+  margin: 0;
+  padding: 24px 28px;
   border: none;
   border-radius: 15px;
   width: 90%;
-  max-width: 600px;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   animation: slideIn 0.3s;
 }
@@ -87,6 +90,10 @@
   font-size: 1.8em;
 }
 
+.modal-content p {
+  margin: 0 0 12px;
+}
+
 .modal-content label {
   display: block;
   margin-bottom: 8px;
@@ -113,6 +120,9 @@
   display: flex;
   gap: 15px;
   margin-top: 30px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .modal-buttons-promocion {

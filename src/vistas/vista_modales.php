@@ -84,14 +84,14 @@ function mostrarModalConfirmarReiniciar()
 ?>
   <div id="modalConfirmarReiniciar" class="modal-overlay">
     <div class="modal-content">
-      <h2>🔄 Confirmar nueva partida</h2>
-      <p>¿Deseas empezar una nueva partida? Perderás todo el progreso.</p>
+      <h2>🏠 Volver al inicio</h2>
+      <p>¿Deseas volver al inicio? Perderás el progreso de la partida actual.</p>
       <!-- Advertencia para que el usuario sepa que es irreversible -->
       <p class="texto-advertencia">Esta acción no se puede deshacer.</p>
       <div class="modal-buttons">
         <form method="post" style="display: inline;">
           <!-- Botón para confirmar el reinicio -->
-          <button type="submit" name="confirmar_reiniciar" class="btn-confirmar btn-reiniciar-confirm">✅ Sí, nueva partida</button>
+          <button type="submit" name="confirmar_reiniciar" class="btn-confirmar btn-reiniciar-confirm">✅ Sí, volver al inicio</button>
         </form>
         <form method="post" style="display: inline;">
           <!-- Botón para cancelar sin reiniciar -->

@@ -39,7 +39,7 @@ function mostrarBotonesControl($partida)
     </form>
     <!-- Botón para reiniciar y volver a la pantalla de inicio -->
     <form method="post" style="display: inline;">
-      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar">🔄 Nueva partida</button>
+      <button type="submit" name="abrir_modal_reiniciar" class="btn-reiniciar" id="btn-reiniciar">🏠 Volver al inicio</button>
     </form>
   </div>
 <?php
