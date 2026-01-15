@@ -210,7 +210,7 @@ function mostrarModalEnroque()
 // Para mostrar modal para confirmar la eliminación de una partida guardada
 function mostrarModalConfirmarEliminar($nombrePartida, $archivoPartida, $desdeInicio = false)
 {
-  ?>
+?>
   <!-- Modal de confirmación con overlay oscuro de fondo -->
   <div id="modalConfirmarEliminar" class="modal-overlay">
     <div class="modal-content">
