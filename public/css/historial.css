@@ -4,7 +4,11 @@
 
 /* Historial de movimientos */
 .historial-movimientos {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
 }
 
 .historial-header {
@@ -12,15 +16,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f0f0f0;
-  padding: 10px 15px;
-  border-radius: 5px;
+  background: #f8f9fa;
+  padding: 12px 18px;
+  border-bottom: 1px solid #e0e0e0;
   user-select: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .historial-header:hover {
-  background: #e8e8e8;
+  background: #e9ecef;
 }
 
 .historial-toggle {
@@ -29,13 +33,10 @@
 }
 
 .historial-contenido {
-  padding: 10px;
-  background: #fafafa;
-  border-radius: 5px;
-  margin-top: 5px;
+  padding: 15px;
+  background: #ffffff;
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid #ddd;
 }
 
 .historial-grid {
@@ -91,11 +92,10 @@
 
 /* Instrucciones */
 .instrucciones {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
-  border-right: 4px solid #667eea;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
 }
 
 .instrucciones-header {
@@ -103,15 +103,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f0f0f0;
-  padding: 10px 15px;
-  border-radius: 5px;
+  background: #f8f9fa;
+  padding: 12px 18px;
+  border-bottom: 1px solid #e0e0e0;
   user-select: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .instrucciones-header:hover {
-  background: #e8e8e8;
+  background: #e9ecef;
 }
 
 .instrucciones-toggle {
@@ -121,10 +121,8 @@
 
 .instrucciones-contenido {
   padding: 15px;
-  background: #fafafa;
-  border-radius: 5px;
-  margin-top: 5px;
-}
+  background8px;
+  background: #ffffff
 
 .instrucciones h4 {
   margin-top: 0;

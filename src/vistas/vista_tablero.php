@@ -285,20 +285,20 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
           <!-- SECCIÓN: Gestión de partida -->
           <h4 class="titulo-seccion-separado">Gestión de partida:</h4>
           <ul class="lista-sin-estilo">
-            <li><strong>-Guardar</strong>: Guarda la partida actual para continuarla posteriormente (solo posible si pausas la partida)</li>
-            <li><strong>-Cargar</strong>: Carga una partida guardada anteriormente</li>
-            <li><strong>-Nueva partida</strong>: Inicia una nueva partida desde el principio</li>
-            <li><strong>-Configuración</strong>: Ajusta opciones visuales y de tiempo</li>
+            <li><strong>Deshacer</strong>: Deshace el último movimiento realizado</li>
+            <li><strong>Revancha</strong>: Inicia una nueva partida manteniendo jugadores y configuración</li>
+            <li><strong>Guardar partida</strong>: Guarda la partida actual para continuarla después (requiere pausar)</li>
+            <li><strong>Volver al inicio</strong>: Regresa a la pantalla inicial para configurar una nueva partida</li>
           </ul>
 
           <!-- SECCIÓN: Configuración -->
           <h4 class="titulo-seccion-separado">Configuración:</h4>
           <ul class="lista-sin-estilo">
-            <li><strong>-Avatares</strong>: Personaliza la imagen de los jugadores</li>
-            <li><strong>-Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
-            <li><strong>-Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
-            <li><strong>-Mostrar coordenadas</strong>: Activa/desactiva las letras y números del tablero</li>
-            <li><strong>-Mostrar capturas</strong>: Visualiza las piezas capturadas</li>
+            <li><strong>Avatares</strong>: Personaliza la imagen de los jugadores</li>
+            <li><strong>Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
+            <li><strong>Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
+            <li><strong>Mostrar coordenadas</strong>: Activa/desactiva las letras y números del tablero</li>
+            <li><strong>Mostrar capturas</strong>: Visualiza las piezas capturadas</li>
           </ul>
         </div>
       </div>

@@ -5,7 +5,7 @@ function mostrarCabeceraJuego($partida)
 {
 ?>
   <div class="header-juego">
-    <h1>♟️ Partida de Ajedrez</h1>
+    <h1><img src="public/imagenes/fichas_negras/rey_negra.png" alt="Rey negro" style="width: 100px; height: 100px; vertical-align: middle; transform: translateY(-2px); margin-right: 12px; background: transparent; border-radius: 8px;"> Partida de Ajedrez</h1>
     <div class="header-buttons">
       <!-- Botón para abrir configuración -->
       <button id="btnConfiguracion" class="btn-configuracion" title="Configuración">⚙️</button>
