@@ -108,8 +108,8 @@ body:has(.pantalla-arcade) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 95%;
-  max-height: 70vh;
+  max-width: 110%;
+  max-height: 95vh;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -130,7 +130,7 @@ body:has(.pantalla-arcade) {
 /* Botones arcade superpuestos */
 .botones-arcade {
   position: absolute;
-  bottom: 30px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
