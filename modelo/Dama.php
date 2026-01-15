@@ -2,18 +2,17 @@
 
 require_once __DIR__ . '/Pieza.php';
 
-/**
- * Clase Dama (Reina)
- * Se mueve en líneas horizontales, verticales y diagonales
- * Combina los movimientos de Torre y Alfil
+/*
+  Clase Dama (Reina)
+  Se mueve en líneas horizontales, verticales y diagonales
+  Combina los movimientos de Torre y Alfil
  */
 class Dama extends Pieza
 {
-  /**
-   * Constructor de Dama
-   * @param string $posicion Posición inicial
-   * @param string $color Color de la pieza
-   */
+  /*
+  $posicion: Posición inicial
+  $color: Color de la pieza
+*/
   public function __construct($posicion, $color)
   {
     parent::__construct($posicion, $color);

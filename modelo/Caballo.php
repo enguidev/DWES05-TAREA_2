@@ -2,18 +2,17 @@
 
 require_once __DIR__ . '/Pieza.php';
 
-/**
- * Clase Caballo
- * Se mueve en forma de L: 2 casillas en una dirección y 1 en perpendicular
- * Es la única pieza que puede saltar sobre otras
+/*
+  Clase Caballo
+  Se mueve en forma de L: 2 casillas en una dirección y 1 en perpendicular
+  Es la única pieza que puede saltar sobre otras
  */
 class Caballo extends Pieza
 {
-  /**
-   * Constructor de Caballo
-   * @param string $posicion Posición inicial
-   * @param string $color Color de la pieza
-   */
+  /*
+  $posicion: Posición inicial
+  $color: Color de la pieza
+*/
   public function __construct($posicion, $color)
   {
     parent::__construct($posicion, $color);

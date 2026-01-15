@@ -7,19 +7,19 @@ require_once __DIR__ . '/Dama.php';
 require_once __DIR__ . '/Rey.php';
 require_once __DIR__ . '/Peon.php';
 
-/**
- * Clase Jugador
- * Representa un jugador con sus 16 piezas
- */
+//  Clase Jugador. Representa un jugador con sus 16 piezas
 class Jugador
 {
-  private $nombre;
+  private $nombre; // Nombre del jugador
+
   private $color;  // "blancas" o "negras"
+
   private $piezas; // Array de 16 piezas
+
 
   /*
    Constructor del Jugador:
-   - Inicializa el nombre y color del jugador.
+   - Inicializa el nombre ($nombre) y color del jugador ($color).
    - Crea las 16 piezas en sus posiciones iniciales según el color.
    - Blancas: piezas mayores en fila 1, peones en fila 2.
    - Negras: piezas mayores en fila 8, peones en fila 7.
@@ -30,18 +30,23 @@ class Jugador
     $this->color = $color;
     $this->piezas = []; // Inicializamos el array de piezas vacío
 
-    // Determinar la fila inicial según el color
-    // Blancas: piezas mayores en fila 1, peones en fila 2
-    // Negras: piezas mayores en fila 8, peones en fila 7
+    // Determinamos las filas iniciales según el color
+    // Si el color es "blancas"...
     if ($color === "blancas") {
-      $filaPiezasMayores = 1;
-      $filaPeones = 2;
+
+      $filaPiezasMayores = 1; // piezas mayores en fila 1
+
+      $filaPeones = 2; // peones en fila 2
+
+      // Si el color es "negras"... 
     } else {
-      $filaPiezasMayores = 8;
-      $filaPeones = 7;
+
+      $filaPiezasMayores = 8; // piezas mayores en fila 8
+
+      $filaPeones = 7; // peones en fila 7
     }
 
-    // Crear las piezas mayores en el orden estándar de ajedrez
+    // Creamos las piezas mayores en el orden estándar de ajedrez
     $this->piezas[] = new Torre("A" . $filaPiezasMayores, $color);    // Torre izquierda
     $this->piezas[] = new Caballo("B" . $filaPiezasMayores, $color);  // Caballo izquierdo
     $this->piezas[] = new Alfil("C" . $filaPiezasMayores, $color);    // Alfil izquierdo
@@ -51,92 +56,95 @@ class Jugador
     $this->piezas[] = new Caballo("G" . $filaPiezasMayores, $color);  // Caballo derecho
     $this->piezas[] = new Torre("H" . $filaPiezasMayores, $color);    // Torre derecha
 
-    // Crear los 8 peones (uno en cada columna)
+    // Creamos los 8 peones (uno en cada columna)
     $columnas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+    // Recorremos las columnas para crear los peones
     foreach ($columnas as $columna) {
+
+      // Creamos el peon en la fila correspondiente
       $this->piezas[] = new Peon($columna . $filaPeones, $color);
     }
   }
 
-  /**
-   * Obtiene el nombre del jugador
-   * @return string Nombre del jugador
-   */
+
+  // Para obtener el nombre del jugador
   public function getNombre()
   {
-    return $this->nombre;
+    return $this->nombre; // Retornamos el nombre
   }
 
-  /**
-   * Obtiene el color de las piezas del jugador
-   * @return string Color ("blancas" o "negras")
-   */
+  // Para obtener el color del jugador
   public function getColor()
   {
-    return $this->color;
+    return $this->color; // Retornamos el color
   }
 
-  /**
-   * Obtiene todas las piezas del jugador
-   * @return array Array de piezas
-   */
+  // Para obtener todas las piezas del jugador
   public function getPiezas()
   {
-    return $this->piezas;
+    return $this->piezas; // Retornamos el array de piezas
   }
 
-  /**
-   * Busca una pieza en una posición específica
-   * @param string $posicion Posición a buscar
-   * @return Pieza|null La pieza encontrada o null
-   */
+
+  /*
+    Para obtener la pieza en una posición específica:
+    - Recorremos el array de piezas del jugador.
+    - Si encontramos una pieza cuya posición coincide con la solicitada y no está capturada, la retornamos.
+    - Si no encontramos ninguna, retornamos null.
+  */
   public function getPiezaEnPosicion($posicion)
   {
+    // Recorremos las piezas del jugador
     foreach ($this->piezas as $pieza) {
-      if ($pieza->getPosicion() === $posicion && !$pieza->estCapturada()) {
-        return $pieza;
-      }
+
+      // Si la posición coincide y la pieza no está capturada...
+      if ($pieza->getPosicion() === $posicion && !$pieza->estCapturada()) return $pieza; // Retornamos la pieza encontrada
     }
+
+    // Si no encontramos ninguna pieza en esa posición, retornamos null
     return null;
   }
 
-  /**
-   * Obtiene el rey del jugador
-   * @return Rey|null El rey o null si fue capturado
-   */
+
+  // Para obtener el rey del jugador
   public function getRey()
   {
+    // Recorremos las piezas del jugador
     foreach ($this->piezas as $pieza) {
-      if ($pieza instanceof Rey && !$pieza->estCapturada()) {
-        return $pieza;
-      }
+
+      // Si la pieza es un rey y no está capturada...
+      if ($pieza instanceof Rey && !$pieza->estCapturada()) return $pieza;
     }
+
+    // Si no encontramos el rey (debería existir siempre), retornamos null
     return null;
   }
 
-  /**
-   * Calcula los puntos totales del jugador (suma de valores de piezas activas)
-   * @return int Puntos totales
-   */
+
+  // Para calcular los puntos del jugador
   public function calcularPuntos()
   {
-    $puntos = 0;
+
+    $puntos = 0; // Inicializamos los puntos en 0
+
+    // Recorremos las piezas del jugador
     foreach ($this->piezas as $pieza) {
-      if (!$pieza->estCapturada()) {
-        $puntos += $pieza->getValor();
-      }
+
+      // Si la pieza no está capturada, sumamos su valor a los puntos
+      if (!$pieza->estCapturada()) $puntos += $pieza->getValor();
     }
-    return $puntos;
+
+    return $puntos; // Retornamos el total de puntos
   }
 
-  /**
-   * Verifica si el rey del jugador ha sido capturado
-   * @return bool True si el rey fue capturado (el jugador perdió)
-   */
+
+  // Para verificar si el jugador ha perdido
   public function haPerdido()
   {
-    $rey = $this->getRey();
-    return $rey === null || $rey->estCapturada();
+    $rey = $this->getRey(); // Obtenemos el rey del jugador
+
+    return $rey === null || $rey->estCapturada(); // Retornamos true si el rey no existe o está capturado 
   }
 
   /*
@@ -147,41 +155,62 @@ class Jugador
   */
   public function promoverPeon($peon, $tipoPieza = 'Dama')
   {
-    // Verificamos que sea un peón y que pueda promoverse
-    if (!$peon instanceof Peon || !$peon->puedePromoverse()) {
-      return false; // No es válido para promoción
-    }
+    // Si no es un peón o no puede promoverse...  
+    if (!$peon instanceof Peon || !$peon->puedePromoverse()) return false; // No es válido para promoción
 
-    // Obtenemos la posición y color del peón
-    $posicion = $peon->getPosicion();
-    $color = $peon->getColor();
+    $posicion = $peon->getPosicion(); // Obtenemos la posición del peón
+
+    $color = $peon->getColor(); // Obtenemos el color del peón
 
     // Crear la nueva pieza según el tipo solicitado
     switch ($tipoPieza) {
+
+      // En el caso de ser una dama
       case 'Dama':
-        $nuevaPieza = new Dama($posicion, $color);
+
+        $nuevaPieza = new Dama($posicion, $color); // Creamos una dama
+
         break;
+
+      // En el caso de ser una torre
       case 'Torre':
-        $nuevaPieza = new Torre($posicion, $color);
+
+        $nuevaPieza = new Torre($posicion, $color); // Creamos una torre
+
         break;
+
+      // En el caso de ser un alfil
       case 'Alfil':
-        $nuevaPieza = new Alfil($posicion, $color);
+
+        $nuevaPieza = new Alfil($posicion, $color); // Creamos un alfil
+
         break;
+
+      // En el caso de ser un caballo
       case 'Caballo':
-        $nuevaPieza = new Caballo($posicion, $color);
+
+        $nuevaPieza = new Caballo($posicion, $color); // Creamos un caballo
         break;
+
+      // En caso de no ser un tipo válido
       default:
-        return false; // Tipo de pieza no válido
+        return false; // Retornamos false
     }
 
-    // Reemplazar el peón en la lista de piezas
+    // Reemplazamos el peón en la lista de piezas
+    // Buscamos el peón en el array de piezas
     foreach ($this->piezas as $key => $pieza) {
+
+      // Si encontramos el peón...
       if ($pieza === $peon) { // Comparación por referencia
-        $this->piezas[$key] = $nuevaPieza; // Reemplazamos
-        return true; // Promoción exitosa
+
+        $this->piezas[$key] = $nuevaPieza; // Reemplazamos el peón por la nueva pieza
+
+        return true; // Retornamos true
       }
     }
 
-    return false; // No se encontró el peón
+    // Si no encontramos el peón, retornamos false
+    return false;
   }
 }
