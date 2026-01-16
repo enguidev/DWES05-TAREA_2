@@ -74,9 +74,9 @@ class Pieza
 
 
   // Para marcar la pieza como movida
-  public function setHaMovido()
+  public function setHaMovido($valor = true)
   {
-    $this->haMovido = true; // Actualizamos el estado a movida
+    $this->haMovido = $valor; // Actualizamos el estado de movimiento
   }
 
   /*

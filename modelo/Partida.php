@@ -313,11 +313,7 @@ class Partida
 
         $piezaOrigenTemp->setPosicion($destino); // Movemos la pieza en el estado temporal
 
-        $piezaOrigenTemp->setHaMovido(); // Marcamos que ha movido
-
-        // Si la pieza es un peón, marcamos que no es su primer movimiento
-        if ($piezaOrigenTemp instanceof Peon) $piezaOrigenTemp->setEsPrimerMovimiento(false);
-      }
+          $piezaOrigenTemp->setHaMovido(true); // Marcamos que ha movido
 
       // Simular enroque moviendo rey y torre en temp si aplica:
 
@@ -432,11 +428,11 @@ class Partida
         // Mover rey y torre
         $piezaOrigen->setPosicion($posReyDestino); // Mover el rey
 
-        $piezaOrigen->setHaMovido(); // Marcar el rey como movido
+        $piezaOrigen->setHaMovido(true); // Marcar el rey como movido
 
         $torre->setPosicion($posTorreDestino); // Mover la torre
 
-        $torre->setHaMovido(); // Marcar la torre como movida
+        $torre->setHaMovido(true); // Marcar la torre como movida
 
         // Si no es enroque
       } else {
@@ -1319,14 +1315,6 @@ class Partida
     }
 
     return true;
-  }
-
-  /**
-   * Termina la partida
-   */
-  public function terminar()
-  {
-    $this->partidaTerminada = true;
   }
 
   /**
