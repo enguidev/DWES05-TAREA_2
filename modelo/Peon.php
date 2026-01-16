@@ -42,7 +42,7 @@ class Peon extends Pieza
   public function movimiento($nuevaPosicion, $esCaptura = false)
   {
     // Si la pieza está capturada, no puede moverse por lo que retornamos false
-      if ($this->estaCapturada()) return false;
+    if ($this->estaCapturada()) return false;
 
     // Convertimos las posiciones a coordenadas numéricas
     $coordsActuales = $this->notacionACoords($this->posicion);
@@ -102,7 +102,7 @@ class Peon extends Pieza
   public function simulaMovimiento($nuevaPosicion, $esCaptura = false)
   {
     // Si la pieza está capturada, no puede moverse, retornamos array vacío
-      if ($this->estaCapturada()) return [];
+    if ($this->estaCapturada()) return [];
 
     // Convertimos las posiciones a coordenadas numéricas
     $coordsActuales = $this->notacionACoords($this->posicion);
@@ -161,7 +161,7 @@ class Peon extends Pieza
   public function puedePromoverse()
   {
     // Si la pieza está capturada, no puede promoverse
-      if ($this->estaCapturada()) return false;
+    if ($this->estaCapturada()) return false;
 
     // Convertimos la posición a coordenadas
     $coords = $this->notacionACoords($this->posicion);

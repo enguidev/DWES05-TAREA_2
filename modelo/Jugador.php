@@ -108,7 +108,7 @@ class Jugador
     foreach ($this->piezas as $pieza) {
 
       // Si la posición coincide y la pieza no está capturada...
-        if ($pieza->getPosicion() === $posicion && !$pieza->estaCapturada()) return $pieza; // Retornamos la pieza encontrada
+      if ($pieza->getPosicion() === $posicion && !$pieza->estaCapturada()) return $pieza; // Retornamos la pieza encontrada
     }
 
     return null; // Retornamos null si no encontramos ninguna pieza

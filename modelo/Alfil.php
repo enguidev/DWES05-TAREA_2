@@ -26,7 +26,7 @@ class Alfil extends Pieza
   public function movimiento($nuevaPosicion)
   {
     // Si la pieza está capturada, no puede moverse por lo que retornamos false
-      if ($this->estaCapturada()) return false;
+    if ($this->estaCapturada()) return false;
 
     // Convertimos las posiciones a coordenadas numéricas
     $coordsActuales = $this->notacionACoords($this->posicion);
@@ -72,7 +72,7 @@ class Alfil extends Pieza
   public function simulaMovimiento($nuevaPosicion)
   {
     // Si la pieza está capturada, no puede moverse, retornamos array vacío
-      if ($this->estaCapturada()) return [];
+    if ($this->estaCapturada()) return [];
 
     // Convertimos las posiciones a coordenadas numéricas
     $coordsActuales = $this->notacionACoords($this->posicion);
