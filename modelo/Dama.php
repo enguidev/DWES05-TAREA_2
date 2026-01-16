@@ -10,8 +10,9 @@ require_once __DIR__ . '/Pieza.php';
 class Dama extends Pieza
 {
   /*
-  $posicion: Posición inicial
-  $color: Color de la pieza
+  Constructor de la clase Dama (Reina):
+   -$posicion: Posición inicial
+  - $color: Color de la pieza
 */
   public function __construct($posicion, $color)
   {

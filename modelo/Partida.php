@@ -2,26 +2,28 @@
 
 require_once __DIR__ . '/Jugador.php';
 
-/**
- * Clase Partida
- * Controla el juego completo de ajedrez
- */
+/*
+  Clase Partida
+  Controla el juego completo de ajedrez
+*/
 class Partida
 {
-  private $jugadores;  // Array de 2 jugadores
-  private $turno;      // Jugador al que le toca mover
-  private $mensaje;    // Mensaje de estado de la partida
+  private $jugadores; // Array de 2 jugadores
+  private $turno; // Jugador al que le toca mover
+  private $mensaje; // Mensaje de estado de la partida
   private $partidaTerminada; // Indica si la partida ha terminado
-  private $historial;  // Historial de snapshots para deshacer jugadas
+  private $historial; // Historial de snapshots para deshacer jugadas
   private $ultimoMovimiento; // Meta del último movimiento realizado
   private $historialMovimientos; // Historial en notación algebraica
 
-  /**
-   * Constructor de Partida
-   * Inicializa los dos jugadores y establece que comienzan las blancas
-   * @param string $nombreBlancas Nombre del jugador con piezas blancas
-   * @param string $nombreNegras Nombre del jugador con piezas negras
-   */
+  /*
+    Constructor de la Partida:
+      - Crea dos jugadores con los nombres dados y colores correspondientes.
+      - Establece que el turno inicial es para las blancas.
+      - Inicializa el mensaje de turno y otros atributos de estado.
+      - $nombreBlancas: Nombre del jugador con piezas blancas
+      - $nombreNegras: Nombre del jugador con piezas negras
+  */
   public function __construct($nombreBlancas = "Jugador 1", $nombreNegras = "Jugador 2")
   {
     $this->jugadores = [
@@ -36,117 +38,196 @@ class Partida
     $this->historialMovimientos = [];
   }
 
-  /**
-   * Realiza una jugada en el tablero
-   * @param string $origen Posición de origen (ej: "E2")
-   * @param string $destino Posición de destino (ej: "E4")
-   * @return bool True si la jugada fue exitosa
-   */
+  /*
+    Para realizar una jugada:
+      - Verificar que la partida no haya terminado
+      - Guardar captura del estado actual para poder deshacer
+      - Verificar que existe una pieza en el origen
+      - Verificar si hay una pieza en el destino (para saber si es captura)
+      - Verificar si el movimiento es valido para la pieza
+      - Realizar el movimiento
+      - Cambiar el turno al otro jugador
+      - Actualizar el mensaje de turno
+      - Guardar el movimiento en el historial
+      - $origen Posición de origen (ej: "E2")
+      - $destino Posición de destino (ej: "E4")
+      - @return True si la jugada fue exitosa
+  */
   public function jugada($origen, $destino)
   {
+    // Si la partida ya terminó, no se pueden hacer más jugadas
     if ($this->partidaTerminada) {
-      $this->mensaje = "La partida ha terminado";
-      return false;
+
+      $this->mensaje = "La partida ha terminado"; // Actualizamos el mensaje
+
+      return false; // Retornamos false ya que no se puede jugar
     }
 
-    // Guardar snapshot del estado actual para poder deshacer
-    $this->historial[] = serialize([
-      'jugadores' => $this->jugadores,
-      'turno' => $this->turno,
-      'mensaje' => $this->mensaje,
+    // Guardamos captura del estado actual para poder deshacer la jugada si es necesario
+    $this->historial[] = serialize([ // Serializamos el estado actual
+
+      'jugadores' => $this->jugadores, // Jugadores actuales
+
+      'turno' => $this->turno, // Turno actual
+
+      'mensaje' => $this->mensaje, // Mensaje actual
+
       'partidaTerminada' => $this->partidaTerminada
-    ]);
-    // Limitar historial a 10 movimientos para no consumir memoria
-    if (count($this->historial) > 10) {
-      array_shift($this->historial);
-    }
 
-    // 1. Verificar que existe una pieza en el origen
+    ]);
+
+    // Limitar historial a 10 movimientos para no consumir memoria
+    // Si hay más de 10, eliminamos el más antiguo
+    if (count($this->historial) > 10) array_shift($this->historial);
+
+    // 1. Verificamos que existe una pieza en el origen
     $piezaOrigen = $this->jugadores[$this->turno]->getPiezaEnPosicion($origen);
 
+    // Si no hay pieza o no es del jugador actual, retornamos false
     if (!$piezaOrigen) {
       $this->mensaje = "No hay ninguna pieza en $origen o no es tu pieza";
-      return false;
+
+      return false; // Retornamos false
     }
 
-    // 2. Verificar si hay una pieza en el destino (para saber si es captura)
+    // 2. Verificamos si hay una pieza en el destino (para saber si es captura)
     $piezaDestino = $this->obtenerPiezaEnPosicion($destino);
-    $esCaptura = ($piezaDestino !== null);
 
-    // 2.1 Detectar posibles movimientos especiales antes del cálculo estándar
-    $esEnroque = false;
-    $tipoEnroque = null; // 'corto' | 'largo'
-    $esEnPassant = false;
-    $posCapturaEnPassant = null;
+    $esCaptura = ($piezaDestino !== null); // Es captura si hay pieza en destino
+
+    // 2.1 Detectar posibles movimientos especiales antes del cálculo
+    $esEnroque = false; // Indica si es un enroque
+
+    $tipoEnroque = null; // Tipo de enroque: 'corto' o 'largo'
+
+    $esEnPassant = false; // Indica si es captura al paso
+
+    $posCapturaEnPassant = null; // Posición del peón capturado al paso
 
     // Coordenadas para cálculos especiales
+    // Convertimos las posiciones a coordenadas numéricas
     $coordsOrigen = $this->notacionACoordsLocal($origen);
+
     $coordsDestino = $this->notacionACoordsLocal($destino);
+
+    // Si alguna de las conversiones falla
     if (!$coordsOrigen || !$coordsDestino) {
-      $this->mensaje = "Coordenadas inválidas";
-      return false;
+
+      $this->mensaje = "Coordenadas inválidas"; // Actualizamos el mensaje
+
+      return false; // Retornamos false
     }
+
+    // Obtenemos las coordenadas de las posiciones actuales y nuevas
+    // Con list() asignamos los valores de los arrays a variables individuales (desestructuración de arrays)
     list($filaOrig, $colOrig) = $coordsOrigen;
     list($filaDest, $colDest) = $coordsDestino;
 
     // Enroque: el rey se desplaza 2 columnas en la misma fila
-    // Ahora requiere confirmación del jugador vía modal
+    // Se requiere confirmación del jugador vía modal (ventanita de confirmación)
+    // Si la pieza es un rey y no ha movido aún
     if ($piezaOrigen instanceof Rey && !$piezaOrigen->haMovido()) {
+
+      // Si se mueve 2 columnas en la misma fila
       if ($filaOrig === $filaDest && abs($colDest - $colOrig) === 2) {
-        // Determinar corto/largo por dirección de columna
+
+        // Si es hacia la derecha, es enroque corto; si es hacia la izquierda, es enroque largo
         if ($colDest > $colOrig) {
-          // Corto (E -> G)
+
+          // Si es corto (E -> G)
           if ($this->puedeEnrocarCorto($this->turno)) {
+
             // En lugar de ejecutar automáticamente, pedimos confirmación
-            $_SESSION['enroque_pendiente'] = [
-              'tipo' => 'corto',
-              'color' => $this->turno,
-              'origen' => $origen,
-              'destino' => $destino
+            $_SESSION['enroque_pendiente'] = [ // Guardamos en sesión el enroque pendiente
+
+              'tipo' => 'corto', // Tipo de enroque
+
+              'color' => $this->turno, // Color del jugador
+
+              'origen' => $origen, // Origen de la pieza
+
+              'destino' => $destino // Destino de la pieza
             ];
-            $this->mensaje = "¿Deseas hacer enroque corto?";
-            return false; // No ejecutar todavía
+
+            $this->mensaje = "¿Deseas hacer enroque corto?"; // Actualizamos el mensaje
+
+            return false; // Retornamos false para no ejecutar todavía
+
+            // Si no puede enrocar corto
           } else {
-            $this->mensaje = "Enroque corto no permitido";
-            return false;
+
+            $this->mensaje = "Enroque corto no permitido"; // Actualizamos el mensaje
+
+            return false; // Retornamos false
           }
+
+          // Si es hacia la izquierda
         } else {
-          // Largo (E -> C)
+
+          // Si es largo (E -> C)
           if ($this->puedeEnrocarLargo($this->turno)) {
+
             // En lugar de ejecutar automáticamente, pedimos confirmación
-            $_SESSION['enroque_pendiente'] = [
-              'tipo' => 'largo',
-              'color' => $this->turno,
-              'origen' => $origen,
-              'destino' => $destino
+            $_SESSION['enroque_pendiente'] = [ // Guardamos en sesión el enroque pendiente
+
+              'tipo' => 'largo', // Tipo de enroque
+
+              'color' => $this->turno, // Color del jugador
+
+              'origen' => $origen, // Origen de la pieza
+
+              'destino' => $destino // Destino de la pieza
             ];
-            $this->mensaje = "¿Deseas hacer enroque largo?";
-            return false; // No ejecutar todavía
+
+            $this->mensaje = "¿Deseas hacer enroque largo?"; // Actualizamos el mensaje
+
+            return false; // Retornamos false para no ejecutar todavía
+
+            // Si no puede enrocar largo
           } else {
-            $this->mensaje = "Enroque largo no permitido";
-            return false;
+
+            $this->mensaje = "Enroque largo no permitido"; // Actualizamos el mensaje
+
+            return false; // Retornamos false
           }
         }
       }
     }
 
-    // Captura al paso: peón se mueve diagonal a casilla vacía en el turno inmediatamente posterior
+    // Captura al paso (peón se mueve diagonal a casilla vacía en el turno inmediatamente posterior):
+    // Si no es enroque, la pieza es un peón y no es captura normal
     if (!$esEnroque && $piezaOrigen instanceof Peon && !$esCaptura) {
-      $direccion = ($this->turno === 'blancas') ? -1 : 1;
-      $difFilas = $filaDest - $filaOrig;
-      $difCols = abs($colDest - $colOrig);
+
+      $direccion = ($this->turno === 'blancas') ? -1 : 1; // Dirección de avance según el color
+
+      $difFilas = $filaDest - $filaOrig; // Diferencia de filas
+
+      $difCols = abs($colDest - $colOrig); // Diferencia de columnas
+
+      // Si el peón se mueve una fila en la dirección correcta y una columna (diagonal)
       if ($difFilas === $direccion && $difCols === 1) {
+
         // Casilla del peón que sería capturado al paso (misma fila de origen, columna destino)
         $posCapturaEnPassant = $this->coordsANotacionLocal($filaOrig, $colDest);
+
+        // Obtenemos la pieza en esa posición
         $piezaPosibleCapturada = $this->obtenerPiezaEnPosicion($posCapturaEnPassant);
-        // Validar último movimiento del contrario
+
+        // Validar último movimiento del contrario:
+        // Si existe un último movimiento registrado
         if ($this->ultimoMovimiento && $piezaPosibleCapturada instanceof Peon) {
-          $um = $this->ultimoMovimiento;
+
+          $um = $this->ultimoMovimiento; // Último movimiento realizado
+
           // Debe ser peón del oponente que avanzó 2 casillas y acabó en la posición a capturar
-          $coordsUMOrig = $this->notacionACoordsLocal($um['origen']);
-          $coordsUMDest = $this->notacionACoordsLocal($um['destino']);
-          if ($coordsUMOrig && $coordsUMDest && $um['pieza'] === 'Peon' && $um['color'] !== $this->turno) {
-            $salto = abs($coordsUMDest[0] - $coordsUMOrig[0]);
+          $coordenadas_del_origen_del_ultimo_movimiento = $this->notacionACoordsLocal($um['origen']); // Coordenadas del origen del último movimiento
+
+          $coordenadas_del_destino_del_ultimo_movimiento = $this->notacionACoordsLocal($um['destino']); // Coordenadas del destino del último movimiento
+
+          // Si el peón del oponente avanzó 2 casillas hacia la posición de captura al paso 
+          if ($coordenadas_del_origen_del_ultimo_movimiento && $coordenadas_del_destino_del_ultimo_movimiento && $um['pieza'] === 'Peon' && $um['color'] !== $this->turno) {
+
+            $salto = abs($coordenadas_del_destino_del_ultimo_movimiento[0] - $coordenadas_del_origen_del_ultimo_movimiento[0]);
             if ($salto === 2 && $um['destino'] === $posCapturaEnPassant) {
               $esEnPassant = true;
               // Se trata como captura especial

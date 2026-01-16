@@ -6,9 +6,10 @@ require_once __DIR__ . '/Pieza.php';
 class Alfil extends Pieza
 {
 
-/*
-  $posicion: Posición inicial
-  $color: Color de la pieza
+  /*
+  Constructor de la clase Alfil:
+  - $posicion: Posición inicial
+  - $color: Color de la pieza
 */
   public function __construct($posicion, $color)
   {

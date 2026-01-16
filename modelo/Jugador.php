@@ -26,8 +26,10 @@ class Jugador
   */
   public function __construct($nombre, $color)
   {
-    $this->nombre = $nombre;
-    $this->color = $color;
+    $this->nombre = $nombre; // Establecemos el nombre del jugador
+
+    $this->color = $color; // Establecemos el color del jugador
+
     $this->piezas = []; // Inicializamos el array de piezas vacío
 
     // Determinamos las filas iniciales según el color
@@ -47,14 +49,21 @@ class Jugador
     }
 
     // Creamos las piezas mayores en el orden estándar de ajedrez
-    $this->piezas[] = new Torre("A" . $filaPiezasMayores, $color);    // Torre izquierda
-    $this->piezas[] = new Caballo("B" . $filaPiezasMayores, $color);  // Caballo izquierdo
-    $this->piezas[] = new Alfil("C" . $filaPiezasMayores, $color);    // Alfil izquierdo
-    $this->piezas[] = new Dama("D" . $filaPiezasMayores, $color);     // Dama
-    $this->piezas[] = new Rey("E" . $filaPiezasMayores, $color);      // Rey
-    $this->piezas[] = new Alfil("F" . $filaPiezasMayores, $color);    // Alfil derecho
-    $this->piezas[] = new Caballo("G" . $filaPiezasMayores, $color);  // Caballo derecho
-    $this->piezas[] = new Torre("H" . $filaPiezasMayores, $color);    // Torre derecha
+    $this->piezas[] = new Torre("A" . $filaPiezasMayores, $color); // Torre izquierda
+
+    $this->piezas[] = new Caballo("B" . $filaPiezasMayores, $color); // Caballo izquierdo
+
+    $this->piezas[] = new Alfil("C" . $filaPiezasMayores, $color); // Alfil izquierdo
+
+    $this->piezas[] = new Dama("D" . $filaPiezasMayores, $color); // Dama
+
+    $this->piezas[] = new Rey("E" . $filaPiezasMayores, $color); // Rey
+
+    $this->piezas[] = new Alfil("F" . $filaPiezasMayores, $color); // Alfil derecho
+
+    $this->piezas[] = new Caballo("G" . $filaPiezasMayores, $color); // Caballo derecho
+
+    $this->piezas[] = new Torre("H" . $filaPiezasMayores, $color); // Torre derecha
 
     // Creamos los 8 peones (uno en cada columna)
     $columnas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -102,8 +111,7 @@ class Jugador
       if ($pieza->getPosicion() === $posicion && !$pieza->estCapturada()) return $pieza; // Retornamos la pieza encontrada
     }
 
-    // Si no encontramos ninguna pieza en esa posición, retornamos null
-    return null;
+    return null; // Retornamos null si no encontramos ninguna pieza
   }
 
 
@@ -117,8 +125,7 @@ class Jugador
       if ($pieza instanceof Rey && !$pieza->estCapturada()) return $pieza;
     }
 
-    // Si no encontramos el rey (debería existir siempre), retornamos null
-    return null;
+    return null; // Retornamos null si no encontramos el rey (aunque debe existir siempre)
   }
 
 
@@ -210,7 +217,6 @@ class Jugador
       }
     }
 
-    // Si no encontramos el peón, retornamos false
-    return false;
+    return false; // Retornamos false si no encontramos el peón
   }
 }

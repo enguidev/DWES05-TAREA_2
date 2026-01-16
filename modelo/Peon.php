@@ -2,22 +2,22 @@
 
 require_once __DIR__ . '/Pieza.php';
 
-/**
- * Clase Peon
- * Movimiento especial:
- * - Avanza 1 casilla hacia adelante (sin captura)
- * - Avanza 2 casillas en su primer movimiento (sin captura)
- * - Captura en diagonal (1 casilla en diagonal hacia adelante)
- */
+
+/*
+Clase Peon, que hereda la clase Pieza y tiene movimientos especiales:
+  - Avanza 2 casillas en su primer movimiento (sin captura)
+  - Avanza 1 casilla hacia adelante (sin captura)
+  - Captura en diagonal (1 casilla en diagonal hacia adelante)
+*/
 class Peon extends Pieza
 {
   private $esPrimerMovimiento; // Indica si es el primer movimiento del peón
 
-  /**
-   * Constructor de Peon
-   * @param string $posicion Posición inicial
-   * @param string $color Color de la pieza
-   */
+  /*
+  Constructor de la clase Peon:
+   -$posicion: Posición inicial
+  - $color: Color de la pieza
+*/
   public function __construct($posicion, $color)
   {
     parent::__construct($posicion, $color);
@@ -25,10 +25,8 @@ class Peon extends Pieza
     $this->esPrimerMovimiento = true;
   }
 
-  /**
-   * Permite forzar el estado de primer movimiento (útil para simulaciones)
-   * @param bool $v
-   */
+
+  // Permite forzar el estado de primer movimiento (útil para simulaciones)
   public function setEsPrimerMovimiento($v)
   {
     $this->esPrimerMovimiento = (bool)$v;
@@ -147,9 +145,11 @@ class Peon extends Pieza
    * Obtiene si es el primer movimiento del peón
    * @return bool True si es el primer movimiento
    */
+  // Para verificar el movimiento del peón:
+  // - Si es el primer movimiento, el peón avanza 2 casillas.
   public function getEsPrimerMovimiento()
   {
-    return $this->esPrimerMovimiento;
+    return $this->esPrimerMovimiento; // Retornamos el estado de primer movimiento
   }
 
   /*
@@ -165,6 +165,8 @@ class Peon extends Pieza
 
     // Convertimos la posición a coordenadas
     $coords = $this->notacionACoords($this->posicion);
+
+    // Si la conversión falla, retornamos false
     if (!$coords) return false;
 
     // Obtenemos la fila actual
@@ -177,6 +179,6 @@ class Peon extends Pieza
     if ($this->color === 'blancas' && $fila === 0) return true;
     if ($this->color === 'negras' && $fila === 7) return true;
 
-    return false; // No puede promoverse
+    return false; // Retornamos false si no puede promoverse
   }
 }

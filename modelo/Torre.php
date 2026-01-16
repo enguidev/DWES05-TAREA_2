@@ -8,11 +8,11 @@ require_once __DIR__ . '/Pieza.php';
  */
 class Torre extends Pieza
 {
-  /**
-   * Constructor de Torre
-   * @param string $posicion Posición inicial
-   * @param string $color Color de la pieza
-   */
+  /*
+  Constructor de la clase Torre:
+   -$posicion: Posición inicial
+  - $color: Color de la pieza
+*/
   public function __construct($posicion, $color)
   {
     parent::__construct($posicion, $color);
