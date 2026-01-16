@@ -108,7 +108,7 @@ class Jugador
     foreach ($this->piezas as $pieza) {
 
       // Si la posición coincide y la pieza no está capturada...
-      if ($pieza->getPosicion() === $posicion && !$pieza->estCapturada()) return $pieza; // Retornamos la pieza encontrada
+        if ($pieza->getPosicion() === $posicion && !$pieza->estaCapturada()) return $pieza; // Retornamos la pieza encontrada
     }
 
     return null; // Retornamos null si no encontramos ninguna pieza
@@ -122,7 +122,7 @@ class Jugador
     foreach ($this->piezas as $pieza) {
 
       // Si la pieza es un rey y no está capturada...
-      if ($pieza instanceof Rey && !$pieza->estCapturada()) return $pieza;
+      if ($pieza instanceof Rey && !$pieza->estaCapturada()) return $pieza;
     }
 
     return null; // Retornamos null si no encontramos el rey (aunque debe existir siempre)
@@ -139,7 +139,7 @@ class Jugador
     foreach ($this->piezas as $pieza) {
 
       // Si la pieza no está capturada, sumamos su valor a los puntos
-      if (!$pieza->estCapturada()) $puntos += $pieza->getValor();
+      if (!$pieza->estaCapturada()) $puntos += $pieza->getValor();
     }
 
     return $puntos; // Retornamos el total de puntos
@@ -151,7 +151,7 @@ class Jugador
   {
     $rey = $this->getRey(); // Obtenemos el rey del jugador
 
-    return $rey === null || $rey->estCapturada(); // Retornamos true si el rey no existe o está capturado 
+    return $rey === null || $rey->estaCapturada(); // Retornamos true si el rey no existe o está capturado 
   }
 
   /*

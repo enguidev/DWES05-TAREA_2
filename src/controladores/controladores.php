@@ -459,14 +459,14 @@ function resolverAcciones()
     foreach ($estado['jugadores']['blancas']->getPiezas() as $pieza) {
 
       // Si la pieza estuvo capturada, la agregamos a la lista
-      if ($pieza->estCapturada()) $estado['piezasCapturadas']['blancas'][] = $pieza;
+      if ($pieza->estaCapturada()) $estado['piezasCapturadas']['blancas'][] = $pieza;
     }
 
     // Recorremos las piezas de las negras
     foreach ($estado['jugadores']['negras']->getPiezas() as $pieza) {
 
       // Si la pieza estuvo capturada, la agregamos a la lista
-      if ($pieza->estCapturada()) $estado['piezasCapturadas']['negras'][] = $pieza;
+      if ($pieza->estaCapturada()) $estado['piezasCapturadas']['negras'][] = $pieza;
     }
   }
 

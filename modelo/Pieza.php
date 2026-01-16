@@ -54,7 +54,7 @@ class Pieza
   }
 
   // Para verificar si la pieza está capturada
-  public function estCapturada()
+  public function estaCapturada()
   {
     return $this->posicion === "CAPTURADA"; // Retornamos true si está capturada
   }
