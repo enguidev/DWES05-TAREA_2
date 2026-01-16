@@ -120,53 +120,69 @@
 }
 
 .instrucciones-contenido {
-  padding: 15px;
-  background8px;
+  padding: 25px;
+  background: #ffffff;
+}
 
-  background: #ffffff .instrucciones h4 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    color: #333;
-    font-size: 1.1em;
-  }
+.instrucciones h4 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.1em;
+}
 
-  .instrucciones p {
-    margin-bottom: 10px;
-    color: #333;
-    line-height: 1.6;
-  }
+.instrucciones h4:first-child {
+  margin-top: 0;
+}
 
-  .instrucciones ol {
-    margin-left: 20px;
-    color: #555;
-  }
+.instrucciones p {
+  margin-bottom: 15px;
+  color: #333;
+  line-height: 1.6;
+}
 
-  .instrucciones li {
-    margin-bottom: 8px;
-    line-height: 1.6;
-  }
+.instrucciones ol {
+  margin-left: 20px;
+  color: #555;
+  padding: 0;
+}
 
-  .instrucciones ul {
-    margin-left: 20px;
-    color: #555;
-    list-style-type: disc;
-  }
+.instrucciones li {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
 
-  .titulo-seccion {
-    margin-top: 0;
-    color: #333;
-  }
+.instrucciones ul {
+  margin-left: 20px;
+  color: #555;
+  list-style-type: disc;
+  padding: 0;
+}
 
-  .titulo-seccion-separado {
-    margin-top: 15px;
-    color: #333;
-  }
+.titulo-seccion {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
 
-  .lista-sin-estilo {
-    list-style: none;
-    padding-left: 0;
-  }
+.titulo-seccion-separado {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  color: #333;
+}
 
-  .formulario-inline {
-    display: inline;
-  }
+.lista-sin-estilo {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.lista-sin-estilo li {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.formulario-inline {
+  display: inline;
+}
