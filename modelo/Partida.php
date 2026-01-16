@@ -901,154 +901,198 @@ class Partida
 
     $tablero .= "  A B C D E F G H\n"; // Pie de columnas
 
-    return $tablero;
+    return $tablero; // Retornamos la representación del tablero
   }
 
-  /**
-   * Obtiene la letra que representa una pieza
-   * @param Pieza $pieza La pieza
-   * @return string Letra representativa (T=Torre, C=Caballo, A=Alfil, D=Dama, R=Rey, P=Peón)
-   */
+
+  /*
+  Para obtener la letra representativa de una pieza
+    -$pieza: La pieza a evaluar
+    -@return Letra representativa de la pieza:
+      T = Torre
+      C = Caballo
+      A = Alfil
+      D = Dama
+      R = Rey
+      P = Peón
+  */
   private function obtenerLetraPieza($pieza)
   {
-    if ($pieza instanceof Torre) return 'T';
-    if ($pieza instanceof Caballo) return 'C';
-    if ($pieza instanceof Alfil) return 'A';
-    if ($pieza instanceof Dama) return 'D';
-    if ($pieza instanceof Rey) return 'R';
-    if ($pieza instanceof Peon) return 'P';
-    return '?';
+    if ($pieza instanceof Torre) return 'T'; // Si es torre, retornamos 'T'
+    if ($pieza instanceof Caballo) return 'C'; // Si es caballo, retornamos 'C'
+    if ($pieza instanceof Alfil) return 'A'; // Si es alfil, retornamos 'A'
+    if ($pieza instanceof Dama) return 'D'; // Si es dama, retornamos 'D'
+    if ($pieza instanceof Rey) return 'R'; // Si es rey, retornamos 'R'
+    if ($pieza instanceof Peon) return 'P'; // Si es peón, retornamos 'P'
+
+    return '?'; // Si no coincide con ninguna, retornamos '?'
   }
 
-  /**
-   * Obtiene el mensaje actual de la partida
-   * @return string Mensaje de estado
-   */
+
+  /*
+  Para obtener el mensaje actual de la partida
+    -@return Mensaje de estado  
+  */
   public function getMensaje()
   {
-    return $this->mensaje;
+    return $this->mensaje; // Retornamos el mensaje
   }
 
-  /**
-   * Obtiene el turno actual
-   * @return string Color del jugador actual
-   */
+
+  /*
+  Para obtener el turno actual
+    -@return Color del jugador actual ('blancas' o 'negras')
+  */
   public function getTurno()
   {
-    return $this->turno;
+    return $this->turno; // Retornamos el turno actual
   }
 
-  /**
-   * Verifica si la partida ha terminado
-   * @return bool True si la partida terminó
-   */
+
+  /*
+  Para verificar si la partida ha terminado
+    -@return True si la partida ha terminado, False en caso contrario
+  */
   public function estaTerminada()
   {
-    return $this->partidaTerminada;
+    return $this->partidaTerminada; // Retornamos el estado de la partida
   }
 
-  /**
-   * Obtiene todos los jugadores
-   * @return array Array asociativo con los jugadores
-   */
+  /*
+  Para obtener todos los jugadores
+    -@return Array asociativo con los jugadores  
+  */
   public function getJugadores()
   {
-    return $this->jugadores;
+    return $this->jugadores; // Retornamos el array de jugadores
   }
 
-  /**
-   * Verifica si hay historial de jugadas disponible para deshacer
-   * @return bool True si hay jugadas en el historial, false en caso contrario
-   */
+
+  /*
+  Para verificar si hay historial de jugadas disponible para deshacer
+    -@return True si hay jugadas en el historial, False en caso contrario
+  */
   public function tieneHistorial()
   {
-    return !empty($this->historial);
+    return !empty($this->historial); // Retornamos true si hay historial, false si está vacío
   }
 
-  /**
-   * Deshace la última jugada realizada
-   * @return bool True si se pudo deshacer, false si no hay jugadas para deshacer
-   */
+
+  /*
+  Para deshacer la última jugada realizada
+    -@return True si se pudo deshacer, False si no hay jugadas para deshacer
+  */
   public function deshacerJugada()
   {
+    // Si no hay historial, no se puede deshacer
     if (empty($this->historial)) {
-      $this->mensaje = "No hay jugadas para deshacer";
-      return false;
+
+      $this->mensaje = "No hay jugadas para deshacer"; // Actualizamos el mensaje
+
+      return false; // Retornamos false
     }
 
-    // Restaurar el último snapshot
-    $snapshot = unserialize(array_pop($this->historial));
-    $this->jugadores = $snapshot['jugadores'];
-    $this->turno = $snapshot['turno'];
-    $this->mensaje = $snapshot['mensaje'];
-    $this->partidaTerminada = $snapshot['partidaTerminada'];
+    // Restaurar la ultima captura del historial
+    $snapshot = unserialize(array_pop($this->historial)); // Obtenemos la ultima captura del historial
 
-    return true;
+    $this->jugadores = $snapshot['jugadores']; // Restauramos los jugadores
+
+    $this->turno = $snapshot['turno']; // Restauramos el turno
+
+    $this->mensaje = $snapshot['mensaje']; // Restauramos el mensaje
+
+    $this->partidaTerminada = $snapshot['partidaTerminada']; // Restauramos el estado de la partida
+
+    return true; // Retornamos true
   }
 
-  /**
-   * Verifica si el enroque corto está disponible para el color dado
-   * @param string $color 'blancas' o 'negras'
-   * @return bool True si está disponible
-   */
+
+  /*
+  Para comprobar si el enroque corto está disponible para el color dado
+    -$color: Color del jugador ('blancas' o 'negras')
+    -@return True si el enroque corto está disponible, False en caso contrario
+  */
   public function puedeEnrocarCorto($color)
   {
-    $rey = $this->jugadores[$color]->getRey();
+    $rey = $this->jugadores[$color]->getRey(); // Obtenemos el rey del color dado
+
+    // Si no hay rey, o ha movido, o está en jaque, no se puede enrocar, por lo que retornamos false
     if (!$rey || $rey->haMovido() || $this->estaEnJaque($color)) return false;
 
+    // Obtenemos la torre correspondiente
     $torre = $this->jugadores[$color]->getPiezaEnPosicion($color === 'blancas' ? 'H1' : 'H8');
+
+    // Si no hay torre, o no es torre, o ha movido, retornamos false
     if (!$torre || !($torre instanceof Torre) || $torre->haMovido()) return false;
 
+    // Verificamos que las casillas entre rey y torre estén libres y no en jaque
     $casillas = $color === 'blancas' ? ['F1', 'G1'] : ['F8', 'G8'];
+
+    // Para cada casilla entre rey y torre
     foreach ($casillas as $casilla) {
+
+      // Si la casilla no está libre, retornamos false
       if ($this->obtenerPiezaEnPosicion($casilla) !== null) return false;
-      // Simular movimiento del rey a esa casilla y verificar jaque
-      $posOriginal = $rey->getPosicion();
-      $rey->setPosicion($casilla);
-      $enJaque = $this->estaEnJaque($color);
+
+      // Simular movimiento del rey a esa casilla y verificar jaque:
+      $posOriginal = $rey->getPosicion(); // Guardamos posición original
+
+      $rey->setPosicion($casilla); // Movemos el rey a la casilla
+
+      $enJaque = $this->estaEnJaque($color); // Verificamos si está en jaque
+
       $rey->setPosicion($posOriginal); // Restaurar
-      if ($enJaque) return false;
+
+      if ($enJaque) return false; // Si queda en jaque, retornamos false
     }
-    return true;
+    // Si llega aquí, el enroque corto es posible
+    return true; // Retornamos true
   }
 
-  /**
-   * Verifica si el enroque largo está disponible para el color dado
-   * @param string $color 'blancas' o 'negras'
-   * @return bool True si está disponible
-   */
+
+  /*
+  Para comprobar si el enroque largo está disponible para el color dado
+    -$color: Color del jugador ('blancas' o 'negras')
+    -@return True si el enroque largo está disponible, False en caso contrario
+  */
   public function puedeEnrocarLargo($color)
   {
-    $rey = $this->jugadores[$color]->getRey();
+    $rey = $this->jugadores[$color]->getRey(); // Obtenemos el rey del color dado
+
+    // Si no hay rey, o ha movido, o está en jaque, no se puede enrocar, por lo que retornamos false
     if (!$rey || $rey->haMovido() || $this->estaEnJaque($color)) return false;
 
+    // Obtenemos la torre correspondiente
     $torre = $this->jugadores[$color]->getPiezaEnPosicion($color === 'blancas' ? 'A1' : 'A8');
+
+    // Si no hay torre, o no es torre, o ha movido, retornamos false
     if (!$torre || !($torre instanceof Torre) || $torre->haMovido()) return false;
 
-    $casillas = $color === 'blancas' ? ['B1', 'C1', 'D1'] : ['B8', 'C8', 'D8'];
+    // 
+    $casillas = $color === 'blancas' ? ['B1', 'C1', 'D1'] : ['B8', 'C8', 'D8']; // Casillas entre rey y torre
+
+    // Para cada casilla entre rey y torre
     foreach ($casillas as $casilla) {
+
+      // Si la casilla no está libre, retornamos false
       if ($this->obtenerPiezaEnPosicion($casilla) !== null) return false;
-      // Para largo, comprobar jaque en C y D; B puede estar fuera del trayecto del rey
+
+      // Para largo, comprobar jaque en C y D; B puede estar fuera del trayecto del rey:
+      // Si la casilla es C1/C8 o D1/D8 
       if ($casilla === ($color === 'blancas' ? 'C1' : 'C8') || $casilla === ($color === 'blancas' ? 'D1' : 'D8')) {
-        $posOriginal = $rey->getPosicion();
-        $rey->setPosicion($casilla);
-        $enJaque = $this->estaEnJaque($color);
-        $rey->setPosicion($posOriginal);
-        if ($enJaque) return false;
+
+        $posOriginal = $rey->getPosicion(); // Guardamos posición original
+
+        $rey->setPosicion($casilla); // Movemos el rey a la casilla
+
+        $enJaque = $this->estaEnJaque($color); // Verificamos si está en jaque
+
+        $rey->setPosicion($posOriginal); // Restauramos la posición original
+
+        if ($enJaque) return false; // Si queda en jaque, retornamos false
       }
     }
-    return true;
-  }
-
-  /**
-   * Verifica si hay captura al paso disponible
-   * @param string $color 'blancas' o 'negras'
-   * @return array|null Posición de captura o null
-   */
-  public function capturaAlPasoDisponible($color)
-  {
-    // Ahora gestionado dentro de jugada() mediante $this->ultimoMovimiento
-    return null;
+    return true; // Retornamos true (ya que el enroque largo es posible)
   }
 
   /**
