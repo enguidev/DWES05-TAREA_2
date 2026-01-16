@@ -314,6 +314,7 @@ class Partida
         $piezaOrigenTemp->setPosicion($destino); // Movemos la pieza en el estado temporal
 
           $piezaOrigenTemp->setHaMovido(true); // Marcamos que ha movido
+      }
 
       // Simular enroque moviendo rey y torre en temp si aplica:
 
