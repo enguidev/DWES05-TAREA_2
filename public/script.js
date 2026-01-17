@@ -118,33 +118,40 @@ const sliderRetrocesos = document.getElementById("num_retrocesos");
 const valorRetrocesos = document.getElementById("num_retrocesos_valor");
 
 if (sliderRetrocesos && valorRetrocesos) {
-  sliderRetrocesos.addEventListener("input", function() {
+  sliderRetrocesos.addEventListener("input", function () {
     valorRetrocesos.textContent = this.value;
   });
 }
 
 // Slider para pantalla inicial
 const sliderRetrocesosInicio = document.getElementById("num_retrocesos_inicio");
-const valorRetrocesosInicio = document.getElementById("num_retrocesos_valor_inicio");
+const valorRetrocesosInicio = document.getElementById(
+  "num_retrocesos_valor_inicio"
+);
 
 if (sliderRetrocesosInicio && valorRetrocesosInicio) {
-  sliderRetrocesosInicio.addEventListener("input", function() {
+  sliderRetrocesosInicio.addEventListener("input", function () {
     valorRetrocesosInicio.textContent = this.value;
   });
 }
 // Deshabilitar selects de tiempo cuando se activa "sin tiempo" en pantalla inicial
 const chkSinTiempoInicio = document.getElementById("sin_tiempo_inicio");
-const selTiempoInicialInicio = document.querySelector('.config-form select[name="tiempo_inicial"]');
-const selIncrementoInicio = document.querySelector('.config-form select[name="incremento"]');
+const selTiempoInicialInicio = document.querySelector(
+  '.config-form select[name="tiempo_inicial"]'
+);
+const selIncrementoInicio = document.querySelector(
+  '.config-form select[name="incremento"]'
+);
 
 function aplicarEstadoSinTiempoInicio() {
-  if (!chkSinTiempoInicio || !selTiempoInicialInicio || !selIncrementoInicio) return;
+  if (!chkSinTiempoInicio || !selTiempoInicialInicio || !selIncrementoInicio)
+    return;
   const activo = chkSinTiempoInicio.checked;
   selTiempoInicialInicio.disabled = activo;
   selIncrementoInicio.disabled = activo;
 }
 if (chkSinTiempoInicio) {
-  chkSinTiempoInicio.addEventListener('change', aplicarEstadoSinTiempoInicio);
+  chkSinTiempoInicio.addEventListener("change", aplicarEstadoSinTiempoInicio);
   // Inicializar estado al cargar
   aplicarEstadoSinTiempoInicio();
 }

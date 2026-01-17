@@ -6,7 +6,7 @@ function mostrarCabeceraJuego($partida)
 ?>
   <div class="header-juego">
     <h1>
-      <img src="public/imagenes/fichas_negras/rey_negra.png" alt="Rey negro" style="width: 100px; height: 100px; vertical-align: middle; transform: translateY(-2px); margin-right: 12px; background: transparent; border-radius: 8px;"> 
+      <img src="public/imagenes/fichas_negras/rey_negra.png" alt="Rey negro" style="width: 100px; height: 100px; vertical-align: middle; transform: translateY(-2px); margin-right: 12px; background: transparent; border-radius: 8px;">
       Partida de Ajedrez
       <?php if (!empty($_SESSION['config']['auto_guardar_partidas']) && $partida && count($partida->getHistorialMovimientos()) > 0): ?>
         <span style="display: inline-flex; align-items: center; justify-content: center; margin-left: 10px; padding: 6px 12px; background: #ff6b6b; color: white; border-radius: 5px; font-size: 0.7em; font-weight: bold; vertical-align: middle;" title="Guardado automático activo">🔴 REC</span>

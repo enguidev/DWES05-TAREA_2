@@ -243,8 +243,8 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           <!-- Modo sin tiempo -->
           <div class="config-option checkbox">
             <label>
-              <input type="checkbox" name="sin_tiempo" id="sin_tiempo_inicio"> 
-              Modo sin tiempo (sin reloj) 
+              <input type="checkbox" name="sin_tiempo" id="sin_tiempo_inicio">
+              Modo sin tiempo (sin reloj)
               <span class="texto-ayuda-inline" style="margin-left: 8px;">Ignora tiempo inicial e incremento</span>
             </label>
           </div>
@@ -313,7 +313,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
 // Para mostrar modal para cargar una partida guardada desde la pantalla de inicio
 function mostrarModalCargarInicial($partidas)
 {
-  ?>
+?>
   <!-- Overlay que cubre toda la pantalla y modal centrado -->
   <div id="modalCargarInicial" class="modal-overlay">
     <div class="modal-content modal-lista">

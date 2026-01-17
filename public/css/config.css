@@ -410,11 +410,12 @@ input[type="file"][id^="avatar_personalizado"] {
   color: #667eea;
   font-weight: 600;
   margin-top: 10px;
-.texto-ayuda-inline {
-  font-size: 0.85em;
-  color: #666;
-  margin-left: 6px;
-}
+
+  .texto-ayuda-inline {
+    font-size: 0.85em;
+    color: #666;
+    margin-left: 6px;
+  }
 }
 
 .config-info {
@@ -429,6 +430,7 @@ input[type="file"][id^="avatar_personalizado"] {
   margin-bottom: 15px;
   font-size: 1.2em;
 }
+
 .select-tiempo:disabled {
   opacity: 0.6;
   cursor: not-allowed;
