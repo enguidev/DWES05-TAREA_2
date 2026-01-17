@@ -240,6 +240,14 @@ function mostrarFormularioConfig($partidasGuardadas = [])
               <option value="3600">60 minutos (Clásicas)</option>
             </select>
           </div>
+          <!-- Modo sin tiempo -->
+          <div class="config-option checkbox">
+            <label>
+              <input type="checkbox" name="sin_tiempo" id="sin_tiempo_inicio"> 
+              Modo sin tiempo (sin reloj) 
+              <span class="texto-ayuda-inline" style="margin-left: 8px;">Ignora tiempo inicial e incremento</span>
+            </label>
+          </div>
           <!-- Opción de incremento Fischer (tiempo extra por movimiento) -->
           <div class="config-option">
             <label>Incremento Fischer:</label>
@@ -264,11 +272,29 @@ function mostrarFormularioConfig($partidasGuardadas = [])
           <div class="config-option checkbox">
             <label><input type="checkbox" name="mostrar_coordenadas" checked> Mostrar coordenadas (A-H, 1-8)</label>
           </div>
-          <!-- Opción para mostrar piezas capturadas -->
           <div class="config-option checkbox">
             <label><input type="checkbox" name="mostrar_capturas" checked> Mostrar piezas capturadas</label>
           </div>
 
+
+          <!-- Número de retrocesos permitidos -->
+          <div class="config-option">
+            <label>🔙 Número máximo de retrocesos:</label>
+            <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px;">
+              <input type="number" name="num_retrocesos" id="num_retrocesos_inicio" min="0" max="20" value="10" step="1" style="width: 110px; padding: 6px 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; background: #5568d3; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold;">
+                <span id="num_retrocesos_valor_inicio" style="min-width: 20px; text-align: center;">10</span>
+                <span style="font-size: 0.9em;">movimientos</span>
+              </div>
+            </div>
+            <small class="texto-ayuda">Configura con flechas (0–20)</small>
+          </div>
+
+          <!-- Auto-guardar todas las partidas -->
+          <div class="config-option checkbox">
+            <label><input type="checkbox" name="auto_guardar_partidas"> 💾 Guardar automáticamente todas las partidas</label>
+            <small class="texto-ayuda">Se guarda tras cada jugada para poder reproducirla o estudiarla después</small>
+          </div>
         </div>
 
         <!-- Linea horizontal separadora -->
@@ -312,11 +338,18 @@ function mostrarModalCargarInicial($partidas)
               </div>
               <!-- Botones de acción para cada partida -->
               <div class="acciones-partida">
-                <!-- Botón para cargar la partida -->
-                <form method="post" class="formulario-inline">
-                  <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
-                  <button type="submit" name="cargar_partida_inicial" class="btn-cargar-item">📂 Cargar</button>
-                </form>
+                <!-- Botón para cargar la partida (solo si tiene movimientos) -->
+                <?php if (!empty($partida['movs'])): ?>
+                  <form method="post" class="formulario-inline">
+                    <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
+                    <button type="submit" name="cargar_partida_inicial" class="btn-cargar-item">📂 Cargar</button>
+                  </form>
+                  <!-- Botón para reproducir la partida (solo si tiene movimientos) -->
+                  <form method="post" class="formulario-inline">
+                    <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">
+                    <button type="submit" name="reproducir_partida_inicial" class="btn-cargar-item">🎬 Reproducir</button>
+                  </form>
+                <?php endif; ?>
                 <!-- Botón para eliminar la partida -->
                 <form method="post" class="formulario-inline">
                   <input type="hidden" name="archivo_partida" value="<?php echo htmlspecialchars($partida['archivo']); ?>">

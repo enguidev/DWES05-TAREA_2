@@ -12,6 +12,14 @@ require_once 'src/controladores/controladores.php';
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'actualizar_relojes') {
   procesarAjaxActualizarRelojes();
 }
+// AJAX: estado de reproducción
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'reproduccion_estado') {
+  procesarAjaxReproduccionEstado();
+}
+// AJAX: avanzar un paso de reproducción
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'reproduccion_paso') {
+  procesarAjaxReproduccionPaso();
+}
 
 // Configuración por defecto y estado inicial
 aplicarConfigPredeterminada(); // Inicializa `$_SESSION['config']` y `$_SESSION['pausa]`

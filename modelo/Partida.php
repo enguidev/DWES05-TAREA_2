@@ -76,9 +76,13 @@ class Partida
 
     ]);
 
-    // Limitar historial a 10 movimientos para no consumir memoria
-    // Si hay más de 10, eliminamos el más antiguo
-    if (count($this->historial) > 10) array_shift($this->historial);
+    // Limitar historial según configuración para no consumir memoria
+    // Si hay más del límite, eliminamos el más antiguo
+    $limiteRetrocesos = 10;
+    if (isset($_SESSION['config']) && isset($_SESSION['config']['num_retrocesos'])) {
+      $limiteRetrocesos = max(1, min(20, (int)$_SESSION['config']['num_retrocesos']));
+    }
+    if (count($this->historial) > $limiteRetrocesos) array_shift($this->historial);
 
     // 1. Verificamos que existe una pieza en el origen
     $piezaOrigen = $this->jugadores[$this->turno]->getPiezaEnPosicion($origen);

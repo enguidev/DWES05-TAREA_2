@@ -32,6 +32,18 @@ if (modal && btnConfiguracion && closeModal && btnCancelar) {
           tiempoLocalBlancas = data.tiempo_blancas;
           tiempoLocalNegras = data.tiempo_negras;
           relojActivoLocal = data.reloj_activo;
+          sinTiempoLocal = !!data.sin_tiempo;
+          // Gestionamos el intervalo según modo sin tiempo
+          if (sinTiempoLocal) {
+            if (intervaloRelojes !== null) {
+              clearInterval(intervaloRelojes);
+              intervaloRelojes = null;
+            }
+          } else {
+            if (!intervaloRelojes) {
+              intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+            }
+          }
         }
         // Actualizamos los relojes en la pantalla
         actualizarDisplayRelojes();
@@ -99,6 +111,43 @@ if (modal && btnConfiguracion && closeModal && btnCancelar) {
   };
 }
 
+// SLIDER PARA NÚMERO DE RETROCESOS
+// ========================================
+// Actualizamos el valor del slider en tiempo real
+const sliderRetrocesos = document.getElementById("num_retrocesos");
+const valorRetrocesos = document.getElementById("num_retrocesos_valor");
+
+if (sliderRetrocesos && valorRetrocesos) {
+  sliderRetrocesos.addEventListener("input", function() {
+    valorRetrocesos.textContent = this.value;
+  });
+}
+
+// Slider para pantalla inicial
+const sliderRetrocesosInicio = document.getElementById("num_retrocesos_inicio");
+const valorRetrocesosInicio = document.getElementById("num_retrocesos_valor_inicio");
+
+if (sliderRetrocesosInicio && valorRetrocesosInicio) {
+  sliderRetrocesosInicio.addEventListener("input", function() {
+    valorRetrocesosInicio.textContent = this.value;
+  });
+}
+// Deshabilitar selects de tiempo cuando se activa "sin tiempo" en pantalla inicial
+const chkSinTiempoInicio = document.getElementById("sin_tiempo_inicio");
+const selTiempoInicialInicio = document.querySelector('.config-form select[name="tiempo_inicial"]');
+const selIncrementoInicio = document.querySelector('.config-form select[name="incremento"]');
+
+function aplicarEstadoSinTiempoInicio() {
+  if (!chkSinTiempoInicio || !selTiempoInicialInicio || !selIncrementoInicio) return;
+  const activo = chkSinTiempoInicio.checked;
+  selTiempoInicialInicio.disabled = activo;
+  selIncrementoInicio.disabled = activo;
+}
+if (chkSinTiempoInicio) {
+  chkSinTiempoInicio.addEventListener('change', aplicarEstadoSinTiempoInicio);
+  // Inicializar estado al cargar
+  aplicarEstadoSinTiempoInicio();
+}
 // ========================================
 // CONTROL DEL BOTÓN GUARDAR CONFIGURACIÓN
 // ========================================
@@ -177,6 +226,7 @@ let relojActivoLocal = "blancas"; // Quién está jugando ahora
 let pausaLocal = false; // Si la partida está en pausa
 let contadorSincronizacion = 0; // Contador para sincronizar cada 5 segundos
 let recargandoPagina = false; // Flag para evitar múltiples recargas cuando se agota el tiempo
+let sinTiempoLocal = false; // Modo sin tiempo: desactiva el decremento del reloj
 
 // Función para formatear segundos a MM:SS
 function formatearTiempo(segundos) {
@@ -200,21 +250,35 @@ function actualizarDisplayRelojes() {
   tb.textContent = formatearTiempo(tiempoLocalBlancas);
   tn.textContent = formatearTiempo(tiempoLocalNegras);
 
-  // Resaltamos en rojo SOLO el reloj del jugador que está jugando si le quedan menos de 60 segundos
-  if (relojActivoLocal === "blancas") {
-    tiempoLocalBlancas < 60
-      ? tb.classList.add("tiempo-critico")
-      : tb.classList.remove("tiempo-critico");
-    tn.classList.remove("tiempo-critico");
+  // Resaltados de tiempo crítico (si hay tiempo)
+  if (!sinTiempoLocal) {
+    if (relojActivoLocal === "blancas") {
+      tiempoLocalBlancas < 60
+        ? tb.classList.add("tiempo-critico")
+        : tb.classList.remove("tiempo-critico");
+      tn.classList.remove("tiempo-critico");
+    } else {
+      tiempoLocalNegras < 60
+        ? tn.classList.add("tiempo-critico")
+        : tn.classList.remove("tiempo-critico");
+      tb.classList.remove("tiempo-critico");
+    }
   } else {
-    tiempoLocalNegras < 60
-      ? tn.classList.add("tiempo-critico")
-      : tn.classList.remove("tiempo-critico");
     tb.classList.remove("tiempo-critico");
+    tn.classList.remove("tiempo-critico");
   }
 
   // Actualizamos los estilos de reloj activo/inactivo en todos los relojes
   document.querySelectorAll(".reloj").forEach((r) => {
+    // Modo sin tiempo: atenuamos relojes y quitamos activo/inactivo
+    if (sinTiempoLocal) {
+      r.classList.add("reloj-disabled");
+      r.classList.remove("reloj-activo");
+      r.classList.remove("reloj-inactivo");
+      return;
+    } else {
+      r.classList.remove("reloj-disabled");
+    }
     if (r.classList.contains("reloj-blancas")) {
       // Si es el reloj de blancas y blancas está jugando
       relojActivoLocal === "blancas"
@@ -237,6 +301,12 @@ function actualizarDisplayRelojes() {
 function actualizarTiempoLocal() {
   // Si ya estamos recargando la página, no hacer nada
   if (recargandoPagina) return;
+
+  // Si el modo sin tiempo está activo, solo refrescamos la vista y salimos
+  if (sinTiempoLocal) {
+    actualizarDisplayRelojes();
+    return;
+  }
 
   // Verificamos que existen los elementos del reloj
   if (
@@ -317,6 +387,7 @@ function sincronizarConServidor() {
         tiempoLocalNegras = data.tiempo_negras;
         relojActivoLocal = data.reloj_activo;
         pausaLocal = data.pausa || false;
+        sinTiempoLocal = !!data.sin_tiempo;
 
         // Log para debugging si la partida está en pausa
         if (data.pausa) {
@@ -334,6 +405,12 @@ function sincronizarConServidor() {
             clearInterval(intervaloRelojes);
             intervaloRelojes = null;
           }
+        }
+
+        // Si está en modo sin tiempo, aseguramos que el intervalo esté parado
+        if (sinTiempoLocal && intervaloRelojes !== null) {
+          clearInterval(intervaloRelojes);
+          intervaloRelojes = null;
         }
       }
     })
@@ -365,13 +442,44 @@ document.addEventListener("DOMContentLoaded", function () {
         tiempoLocalNegras = data.tiempo_negras;
         relojActivoLocal = data.reloj_activo;
         pausaLocal = data.pausa || false;
+        sinTiempoLocal = !!data.sin_tiempo;
         // Actualizamos la pantalla
         actualizarDisplayRelojes();
-        // Iniciamos el intervalo para actualizar cada segundo
-        intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+        // Iniciamos el intervalo para actualizar cada segundo si NO es sin tiempo
+        if (!sinTiempoLocal) {
+          intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+        }
       })
       .catch((e) => console.error("Error al inicializar relojes:", e));
   }
+
+  // ========================================
+  // MODO REPRODUCCIÓN AUTOMÁTICA DE PARTIDAS
+  // ========================================
+  // Si hay un tablero y el backend indica reproducción activa, avanzamos automáticamente
+  fetch("index.php?ajax=reproduccion_estado")
+    .then((r) => r.json())
+    .then((estado) => {
+      if (estado.activo && document.getElementById("tiempo-blancas")) {
+        const avanzar = () => {
+          fetch("index.php?ajax=reproduccion_paso")
+            .then((r) => r.json())
+            .then((res) => {
+              if (res.fin) {
+                // Final de reproducción: recargamos para mostrar estado final
+                location.reload();
+                return;
+              }
+              // Refrescamos tablero tras cada jugada
+              location.reload();
+            })
+            .catch((e) => console.error("Error en reproducción:", e));
+        };
+        // Avanzamos cada segundo
+        setTimeout(avanzar, 500);
+      }
+    })
+    .catch(() => {});
 
   // ========================================
   // GESTIÓN DE AVATARES PERSONALIZADOS

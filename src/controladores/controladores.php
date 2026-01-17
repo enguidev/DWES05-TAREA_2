@@ -18,7 +18,8 @@ function procesarAjaxActualizarRelojes()
       'tiempo_negras' => 0,
       'reloj_activo' => 'blancas',
       'pausa' => false,
-      'sin_partida' => true
+      'sin_partida' => true,
+      'sin_tiempo' => isset($_SESSION['config']['sin_tiempo']) ? (bool)$_SESSION['config']['sin_tiempo'] : false
     ]);
 
     /* Guarda todos los cambios de sesión en el servidor 
@@ -33,9 +34,11 @@ function procesarAjaxActualizarRelojes()
 
   // Obtenemos la hora actual (segundos desde 1970)
   $ahora = time();
+  // Modo sin tiempo desde configuración
+  $sinTiempo = isset($_SESSION['config']['sin_tiempo']) ? (bool)$_SESSION['config']['sin_tiempo'] : false;
 
   // Solo restamos tiempo si la partida no está pausada y no se acabó el tiempo
-  if (!isset($_SESSION['pausa']) || !$_SESSION['pausa']) {
+  if ((!isset($_SESSION['pausa']) || !$_SESSION['pausa']) && !$sinTiempo) {
 
     // Si el tiempo no se agotó, seguimos contando
     if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
@@ -74,7 +77,7 @@ function procesarAjaxActualizarRelojes()
   }
 
   // Verificamos si algún jugador se quedó sin tiempo (solo una vez)
-  if (!isset($_SESSION['partida_terminada_por_tiempo'])) {
+  if (!isset($_SESSION['partida_terminada_por_tiempo']) && !$sinTiempo) {
 
     // Si las blancas se acabaron el tiempo, ganan las negras
     if ($_SESSION['tiempo_blancas'] <= 0) {
@@ -111,7 +114,8 @@ function procesarAjaxActualizarRelojes()
     'reloj_activo' => $_SESSION['reloj_activo'],
     'pausa' => isset($_SESSION['pausa']) ? $_SESSION['pausa'] : false,
     'sin_partida' => false,
-    'partida_terminada' => $partidaTerminada
+    'partida_terminada' => $partidaTerminada,
+    'sin_tiempo' => $sinTiempo
   ]);
   // Guarda los cambios de sesión y cierra la conexión
   session_write_close();
@@ -129,16 +133,26 @@ function aplicarConfigPredeterminada()
     "tiempo_inicial" => 600, // 10 minutos
     "incremento" => 0, // Sin incremento
     "mostrar_coordenadas" => true, // Mostramos coordenadas del tablero
-    "mostrar_capturas" => true // Mostramos piezas capturadas
+    "mostrar_capturas" => true, // Mostramos piezas capturadas
+    "sin_tiempo" => false, // Por defecto con tiempo
+    "num_retrocesos" => 10, // Máximo 10 retrocesos por defecto
+    "auto_guardar_partidas" => false // No guardar automáticamente por defecto
   ];
 
   // Si la configuración no existe en la session, la creamos con los valores por defecto ($configDefecto )
   if (!isset($_SESSION["config"])) $_SESSION["config"] = $configDefecto;
+  else {
+    // Si la configuración existe pero faltan los nuevos campos, los añadimos
+    if (!isset($_SESSION["config"]["sin_tiempo"])) $_SESSION["config"]["sin_tiempo"] = false;
+    if (!isset($_SESSION["config"]["num_retrocesos"])) $_SESSION["config"]["num_retrocesos"] = 10;
+    if (!isset($_SESSION["config"]["auto_guardar_partidas"])) $_SESSION["config"]["auto_guardar_partidas"] = false;
+  }
 
-  // Si hay una partida en curso pero no existe el indicador de pausa
-  if (isset($_SESSION["partida"]) && !isset($_SESSION["pausa"])) {
-
-    $_SESSION["pausa"] = false; // lo inicializamos en false
+  // Si hay una partida en curso, asegurar que el indicador de pausa existe
+  if (isset($_SESSION["partida"])) {
+    if (!isset($_SESSION["pausa"])) {
+      $_SESSION["pausa"] = false; // lo inicializamos en false
+    }
   }
 }
 
@@ -252,6 +266,14 @@ function resolverAcciones()
 
       $_SESSION['nombres_configurados'] = true; // Marcamos que ya se configuraron los nombres
     }
+  }
+
+  // Reproducir partida desde pantalla inicial
+  if (isset($_POST['reproducir_partida_inicial']) && isset($_POST['archivo_partida'])) {
+    iniciarReproduccion($_POST['archivo_partida']);
+    // Forzamos mostrar tablero
+    $_SESSION['pantalla_principal_mostrada'] = true;
+    $_SESSION['nombres_configurados'] = true;
   }
 
   // Si se pidió eliminar una partida desde la pantalla inicial, la eliminamos
@@ -475,6 +497,81 @@ function resolverAcciones()
 
   return $estado; // Retornamos el estado preparado para la vista
 }
+// Inicia modo reproducción con un archivo de partida guardada
+function iniciarReproduccion($archivo)
+{
+  $ruta = __DIR__ . '/../data/partidas/' . basename($archivo);
+  if (!file_exists($ruta)) return false;
+
+  $contenido = json_decode(file_get_contents($ruta), true);
+  if (!is_array($contenido) || !isset($contenido['historialMovimientos'])) return false;
+
+  // Construimos una nueva partida limpia con los mismos nombres, si podemos
+  $partidaGuardada = isset($contenido['partida']) ? unserialize($contenido['partida']) : null;
+  $nombreBlancas = 'Blancas';
+  $nombreNegras = 'Negras';
+  if ($partidaGuardada) {
+    $jug = $partidaGuardada->getJugadores();
+    $nombreBlancas = $jug['blancas']->getNombre();
+    $nombreNegras = $jug['negras']->getNombre();
+  }
+
+  // Nueva partida desde posición inicial
+  $partidaNueva = new Partida($nombreBlancas, $nombreNegras);
+  $_SESSION['partida'] = serialize($partidaNueva);
+  $_SESSION['replay_movs'] = $contenido['historialMovimientos'];
+  $_SESSION['replay_index'] = 0;
+  $_SESSION['modo_reproduccion'] = true;
+  // Desactivar reloj durante reproducción
+  $_SESSION['config']['sin_tiempo'] = true;
+  $_SESSION['pausa'] = true;
+  $_SESSION['ultimo_tick'] = time();
+  return true;
+}
+
+// Estado del modo reproducción
+function procesarAjaxReproduccionEstado()
+{
+  header('Content-Type: application/json');
+  $activo = !empty($_SESSION['modo_reproduccion']);
+  $idx = isset($_SESSION['replay_index']) ? (int)$_SESSION['replay_index'] : 0;
+  $total = isset($_SESSION['replay_movs']) && is_array($_SESSION['replay_movs']) ? count($_SESSION['replay_movs']) : 0;
+  echo json_encode(['activo' => $activo, 'index' => $idx, 'total' => $total]);
+  session_write_close();
+  exit;
+}
+
+// Avanza un paso en la reproducción aplicando la siguiente jugada
+function procesarAjaxReproduccionPaso()
+{
+  header('Content-Type: application/json');
+  if (empty($_SESSION['modo_reproduccion']) || !isset($_SESSION['replay_movs'])) {
+    echo json_encode(['ok' => false, 'fin' => true]);
+    session_write_close();
+    exit;
+  }
+  $idx = (int)$_SESSION['replay_index'];
+  $movs = $_SESSION['replay_movs'];
+  if ($idx >= count($movs)) {
+    // Fin de reproducción
+    $_SESSION['modo_reproduccion'] = false;
+    echo json_encode(['ok' => true, 'fin' => true]);
+    session_write_close();
+    exit;
+  }
+  $mov = $movs[$idx];
+  $partida = unserialize($_SESSION['partida']);
+  // Aplicamos la jugada (origen -> destino)
+  $ok = false;
+  if (!empty($mov['origen']) && !empty($mov['destino'])) {
+    $ok = $partida->jugada($mov['origen'], $mov['destino']);
+  }
+  $_SESSION['partida'] = serialize($partida);
+  $_SESSION['replay_index'] = $idx + 1;
+  echo json_encode(['ok' => $ok, 'fin' => false, 'index' => $_SESSION['replay_index']]);
+  session_write_close();
+  exit;
+}
 
 
 // Para guardar los ajustes que el usuario cambió en el modal de configuración
@@ -485,6 +582,20 @@ function procesarGuardarConfiguracion()
 
   // Guardamos si mostrar o no las piezas capturadas
   $_SESSION['config']['mostrar_capturas'] = isset($_POST['mostrar_capturas']);
+
+  // Guardamos si jugar sin tiempo
+  $_SESSION['config']['sin_tiempo'] = isset($_POST['sin_tiempo']);
+
+  // Guardar automáticamente todas las partidas
+  $_SESSION['config']['auto_guardar_partidas'] = isset($_POST['auto_guardar_partidas']);
+
+  // Guardamos el número de retrocesos (entre 1 y 20, default 10)
+  if (isset($_POST['num_retrocesos'])) {
+    $numRetrocesos = intval($_POST['num_retrocesos']);
+    $_SESSION['config']['num_retrocesos'] = max(1, min(20, $numRetrocesos)); // Validar rango
+  } else {
+    $_SESSION['config']['num_retrocesos'] = 10; // Default
+  }
 }
 
 
@@ -528,17 +639,19 @@ function iniciarPartida()
     elseif ($_POST["avatar_negras"] !== "predeterminado") $avatarNegras = $_POST["avatar_negras"];
   }
 
-  // Guardamos la configuración elegida
-  $_SESSION['config'] = [
-
-    'tiempo_inicial' => (int)$_POST['tiempo_inicial'], // Tiempo inicial para cada jugador
-
-    'incremento' => (int)$_POST['incremento'], // Tiempo extra por movimiento
-
+  // Guardamos la configuración elegida, preservando campos existentes (sin_tiempo, num_retrocesos)
+  $configAnterior = isset($_SESSION['config']) ? $_SESSION['config'] : [];
+  $_SESSION['config'] = array_merge($configAnterior, [
+    'tiempo_inicial' => isset($_POST['tiempo_inicial']) ? (int)$_POST['tiempo_inicial'] : 1800, // Tiempo inicial por jugador
+    'incremento' => isset($_POST['incremento']) ? (int)$_POST['incremento'] : 0, // Tiempo extra por movimiento
     'mostrar_coordenadas' => isset($_POST['mostrar_coordenadas']), // Mostrar letras y números
-
-    'mostrar_capturas' => isset($_POST['mostrar_capturas']) // Mostrar piezas capturadas
-  ];
+    'mostrar_capturas' => isset($_POST['mostrar_capturas']), // Mostrar piezas capturadas
+    'sin_tiempo' => isset($_POST['sin_tiempo']), // Modo sin tiempo
+    'auto_guardar_partidas' => isset($_POST['auto_guardar_partidas']), // Guardar todas las partidas
+    'num_retrocesos' => isset($_POST['num_retrocesos'])
+      ? max(1, min(20, (int)$_POST['num_retrocesos']))
+      : (isset($configAnterior['num_retrocesos']) ? (int)$configAnterior['num_retrocesos'] : 10)
+  ]);
 
   // Creamos una nueva partida con los nombres de los jugadores
   $_SESSION['partida'] = serialize(new Partida($nombreBlancas, $nombreNegras));
@@ -547,9 +660,14 @@ function iniciarPartida()
   $_SESSION['casilla_seleccionada'] = null;
 
   // Inicializamos los tiempos de ambos jugadores
-  $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
-
-  $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
+  // Si está en modo sin tiempo, los relojes se inicializan a 0 (no tienen sentido)
+  if (!empty($_SESSION['config']['sin_tiempo'])) {
+    $_SESSION['tiempo_blancas'] = 0;
+    $_SESSION['tiempo_negras'] = 0;
+  } else {
+    $_SESSION['tiempo_blancas'] = $_SESSION['config']['tiempo_inicial'];
+    $_SESSION['tiempo_negras'] = $_SESSION['config']['tiempo_inicial'];
+  }
 
   $_SESSION['reloj_activo'] = 'blancas'; // Las blancas empiezan jugando
 
@@ -557,7 +675,7 @@ function iniciarPartida()
 
   $_SESSION['nombres_configurados'] = true; // Marcamos que ya se configuró la partida
 
-  $_SESSION['pausa'] = false; // La partida no está pausada al inicio
+  $_SESSION['pausa'] = false; // La partida no está pausada al inicio (forzamos false)
 
   // Guardamos los avatares elegidos de ambos jugadores
 
@@ -719,7 +837,7 @@ function procesarJugada($partida)
 
           // Incremento Fischer (después de restar el tiempo transcurrido)
           // Si han configurado un tiempo de incremento
-          if ($_SESSION['config']['incremento'] > 0) {
+          if ($_SESSION['config']['incremento'] > 0 && (!isset($_SESSION['config']['sin_tiempo']) || !$_SESSION['config']['sin_tiempo'])) {
 
             // Si fue el turno de las blancas, le sumamos el incremento
             if ($turnoAnterior === 'blancas') $_SESSION['tiempo_blancas'] += $_SESSION['config']['incremento'];
@@ -763,6 +881,12 @@ function procesarJugada($partida)
         $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
 
         $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
+
+        // Auto-guardado tras cada jugada si está activo
+        if (isset($_SESSION['config']['auto_guardar_partidas']) && $_SESSION['config']['auto_guardar_partidas']) {
+          // Guardamos con nombre por defecto (jugadores vs)
+          guardarPartida($partida);
+        }
       }
     }
   }
@@ -866,7 +990,11 @@ function guardarPartida($partida, $nombrePartida = null)
   ];
 
   // Guardamos el archivo JSON en la carpeta de partidas
-  file_put_contents(__DIR__ . '/../data/partidas/' . $nombreArchivo . '.json', json_encode($data, JSON_PRETTY_PRINT));
+  $dirPartidas = __DIR__ . '/../data/partidas';
+  if (!is_dir($dirPartidas)) {
+    mkdir($dirPartidas, 0777, true); // Crear directorio si no existe
+  }
+  file_put_contents($dirPartidas . '/' . $nombreArchivo . '.json', json_encode($data, JSON_PRETTY_PRINT));
 
   return $nombreArchivo; // Retornamos el nombre del archivo guardado
 }
@@ -917,6 +1045,9 @@ function listarPartidas()
 
       // Nombre del archivo sin la ruta, solo el nombre (basename($rutaArchivo))
       'archivo' => basename($rutaArchivo),
+
+      // Número de movimientos en el historial (si no existe, 0)
+      'movs' => isset($contenido['historialMovimientos']) && is_array($contenido['historialMovimientos']) ? count($contenido['historialMovimientos']) : 0,
 
       // Timestamp para ordenar
       'timestamp' => $timestamp

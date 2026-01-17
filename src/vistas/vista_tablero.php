@@ -158,7 +158,7 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
               <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
                 <?php if ($pieza !== null): ?>
                   <!-- Si hay una pieza en esta casilla, mostramos un botón para interactuar con ella -->
-                  <form method="post" class="formulario">
+                  <form method="post" action="index.php" class="formulario">
                     <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>"
                       class="btn-pieza-casilla <?php echo ($pieza->getColor() === $turno) ? 'puede-seleccionar' : 'no-puede-seleccionar'; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>"
                       <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? 'disabled' : ''; ?>>
@@ -168,7 +168,7 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
                   </form>
                 <?php elseif ($esMovimientoPosible): ?>
                   <!-- Si es un movimiento posible, mostramos un indicador visual (círculo verde) -->
-                  <form method="post" class="formulario">
+                  <form method="post" action="index.php" class="formulario">
                     <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>" class="btn-movimiento">
                       <!-- Indicador visual del movimiento posible -->
                       <span class="indicador-movimiento"></span>
@@ -276,29 +276,86 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
           <h4 class="titulo-seccion">Cómo jugar:</h4>
           <ol>
             <li><strong>Pausa/Reanudar</strong>: Usa el botón superior (⏸️/▶️) para pausar la partida</li>
-            <li><strong>Reloj</strong>: Solo corre el reloj del jugador en turno</li>
-            <li><strong>Movimientos válidos</strong>: Se marcan con círculos verdes</li>
-            <li><strong>Capturas</strong>: Se marcan con borde rojo pulsante</li>
-            <li><strong>Tiempo límite</strong>: Si llegas a 0:00, pierdes automáticamente</li>
+            <li><strong>Reloj</strong>: Solo corre el reloj del jugador en turno. Si llega a 0:00, pierdes</li>
+            <li><strong>Seleccionar pieza</strong>: Haz clic en una pieza para ver movimientos válidos (círculos verdes)</li>
+            <li><strong>Movimientos válidos</strong>: Se marcan con círculos verdes. El programa evita movimientos ilegales</li>
+            <li><strong>Capturas</strong>: Se marcan con borde rojo pulsante. No puedes capturar tus propias piezas</li>
           </ol>
+
+          <!-- SECCIÓN: Reglas de Ajedrez Avanzadas -->
+          <h4 class="titulo-seccion-separado">Reglas de Ajedrez Avanzadas:</h4>
+          <ul class="lista-sin-estilo">
+            <li><strong>Jaque</strong>: Tu rey está bajo amenaza. Debes hacer un movimiento legal que quite el jaque</li>
+            <li><strong>Jaque Mate</strong>: Tu rey está en jaque y NO hay ningún movimiento legal. ¡Pierdes la partida!</li>
+            <li><strong>Tablas (Empate)</strong>: Ocurre en dos casos:
+              <ul style="margin-top: 8px; margin-left: 20px;">
+                <li><strong>Ahogado (Stalemate)</strong>: Tu rey NO está en jaque, pero no tienes ningún movimiento legal</li>
+                <li><strong>Material insuficiente</strong>: Solo quedan reyes, o rey+caballo/alfil vs rey (imposible dar jaque mate)</li>
+              </ul>
+            </li>
+            <li><strong>Enroque</strong>: Movimiento especial del rey y la torre (cada uno 1 vez por partida máximo):
+              <ul style="margin-top: 8px; margin-left: 20px;">
+                <li><strong>Enroque corto (O-O)</strong>: Rey e→g, Torre h→f (lado derecho)</li>
+                <li><strong>Enroque largo (O-O-O)</strong>: Rey e→c, Torre a→d (lado izquierdo)</li>
+                <li>Requisitos: Rey y torre no han movido, casillas intermedias vacías, rey no en jaque ni pasa por jaque</li>
+              </ul>
+            </li>
+            <li><strong>Captura al Paso</strong>: Si un peón avanza 2 casillas y queda junto a uno enemigo, este puede capturarlo en diagonal. Solo disponible en el turno inmediatamente siguiente</li>
+            <li><strong>Promoción de Peón</strong>: Cuando un peón llega a la última fila, se transforma en Dama, Torre, Alfil o Caballo (elegir en modal)</li>
+            <li><strong>Bloqueo de piezas</strong>: Torres, alfiles y damas NO pueden saltar. Los caballos SÍ pueden saltar</li>
+          </ul>
 
           <!-- SECCIÓN: Gestión de partida -->
           <h4 class="titulo-seccion-separado">Gestión de partida:</h4>
           <ul class="lista-sin-estilo">
-            <li><strong>Deshacer</strong>: Deshace el último movimiento realizado</li>
-            <li><strong>Revancha</strong>: Inicia una nueva partida manteniendo jugadores y configuración</li>
-            <li><strong>Guardar partida</strong>: Guarda la partida actual para continuarla después (requiere pausar)</li>
+            <li><strong>Deshacer</strong>: Deshace el último movimiento realizado (máximo 10 movimientos)</li>
+            <li><strong>Revancha</strong>: Inicia una nueva partida manteniendo los mismos jugadores y configuración</li>
+            <li><strong>Guardar partida</strong>: Guarda la partida actual (estado, piezas, tiempo, historial) para continuarla después. Solo disponible en pausa</li>
+            <li><strong>Cargar partida</strong>: Carga una partida guardada previamente en formato JSON</li>
             <li><strong>Volver al inicio</strong>: Regresa a la pantalla inicial para configurar una nueva partida</li>
+          </ul>
+
+          <!-- SECCIÓN: Avatares y Personalización -->
+          <h4 class="titulo-seccion-separado">Avatares y Personalización:</h4>
+          <ul class="lista-sin-estilo">
+            <li><strong>Avatares predeterminados</strong>: Símbolos del rey (♔/♚)</li>
+            <li><strong>Fichas personalizadas</strong>: Imágenes de ajedrez predeterminadas (fichas blancas/negras)</li>
+            <li><strong>GIFs personalizados</strong>: Animaciones cortas para los jugadores</li>
+            <li><strong>Campeones de Ajedrez</strong>: Imágenes de legendarios campeones (Kasparov, Fischer, etc.)</li>
+            <li><strong>Avatar personalizado</strong>: Sube tu propia imagen (JPG, PNG, GIF)</li>
           </ul>
 
           <!-- SECCIÓN: Configuración -->
           <h4 class="titulo-seccion-separado">Configuración:</h4>
           <ul class="lista-sin-estilo">
-            <li><strong>Avatares</strong>: Personaliza la imagen de los jugadores</li>
-            <li><strong>Tiempo inicial</strong>: Elige cuánto tiempo tienen por partida</li>
-            <li><strong>Incremento Fischer</strong>: Tiempo adicional por cada movimiento</li>
-            <li><strong>Mostrar coordenadas</strong>: Activa/desactiva las letras y números del tablero</li>
-            <li><strong>Mostrar capturas</strong>: Visualiza las piezas capturadas</li>
+            <li><strong>Tiempo inicial</strong>: Elige cuánto tiempo tienen ambos jugadores (minutos)</li>
+            <li><strong>Incremento Fischer</strong>: Tiempo adicional ganado por cada movimiento realizado</li>
+            <li><strong>Modo sin tiempo</strong>: Juega sin límite de tiempo (si lo activas, ignora tiempo inicial e incremento)</li>
+            <li><strong>Número de retrocesos</strong>: Configura cuántos movimientos puedes deshacer (máximo 10)</li>
+            <li><strong>Mostrar coordenadas</strong>: Activa/desactiva las letras (A-H) y números (1-8) del tablero</li>
+            <li><strong>Mostrar piezas capturadas</strong>: Visualiza las piezas capturadas de cada jugador en paneles laterales</li>
+          </ul>
+
+          <!-- SECCIÓN: Notación Algebraica -->
+          <h4 class="titulo-seccion-separado">Historial de Movimientos (Notación Algebraica):</h4>
+          <ul class="lista-sin-estilo">
+            <li><strong>Peón</strong>: Solo destino (ej: e4, d8=D por promoción)</li>
+            <li><strong>Otras piezas</strong>: Letra pieza + destino (ej: Nf3=caballo f3, Bd5=alfil d5)</li>
+            <li><strong>Capturas</strong>: Letra pieza + 'x' + destino (ej: Nxf3, Bxd5)</li>
+            <li><strong>Enroque</strong>: O-O (corto) u O-O-O (largo)</li>
+            <li><strong>Jaque</strong>: Se añade '+' al final (ej: Nf3+)</li>
+            <li><strong>Jaque Mate</strong>: Se añade '#' al final (ej: Qf7#)</li>
+          </ul>
+
+          <!-- SECCIÓN: Puntuación -->
+          <h4 class="titulo-seccion-separado">Puntuación:</h4>
+          <ul class="lista-sin-estilo">
+            <li><strong>Peón</strong>: 1 punto</li>
+            <li><strong>Caballo</strong>: 3 puntos</li>
+            <li><strong>Alfil</strong>: 3 puntos</li>
+            <li><strong>Torre</strong>: 5 puntos</li>
+            <li><strong>Dama</strong>: 9 puntos</li>
+            <li><strong>Rey</strong>: Sin valor (su captura = fin de partida)</li>
           </ul>
         </div>
       </div>

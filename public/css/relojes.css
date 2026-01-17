@@ -45,6 +45,14 @@
   opacity: 0.7;
 }
 
+/* Modo sin tiempo: apariencia atenuada y sin resaltado */
+.reloj-disabled {
+  filter: grayscale(0.6);
+  opacity: 0.6;
+  box-shadow: none !important;
+  border-color: #bbb !important;
+}
+
 .reloj-jugador {
   font-size: 1.2em;
   font-weight: bold;
