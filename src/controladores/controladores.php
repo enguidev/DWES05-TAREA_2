@@ -765,7 +765,7 @@ function reiniciarPartida()
 
   // Borramos TODAS las variables de sesión de forma exhaustiva
   $_SESSION = array();
-  
+
   // Borramos la cookie de sesión para limpiar completamente
   if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();

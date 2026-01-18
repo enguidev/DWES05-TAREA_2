@@ -24,7 +24,7 @@ if (isset($_POST['confirmar_reiniciar'])) {
   // Borramos toda la sesión completamente
   $_SESSION = array();
   session_destroy();
-  
+
   // Redirigimos al index sin sesión
   header('Location: index.php');
   exit();
