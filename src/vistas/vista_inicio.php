@@ -310,6 +310,7 @@ function mostrarFormularioConfig($partidasGuardadas = [])
 <?php
 }
 
+
 // Para mostrar modal para cargar una partida guardada desde la pantalla de inicio
 function mostrarModalCargarInicial($partidas)
 {

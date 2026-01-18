@@ -54,15 +54,24 @@ function mostrarBotonesControl($partida)
 // Para mostrar los relojes
 function mostrarRelojes($jugadores, $marcador)
 {
+  // Si no hay jugadores, no mostramos nada
+  if (!$jugadores) return;
+  
+  // Proteger acceso a variables de sesión
+  $tiempoBlancas = isset($_SESSION['tiempo_blancas']) ? $_SESSION['tiempo_blancas'] : 0;
+  $tiempoNegras = isset($_SESSION['tiempo_negras']) ? $_SESSION['tiempo_negras'] : 0;
+  $relojActivo = isset($_SESSION['reloj_activo']) ? $_SESSION['reloj_activo'] : 'blancas';
+  $avatarBlancas = isset($_SESSION['avatar_blancas']) ? $_SESSION['avatar_blancas'] : null;
+  $avatarNegras = isset($_SESSION['avatar_negras']) ? $_SESSION['avatar_negras'] : null;
 ?>
   <!-- RELOJES - Mostramos los tiempos y nombres de ambos jugadores -->
   <div class="relojes-container">
     <!-- Reloj del jugador con piezas blancas -->
-    <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'blancas' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
+    <div class="reloj <?php echo ($relojActivo === 'blancas') ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-blancas">
       <div class="reloj-jugador">
         <?php
         // Intentamos obtener el avatar del jugador, si no tiene mostramos un círculo blanco
-        $avatarBlancasSrc = normalizarRutaAvatar(isset($_SESSION['avatar_blancas']) ? $_SESSION['avatar_blancas'] : null);
+        $avatarBlancasSrc = normalizarRutaAvatar($avatarBlancas);
         ?>
         <?php if ($avatarBlancasSrc): ?>
           <!-- Mostramos la imagen del avatar si existe -->
@@ -75,8 +84,8 @@ function mostrarRelojes($jugadores, $marcador)
         <?php echo $jugadores['blancas']->getNombre(); ?>
       </div>
       <!-- Tiempo restante del jugador blanco - Se resalta en rojo si le quedan menos de 60 segundos -->
-      <div id="tiempo-blancas" class="reloj-tiempo <?php echo $_SESSION['tiempo_blancas'] < 60 ? 'tiempo-critico' : ''; ?>">
-        <?php echo formatearTiempo($_SESSION['tiempo_blancas']); ?>
+      <div id="tiempo-blancas" class="reloj-tiempo <?php echo $tiempoBlancas < 60 ? 'tiempo-critico' : ''; ?>">
+        <?php echo formatearTiempo($tiempoBlancas); ?>
       </div>
       <!-- Puntuación del jugador blanco en esta partida -->
       <div class="reloj-puntos"><?php echo $marcador[0]; ?> pts</div>
@@ -84,11 +93,11 @@ function mostrarRelojes($jugadores, $marcador)
     <!-- Separador visual entre relojes -->
     <div class="reloj-separador">⏱️</div>
     <!-- Reloj del jugador con piezas negras -->
-    <div class="reloj <?php echo $_SESSION['reloj_activo'] === 'negras' ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-negras">
+    <div class="reloj <?php echo ($relojActivo === 'negras') ? 'reloj-activo' : 'reloj-inactivo'; ?> reloj-negras">
       <div class="reloj-jugador">
         <?php
         // Intentamos obtener el avatar del jugador, si no tiene mostramos un círculo negro
-        $avatarNegrasSrc = normalizarRutaAvatar(isset($_SESSION['avatar_negras']) ? $_SESSION['avatar_negras'] : null);
+        $avatarNegrasSrc = normalizarRutaAvatar($avatarNegras);
         ?>
         <?php if ($avatarNegrasSrc): ?>
           <!-- Mostramos la imagen del avatar si existe -->
@@ -101,8 +110,8 @@ function mostrarRelojes($jugadores, $marcador)
         <?php echo $jugadores['negras']->getNombre(); ?>
       </div>
       <!-- Tiempo restante del jugador negro - Se resalta en rojo si le quedan menos de 60 segundos -->
-      <div id="tiempo-negras" class="reloj-tiempo <?php echo $_SESSION['tiempo_negras'] < 60 ? 'tiempo-critico' : ''; ?>">
-        <?php echo formatearTiempo($_SESSION['tiempo_negras']); ?>
+      <div id="tiempo-negras" class="reloj-tiempo <?php echo $tiempoNegras < 60 ? 'tiempo-critico' : ''; ?>">
+        <?php echo formatearTiempo($tiempoNegras); ?>
       </div>
       <!-- Puntuación del jugador negro en esta partida -->
       <div class="reloj-puntos"><?php echo $marcador[1]; ?> pts</div>

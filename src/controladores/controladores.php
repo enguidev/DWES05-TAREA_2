@@ -8,6 +8,9 @@ function procesarAjaxActualizarRelojes()
 {
   // Le decimos al navegador que vamos a devolver JSON (no HTML)
   header('Content-Type: application/json');
+  header('Cache-Control: no-cache, no-store, must-revalidate');
+  header('Pragma: no-cache');
+  header('Expires: 0');
 
   // Si no hay variables de sesión de tiempo, significa que no hay partida iniciada. En ese caso, devuelve valores vacíos y termina
   if (!isset($_SESSION['tiempo_blancas']) || !isset($_SESSION['tiempo_negras']) || !isset($_SESSION['reloj_activo'])) {
@@ -102,10 +105,19 @@ function procesarAjaxActualizarRelojes()
      Si existe una partida convertimos el objeto guardado en sesion a un objeto de PHP
      So no existe, la variable $partidaObj le asignamos  null
   */
-  $partidaObj = isset($_SESSION['partida']) ? unserialize($_SESSION['partida']) : null;
-
-  // Asignamos a variable booleana ($partidaTerminada si la partida está terminada o no
-  $partidaTerminada = ($partidaObj && $partidaObj->estaTerminada()) ? true : false;
+  $partidaObj = null;
+  $partidaTerminada = false;
+  
+  if (isset($_SESSION['partida'])) {
+    try {
+      $partidaObj = unserialize($_SESSION['partida']);
+      $partidaTerminada = ($partidaObj && $partidaObj->estaTerminada()) ? true : false;
+    } catch (Exception $e) {
+      // Si hay error al deserializar, consideramos que no hay partida
+      $partidaObj = null;
+      $partidaTerminada = false;
+    }
+  }
 
   // Imprimimos los tiempos actuales en formato JSON
   echo json_encode([
@@ -239,9 +251,10 @@ function resolverAcciones()
     }
   }
 
-  // Si se pidió iniciar nueva partida desde pantalla principal, marcamos que se mostró
-  if (isset($_POST['iniciar_nueva_partida'])) {
+  // Si se pidió iniciar nueva partida desde pantalla principal, mostramos el formulario
+  if (isset($_POST['iniciar_nueva_partida']) && !isset($_SESSION['partida'])) {
     $_SESSION['pantalla_principal_mostrada'] = true;
+    unset($_SESSION['nombres_configurados']); // Borramos para mostrar pantalla de configuración
   }
 
   // Si se pidió cargar desde pantalla principal, marcamos que se mostró
@@ -252,12 +265,13 @@ function resolverAcciones()
   // Si se pidió salir de la configuración, volvemos a la pantalla principal
   if (isset($_POST['salir_configuracion'])) {
     unset($_SESSION['pantalla_principal_mostrada']);
-    header('Location: index.php');
-    exit();
   }
 
-  // Si se pidió iniciar una nueva partida, creamos una nueva partida
-  if (isset($_POST['iniciar_partida'])) iniciarPartida();
+  // Si se pidió iniciar una partida (desde formulario de configuración)
+  if (isset($_POST['iniciar_partida']) && !isset($_SESSION['nombres_configurados'])) {
+    procesarGuardarConfiguracion(); // Guardamos la configuración del tiempo
+    iniciarPartida(); // Iniciamos la partida con los nombres, avatares y configuración
+  }
 
   // Cargar/eliminar desde pantalla inicial
   // Si se pidió cargar una partida desde la pantalla inicial
@@ -271,11 +285,13 @@ function resolverAcciones()
       $_SESSION['partida'] = serialize($partidaCargada); // Guardamos la partida en sesión
 
       $_SESSION['nombres_configurados'] = true; // Marcamos que ya se configuraron los nombres
+
+      $_SESSION['pantalla_principal_mostrada'] = true; // Mostramos el tablero
     }
   }
 
   // Reproducir partida desde pantalla inicial
-  if (isset($_POST['reproducir_partida_inicial']) && isset($_POST['archivo_partida'])) {
+  if (isset($_POST['reproducir_partida_inicial']) && isset($_POST['archivo_partida']) && !isset($_SESSION['modo_reproduccion'])) {
     iniciarReproduccion($_POST['archivo_partida']);
     // Forzamos mostrar tablero
     $_SESSION['pantalla_principal_mostrada'] = true;
@@ -283,7 +299,9 @@ function resolverAcciones()
   }
 
   // Si se pidió eliminar una partida desde la pantalla inicial, la eliminamos
-  if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida'])) eliminarPartida($_POST['archivo_partida']);
+  if (isset($_POST['eliminar_partida_inicial']) && isset($_POST['archivo_partida'])) {
+    eliminarPartida($_POST['archivo_partida']); // Eliminamos la partida
+  }
 
 
   // Pausa/reanudar manual
@@ -319,7 +337,11 @@ function resolverAcciones()
   }
 
   // Si se confirmó el reinicio de la partida, la reiniciamos
-  if (isset($_POST['confirmar_reiniciar'])) reiniciarPartida();
+  if (isset($_POST['confirmar_reiniciar'])) {
+    reiniciarPartida();
+    header('Location: index.php');
+    exit();
+  }
 
   // Si se confirmó la revancha, iniciamos una nueva partida con los mismos jugadores
   if (isset($_POST['confirmar_revancha'])) revanchaPartida();
@@ -506,28 +528,57 @@ function resolverAcciones()
 // Inicia modo reproducción con un archivo de partida guardada
 function iniciarReproduccion($archivo)
 {
-  $ruta = __DIR__ . '/../data/partidas/' . basename($archivo);
+  $ruta = __DIR__ . '/../../data/partidas/' . basename($archivo);
   if (!file_exists($ruta)) return false;
 
   $contenido = json_decode(file_get_contents($ruta), true);
-  if (!is_array($contenido) || !isset($contenido['historialMovimientos'])) return false;
+  if (!is_array($contenido)) return false;
+
+  // Cargar el historial de movimientos guardado (si está disponible)
+  // Si tenemos el historialMovimientos grabado, lo usamos
+  // Si no, intentamos reconstruirlo desde la partida guardada
+  $movimientos = [];
+
+  if (isset($contenido['historialMovimientos']) && is_array($contenido['historialMovimientos'])) {
+    // Convertir el historial al formato que espera replay (origen y destino)
+    foreach ($contenido['historialMovimientos'] as $mov) {
+      if (is_array($mov) && isset($mov['origen']) && isset($mov['destino'])) {
+        $movimientos[] = [
+          'origen' => $mov['origen'],
+          'destino' => $mov['destino']
+        ];
+      }
+    }
+  }
 
   // Construimos una nueva partida limpia con los mismos nombres, si podemos
-  $partidaGuardada = isset($contenido['partida']) ? unserialize($contenido['partida']) : null;
   $nombreBlancas = 'Blancas';
   $nombreNegras = 'Negras';
-  if ($partidaGuardada) {
-    $jug = $partidaGuardada->getJugadores();
-    $nombreBlancas = $jug['blancas']->getNombre();
-    $nombreNegras = $jug['negras']->getNombre();
+  if (isset($contenido['partida'])) {
+    try {
+      $partidaGuardada = unserialize($contenido['partida']);
+      if ($partidaGuardada) {
+        $jug = $partidaGuardada->getJugadores();
+        $nombreBlancas = $jug['blancas']->getNombre();
+        $nombreNegras = $jug['negras']->getNombre();
+      }
+    } catch (Exception $e) {
+      // Si no se puede deserializar, usamos los nombres por defecto
+    }
   }
 
   // Nueva partida desde posición inicial
   $partidaNueva = new Partida($nombreBlancas, $nombreNegras);
   $_SESSION['partida'] = serialize($partidaNueva);
-  $_SESSION['replay_movs'] = $contenido['historialMovimientos'];
+  $_SESSION['replay_movs'] = $movimientos; // Array de movimientos
   $_SESSION['replay_index'] = 0;
   $_SESSION['modo_reproduccion'] = true;
+
+  // Cargar tiempos desde el archivo guardado
+  $_SESSION['tiempo_blancas'] = isset($contenido['tiempo_blancas']) ? $contenido['tiempo_blancas'] : 1800;
+  $_SESSION['tiempo_negras'] = isset($contenido['tiempo_negras']) ? $contenido['tiempo_negras'] : 1800;
+  $_SESSION['reloj_activo'] = isset($contenido['reloj_activo']) ? $contenido['reloj_activo'] : 'blancas';
+
   // Desactivar reloj durante reproducción
   $_SESSION['config']['sin_tiempo'] = true;
   $_SESSION['pausa'] = true;
@@ -681,6 +732,8 @@ function iniciarPartida()
 
   $_SESSION['nombres_configurados'] = true; // Marcamos que ya se configuró la partida
 
+  $_SESSION['pantalla_principal_mostrada'] = true; // Mostramos el tablero
+
   $_SESSION['pausa'] = false; // La partida no está pausada al inicio (forzamos false)
 
   // Guardamos los avatares elegidos de ambos jugadores
@@ -737,10 +790,13 @@ function reiniciarPartida()
 
   unset($_SESSION['avatar_negras']); // Borramos el avatar de las negras
 
-  // Recargamos la página para que vuelva a la pantalla de inicio
-  header("Location: " . $_SERVER['PHP_SELF']);
+  unset($_SESSION['modo_reproduccion']); // Borramos el modo de reproducción
 
-  exit; // Terminamos la ejecución del script
+  unset($_SESSION['replay_movs']); // Borramos los movimientos para reproducción
+
+  unset($_SESSION['replay_index']); // Borramos el índice de reproducción
+
+  return true; // Retornamos true para indicar que se reinició
 }
 
 // Para crear una nueva partida manteniendo a los mismos jugadores, avatares y configuración
@@ -997,7 +1053,7 @@ function guardarPartida($partida, $nombrePartida = null)
   ];
 
   // Guardamos el archivo JSON en la carpeta de partidas
-  $dirPartidas = __DIR__ . '/../data/partidas';
+  $dirPartidas = __DIR__ . '/../../data/partidas';
   if (!is_dir($dirPartidas)) {
     mkdir($dirPartidas, 0777, true); // Crear directorio si no existe
   }
@@ -1011,7 +1067,7 @@ function guardarPartida($partida, $nombrePartida = null)
 function listarPartidas()
 {
   // Directorio donde se guardan las partidas
-  $directorio = __DIR__ . '/../data/partidas';
+  $directorio = __DIR__ . '/../../data/partidas';
 
   // Si el directorio no existe, retornamos un array vacio
   if (!is_dir($directorio)) return [];
@@ -1087,10 +1143,15 @@ function cargarPartida($archivo = null)
   // _DIR_ (constante de PHP) es la ruta del directorio actual (src)
   // basename() obtiene el nombre del archivo (partida_guardada.json) sin la ruta 
   $rutaArchivo = $archivo
-    ? __DIR__ . '/../data/partidas/' . basename($archivo)
-    : __DIR__ . '/../data/partida_guardada.json';
+    ? __DIR__ . '/../../data/partidas/' . basename($archivo)
+    : __DIR__ . '/../../data/partida_guardada.json';
 
-  if (!file_exists($rutaArchivo)) return false; // Si el archivo no existe, retornamos false
+  error_log("DEBUG cargarPartida: rutaArchivo = " . $rutaArchivo);
+
+  if (!file_exists($rutaArchivo)) {
+    error_log("DEBUG cargarPartida: Archivo no existe");
+    return false;
+  }
 
   // Leemos el contenido del archivo
   // json_decode() convierte el JSON a un array/objeto
@@ -1099,8 +1160,16 @@ function cargarPartida($archivo = null)
   // true en json_decode() para obtener un array asociativo en lugar de un objeto
   $contenido = json_decode(file_get_contents($rutaArchivo), true);
 
+  error_log("DEBUG cargarPartida: contenido leído, es array: " . (is_array($contenido) ? 'true' : 'false'));
+  
+  if (is_array($contenido)) {
+    error_log("DEBUG cargarPartida: isset(contenido['partida']) = " . (isset($contenido['partida']) ? 'true' : 'false'));
+  }
+
   // Si el contenido no es un array o no tiene la clave 'partida', retornamos false
-  if (!is_array($contenido) || !isset($contenido['partida'])) return false;
+  if (!is_array($contenido) || !isset($contenido['partida'])) {
+    return false;
+  }
 
   // Deserializamos (objetos de la clase Partida) la partida
   $partida = unserialize($contenido['partida']);
@@ -1133,10 +1202,20 @@ function cargarPartida($archivo = null)
   $_SESSION['ultimo_tick'] = time();
 
   // Restauramos avatares, priorizando los que se guardaron en disco
-  $_SESSION['avatar_blancas'] = restaurarAvatarGuardado($contenido, 'blancas');
+  try {
+    $_SESSION['avatar_blancas'] = restaurarAvatarGuardado($contenido, 'blancas');
+  } catch (Exception $e) {
+    error_log("Error restaurando avatar blancas: " . $e->getMessage());
+    $_SESSION['avatar_blancas'] = null;
+  }
 
   // Restauramos avatares, priorizando los que se guardaron en disco
-  $_SESSION['avatar_negras'] = restaurarAvatarGuardado($contenido, 'negras');
+  try {
+    $_SESSION['avatar_negras'] = restaurarAvatarGuardado($contenido, 'negras');
+  } catch (Exception $e) {
+    error_log("Error restaurando avatar negras: " . $e->getMessage());
+    $_SESSION['avatar_negras'] = null;
+  }
 
   return $partida; // Retornamos la partida cargada
 }

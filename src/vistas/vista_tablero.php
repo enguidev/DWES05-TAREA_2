@@ -3,9 +3,16 @@
 // Para mostrar el tablero
 function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturadas)
 {
+  // Si no hay partida, no mostramos nada
+  if (!$partida) return;
+  
+  // Proteger acceso a configuración
+  $config = isset($_SESSION['config']) ? $_SESSION['config'] : [];
+  $mostrarCapturas = isset($config['mostrar_capturas']) ? $config['mostrar_capturas'] : true;
+  $mostrarCoordenadas = isset($config['mostrar_coordenadas']) ? $config['mostrar_coordenadas'] : true;
 ?>
   <!-- TABLERO - El corazón del juego, aquí mostramos el tablero de ajedrez con todas las piezas -->
-  <?php if ($_SESSION['config']['mostrar_capturas']): ?>
+  <?php if ($mostrarCapturas): ?>
     <!-- Si está activada la opción de mostrar capturas, creamos un wrapper con el tablero y las piezas capturadas -->
     <div class="tablero-y-capturas-wrapper">
       <!-- Panel lateral izquierdo: Piezas negras capturadas por el jugador blanco -->
@@ -24,13 +31,13 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
       <?php endif; ?>
 
       <div class="tablero-wrapper">
-        <div class="tablero-contenedor <?php echo $_SESSION['config']['mostrar_coordenadas'] ? '' : 'sin-coordenadas'; ?>">
+        <div class="tablero-contenedor <?php echo $mostrarCoordenadas ? '' : 'sin-coordenadas'; ?>">
           <?php
           // Letras de las columnas (A-H) para mostrar las coordenadas
           $letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
           // Si está activado mostrar coordenadas, pintamos las letras en la parte superior
-          if ($_SESSION['config']['mostrar_coordenadas']) {
+          if ($mostrarCoordenadas) {
             echo '<div class="coordenada-esquina-superior-izquierda"></div>';
             foreach ($letras as $letra) echo '<div class="coordenada-superior">' . $letra . '</div>';
             echo '<div class="coordenada-esquina-superior-derecha"></div>';
@@ -39,7 +46,7 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
           // Recorremos las filas desde arriba (8) hasta abajo (1)
           for ($fila = 8; $fila >= 1; $fila--):
             // Si está activado mostrar coordenadas, pintamos los números a la izquierda
-            if ($_SESSION['config']['mostrar_coordenadas']) {
+            if ($mostrarCoordenadas) {
               echo '<div class="coordenada-izquierda">' . $fila . '</div>';
             }
 
@@ -180,13 +187,13 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
             <?php endfor; ?>
 
             <!-- Si está activado mostrar coordenadas, pintamos los números a la derecha -->
-            <?php if ($_SESSION['config']['mostrar_coordenadas']): ?>
+            <?php if ($mostrarCoordenadas): ?>
               <div class="coordenada-derecha"><?php echo $fila; ?></div>
             <?php endif; ?>
           <?php endfor; ?>
 
           <!-- Si está activado mostrar coordenadas, pintamos las letras en la parte inferior -->
-          <?php if ($_SESSION['config']['mostrar_coordenadas']): ?>
+          <?php if ($mostrarCoordenadas): ?>
             <div class="coordenada-esquina-inferior-izquierda"></div>
             <?php foreach ($letras as $letra): ?>
               <div class="coordenada-inferior"><?php echo $letra; ?></div>
@@ -197,7 +204,7 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
       </div>
 
       <!-- Panel lateral derecho: Piezas blancas capturadas por el jugador negro -->
-      <?php if ($_SESSION['config']['mostrar_capturas']): ?>
+      <?php if ($mostrarCapturas): ?>
         <div class="piezas-capturadas-lado">
           <h3>Cap. blancas:</h3>
           <div class="capturadas-vertical">

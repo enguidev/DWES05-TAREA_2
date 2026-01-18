@@ -431,13 +431,15 @@ function sincronizarConServidor() {
 // ========================================
 // Manejar avatares personalizados y funciones adicionales
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("DOMContentLoaded ejecutado");
   // Reseteamos el flag de recarga cuando la página se carga
   recargandoPagina = false;
 
   // Si no hay un intervalo de relojes activo, lo iniciamos
   if (!intervaloRelojes && document.getElementById("tiempo-blancas")) {
+    console.log("Iniciando fetch de actualizar_relojes");
     // Primero sincronizamos con el servidor para verificar el estado de la partida
-    fetch("index.php?ajax=actualizar_relojes")
+    fetch("index.php?ajax=actualizar_relojes", {timeout: 5000})
       .then((r) => r.json())
       .then((data) => {
         // Si no hay partida o ya terminó, no iniciamos los relojes

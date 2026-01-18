@@ -1,4 +1,8 @@
 <?php
+// Mostrar errores para debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Iniciamos la session 
 session_start();
 
@@ -7,6 +11,37 @@ require_once 'modelo/Partida.php';
 require_once 'src/helpers/funciones_auxiliares.php';
 require_once 'src/vistas.php';
 require_once 'src/controladores/controladores.php';
+
+// CARGA AUTOMÁTICA DE PARTIDA GUARDADA
+// Si no hay partida en sesión pero hay un archivo guardado, intentamos cargarla
+error_log("DEBUG index.php: Verificando cargar partida automática");
+error_log("DEBUG: isset(\$_SESSION['partida']) = " . (isset($_SESSION['partida']) ? 'true' : 'false'));
+
+if (!isset($_SESSION['partida'])) {
+  $rutaPartidaGuardada = __DIR__ . '/data/partida_guardada.json';
+  error_log("DEBUG: Ruta partida guardada: " . $rutaPartidaGuardada);
+  error_log("DEBUG: Archivo existe: " . (file_exists($rutaPartidaGuardada) ? 'true' : 'false'));
+  
+  if (file_exists($rutaPartidaGuardada)) {
+    error_log("DEBUG: Llamando a cargarPartida()");
+    $resultado = cargarPartida(); // Carga la partida guardada y restaura la sesión
+    error_log("DEBUG: Resultado de cargarPartida(): " . ($resultado ? 'true (Partida)' : 'false'));
+    error_log("DEBUG: isset(\$_SESSION['partida']) después de cargarPartida(): " . (isset($_SESSION['partida']) ? 'true' : 'false'));
+    
+    if (isset($_SESSION['partida'])) {
+      $_SESSION['pantalla_principal_mostrada'] = true; // Mostramos el tablero
+      error_log("DEBUG: pantalla_principal_mostrada = true");
+    }
+  }
+}
+
+// Configuración por defecto y estado inicial (ANTES de procesar AJAX)
+aplicarConfigPredeterminada(); // Inicializa `$_SESSION['config']` y `$_SESSION['pausa]`
+
+// DEBUG: verificar si se cargó la partida
+echo "<!-- DEBUG: partida en sesión: " . (isset($_SESSION['partida']) ? 'SÍ' : 'NO') . " -->";
+echo "<!-- DEBUG: nombres_configurados: " . (isset($_SESSION['nombres_configurados']) ? 'SÍ' : 'NO') . " -->";
+echo "<!-- DEBUG: pantalla_principal_mostrada: " . (isset($_SESSION['pantalla_principal_mostrada']) ? 'SÍ' : 'NO') . " -->";
 
 // AJAX de relojes en tiempo real
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'actualizar_relojes') {
@@ -20,9 +55,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'reproduccion_estado') {
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'reproduccion_paso') {
   procesarAjaxReproduccionPaso();
 }
-
-// Configuración por defecto y estado inicial
-aplicarConfigPredeterminada(); // Inicializa `$_SESSION['config']` y `$_SESSION['pausa]`
 
 // Resolver acciones y preparar estado para la vista
 $estado = resolverAcciones();
@@ -85,8 +117,8 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
     <!-- ...mostramos la pantalla principal -->
     <?php mostrarPantallaPrincipal($partidasGuardadasInicio); ?>
 
-    <!-- Modal para cargar una partida desde la pantalla principal -->
-    <?php if (!empty($partidasGuardadasInicio)): ?>
+    <!-- Modal para cargar una partida desde la pantalla principal (solo si se pidió abrir) -->
+    <?php if (!empty($partidasGuardadasInicio) && isset($_SESSION['pantalla_principal_mostrada'])): ?>
       <?php mostrarModalCargarInicial($partidasGuardadasInicio); ?>
     <?php endif; ?>
     <!-- Si ya se han puesto nombres a los jugadores... -->

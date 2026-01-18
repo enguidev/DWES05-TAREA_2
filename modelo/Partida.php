@@ -948,6 +948,14 @@ class Partida
   }
 
   /*
+  Termina la partida
+  */
+  public function terminar()
+  {
+    $this->partidaTerminada = true;
+  }
+
+  /*
   Para obtener todos los jugadores
     -@return Array asociativo con los jugadores  
   */

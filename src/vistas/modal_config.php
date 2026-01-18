@@ -45,9 +45,9 @@
         <div class="config-option checkbox">
           <label>
             <input type="checkbox" name="sin_tiempo" <?php echo isset($_SESSION['config']['sin_tiempo']) && $_SESSION['config']['sin_tiempo'] ? 'checked' : ''; ?>>
-            Modo sin tiempo (ignora tiempo inicial e incremento)
+            Modo sin tiempo (sin reloj)
           </label>
-          <small class="config-note">Si activas esto, la partida no tendrá límite de tiempo</small>
+          <small class="config-note">Si activas esto, la partida no tendrá límite de tiempo (ignora tiempo inicial e incremento)</small>
         </div>
 
         <!-- Número de retrocesos permitidos -->
