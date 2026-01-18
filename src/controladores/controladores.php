@@ -154,7 +154,13 @@ function aplicarConfigPredeterminada()
       $_SESSION["pausa"] = false; // lo inicializamos en false
     }
   }
+
+  // Asegurar que siempre existe la variable de casilla seleccionada
+  if (!isset($_SESSION['casilla_seleccionada'])) {
+    $_SESSION['casilla_seleccionada'] = null;
+  }
 }
+
 
 /*
  Condiciones de todas las acciones de la solicitud y prepara el estado para la vista
@@ -793,6 +799,11 @@ function procesarJugada($partida)
 {
   // Procesar jugada (solo si no está en pausa)
   if (isset($_POST['seleccionar_casilla']) && (!isset($_SESSION['pausa']) || !$_SESSION['pausa'])) {
+
+    // Inicializamos casilla_seleccionada si no existe
+    if (!isset($_SESSION['casilla_seleccionada'])) {
+      $_SESSION['casilla_seleccionada'] = null;
+    }
 
     $casilla = $_POST['seleccionar_casilla']; // Casilla que se ha clickeado
 
