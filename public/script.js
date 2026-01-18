@@ -826,6 +826,12 @@ document.addEventListener("DOMContentLoaded", function () {
         return false;
       });
     });
+    // Permitir cerrar el modal también al hacer click fuera del contenido
+    modalCargar.addEventListener("click", function(e) {
+      if (e.target === modalCargar) {
+        cerrarModal("modalCargar");
+      }
+    });
   }
 });
 

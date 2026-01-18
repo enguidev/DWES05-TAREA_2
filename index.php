@@ -135,14 +135,15 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
     <!-- ...mostramos la pantalla principal -->
     <?php mostrarPantallaPrincipal($partidasGuardadasInicio); ?>
 
-    <!-- Modal para cargar una partida desde la pantalla principal (solo si se pidió abrir y no se acaba de crear nueva partida) -->
+    <!-- Botón para abrir el modal de cargar partida guardada -->
+    <?php if (!empty($partidasGuardadasInicio)): ?>
+      <form method="post" style="text-align:center; margin-bottom: 20px;">
+        <button type="submit" name="abrir_modal_cargar" class="btn-cargar-modal">📁 Cargar Partida Guardada</button>
+      </form>
+    <?php endif; ?>
     <?php
-    $mostrarModalCargar = false;
-    // Solo mostrar el modal si el usuario lo ha solicitado explícitamente (por ejemplo, por POST o GET)
+    // Mostrar el modal solo si el usuario pulsa el botón
     if (!empty($partidasGuardadasInicio) && isset($_POST['abrir_modal_cargar'])) {
-      $mostrarModalCargar = true;
-    }
-    if ($mostrarModalCargar) {
       mostrarModalCargarInicial($partidasGuardadasInicio);
     }
     ?>
