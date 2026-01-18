@@ -56,7 +56,7 @@ function mostrarRelojes($jugadores, $marcador)
 {
   // Si no hay jugadores, no mostramos nada
   if (!$jugadores) return;
-  
+
   // Proteger acceso a variables de sesión
   $tiempoBlancas = isset($_SESSION['tiempo_blancas']) ? $_SESSION['tiempo_blancas'] : 0;
   $tiempoNegras = isset($_SESSION['tiempo_negras']) ? $_SESSION['tiempo_negras'] : 0;

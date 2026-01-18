@@ -107,7 +107,7 @@ function procesarAjaxActualizarRelojes()
   */
   $partidaObj = null;
   $partidaTerminada = false;
-  
+
   if (isset($_SESSION['partida'])) {
     try {
       $partidaObj = unserialize($_SESSION['partida']);
@@ -1161,7 +1161,7 @@ function cargarPartida($archivo = null)
   $contenido = json_decode(file_get_contents($rutaArchivo), true);
 
   error_log("DEBUG cargarPartida: contenido leído, es array: " . (is_array($contenido) ? 'true' : 'false'));
-  
+
   if (is_array($contenido)) {
     error_log("DEBUG cargarPartida: isset(contenido['partida']) = " . (isset($contenido['partida']) ? 'true' : 'false'));
   }

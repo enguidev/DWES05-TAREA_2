@@ -21,13 +21,13 @@ if (!isset($_SESSION['partida'])) {
   $rutaPartidaGuardada = __DIR__ . '/data/partida_guardada.json';
   error_log("DEBUG: Ruta partida guardada: " . $rutaPartidaGuardada);
   error_log("DEBUG: Archivo existe: " . (file_exists($rutaPartidaGuardada) ? 'true' : 'false'));
-  
+
   if (file_exists($rutaPartidaGuardada)) {
     error_log("DEBUG: Llamando a cargarPartida()");
     $resultado = cargarPartida(); // Carga la partida guardada y restaura la sesión
     error_log("DEBUG: Resultado de cargarPartida(): " . ($resultado ? 'true (Partida)' : 'false'));
     error_log("DEBUG: isset(\$_SESSION['partida']) después de cargarPartida(): " . (isset($_SESSION['partida']) ? 'true' : 'false'));
-    
+
     if (isset($_SESSION['partida'])) {
       $_SESSION['pantalla_principal_mostrada'] = true; // Mostramos el tablero
       error_log("DEBUG: pantalla_principal_mostrada = true");

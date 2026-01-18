@@ -5,7 +5,7 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
 {
   // Si no hay partida, no mostramos nada
   if (!$partida) return;
-  
+
   // Proteger acceso a configuración
   $config = isset($_SESSION['config']) ? $_SESSION['config'] : [];
   $mostrarCapturas = isset($config['mostrar_capturas']) ? $config['mostrar_capturas'] : true;
