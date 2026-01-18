@@ -27,6 +27,16 @@ aplicarConfigPredeterminada(); // Inicializa `$_SESSION['config']` y `$_SESSION[
 // Resolver acciones y preparar estado para la vista
 $estado = resolverAcciones();
 
+// DEBUG TEMPORAL
+if (isset($_POST['seleccionar_casilla'])) {
+  echo "<!-- DEBUG: POST recibido con seleccionar_casilla = " . htmlspecialchars($_POST['seleccionar_casilla']) . " -->";
+  echo "<!-- DEBUG: casillaSeleccionada en estado = " . htmlspecialchars($estado['casillaSeleccionada'] ?? 'null') . " -->";
+  if (isset($_SESSION['partida'])) {
+    $debugPartida = unserialize($_SESSION['partida']);
+    echo "<!-- DEBUG: Mensaje de partida = " . htmlspecialchars($debugPartida->getMensaje()) . " -->";
+  }
+}
+
 // Extraemos variables de estado para la vista
 $mostrarModalReiniciar = $estado['mostrarModalReiniciar'];
 $mostrarModalRevancha = $estado['mostrarModalRevancha'];

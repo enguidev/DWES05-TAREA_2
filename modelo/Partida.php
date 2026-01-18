@@ -55,34 +55,10 @@ class Partida
   */
   public function jugada($origen, $destino)
   {
-    // Si la partida ya terminó, no se pueden hacer más jugadas
-    if ($this->partidaTerminada) {
+    // VALIDACIONES Y EJECUCIÓN DEL MOVIMIENTO:
 
-      $this->mensaje = "La partida ha terminado"; // Actualizamos el mensaje
-
-      return false; // Retornamos false ya que no se puede jugar
-    }
-
-    // Guardamos captura del estado actual para poder deshacer la jugada si es necesario
-    $this->historial[] = serialize([ // Serializamos el estado actual
-
-      'jugadores' => $this->jugadores, // Jugadores actuales
-
-      'turno' => $this->turno, // Turno actual
-
-      'mensaje' => $this->mensaje, // Mensaje actual
-
-      'partidaTerminada' => $this->partidaTerminada
-
-    ]);
-
-    // Limitar historial según configuración para no consumir memoria
-    // Si hay más del límite, eliminamos el más antiguo
-    $limiteRetrocesos = 10;
-    if (isset($_SESSION['config']) && isset($_SESSION['config']['num_retrocesos'])) {
-      $limiteRetrocesos = max(1, min(20, (int)$_SESSION['config']['num_retrocesos']));
-    }
-    if (count($this->historial) > $limiteRetrocesos) array_shift($this->historial);
+    // 1. Guardar estado actual del tablero (historial)
+    $this->guardarHistorial();
 
     // 1. Verificamos que existe una pieza en el origen
     $piezaOrigen = $this->jugadores[$this->turno]->getPiezaEnPosicion($origen);
@@ -116,7 +92,6 @@ class Partida
 
     // Si alguna de las conversiones falla
     if (!$coordsOrigen || !$coordsDestino) {
-
       $this->mensaje = "Coordenadas inválidas"; // Actualizamos el mensaje
 
       return false; // Retornamos false
@@ -311,208 +286,208 @@ class Partida
 
       // Si es captura normal, capturamos la pieza destino
       elseif ($piezaDestinoTemp) $piezaDestinoTemp->capturar();
+    }
 
-      // Si no es captura al paso ni enroque, movemos la pieza normalmente   
-      if ($piezaOrigenTemp && !$esEnroque) {
+    // Si no es captura al paso ni enroque, movemos la pieza normalmente   
+    if ($piezaOrigenTemp && !$esEnroque) {
 
-        $piezaOrigenTemp->setPosicion($destino); // Movemos la pieza en el estado temporal
+      $piezaOrigenTemp->setPosicion($destino); // Movemos la pieza en el estado temporal
 
-        $piezaOrigenTemp->setHaMovido(true); // Marcamos que ha movido
-      }
+      $piezaOrigenTemp->setHaMovido(true); // Marcamos que ha movido
+    }
 
-      // Simular enroque moviendo rey y torre en temp si aplica:
+    // Simular enroque moviendo rey y torre en temp si aplica:
 
-      // Si es enroque
-      if ($esEnroque) {
+    // Si es enroque
+    if ($esEnroque) {
 
-        $color = $this->turno; // Color del jugador
+      $color = $this->turno; // Color del jugador
 
-        $filaInicial = ($color === 'blancas') ? 1 : 8; // Fila inicial según color
+      $filaInicial = ($color === 'blancas') ? 1 : 8; // Fila inicial según color
 
-        $posReyOrigen = ($color === 'blancas') ? 'E1' : 'E8'; // Posición inicial del rey
+      $posReyOrigen = ($color === 'blancas') ? 'E1' : 'E8'; // Posición inicial del rey
 
-        // Posiciones según tipo de enroque
-        $posReyDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'G1' : 'C1') : (($tipoEnroque === 'corto') ? 'G8' : 'C8');
+      // Posiciones según tipo de enroque
+      $posReyDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'G1' : 'C1') : (($tipoEnroque === 'corto') ? 'G8' : 'C8');
 
-        // Posiciones de la torre
-        $posTorreOrigen = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'H1' : 'A1') : (($tipoEnroque === 'corto') ? 'H8' : 'A8');
+      // Posiciones de la torre
+      $posTorreOrigen = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'H1' : 'A1') : (($tipoEnroque === 'corto') ? 'H8' : 'A8');
 
-        // Posición destino de la torre
-        $posTorreDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'F1' : 'D1') : (($tipoEnroque === 'corto') ? 'F8' : 'D8');
+      // Posición destino de la torre
+      $posTorreDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'F1' : 'D1') : (($tipoEnroque === 'corto') ? 'F8' : 'D8');
 
-        $reyTemp = $tempJugadores[$color]->getRey(); // Obtenemos el rey temporal
+      $reyTemp = $tempJugadores[$color]->getRey(); // Obtenemos el rey temporal
 
-        // Obtenemos la torre temporal
-        $torreTemp = $tempJugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
+      // Obtenemos la torre temporal
+      $torreTemp = $tempJugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
 
-        // Si no se encuentran rey o torre
-        if (!$reyTemp || !$torreTemp) {
+      // Si no se encuentran rey o torre
+      if (!$reyTemp || !$torreTemp) {
 
-          $this->mensaje = 'Enroque no válido'; // Actualizamos el mensaje
-
-          return false; // Retornamos false
-        }
-
-        $reyTemp->setPosicion($posReyDestino); // Movemos el rey en el estado temporal
-
-        $torreTemp->setPosicion($posTorreDestino); // Movemos la torre en el estado temporal
-      }
-
-      $miColor = $this->turno; // Color del jugador que mueve
-
-      $quedaEnJaque = $this->estaEnJaque($miColor, $tempJugadores); // Verificamos si queda en jaque
-
-      //  Si queda en jaque
-      if ($quedaEnJaque) {
-
-        $this->mensaje = "Movimiento inválido: deja en jaque a tu rey"; // Actualizamos el mensaje
+        $this->mensaje = 'Enroque no válido'; // Actualizamos el mensaje
 
         return false; // Retornamos false
       }
 
-      // 5. Verificar la casilla de destino:
-      // Si no es captura al paso ni enroque
-      if (!$esEnroque && !$esEnPassant && $piezaDestino !== null) {
+      $reyTemp->setPosicion($posReyDestino); // Movemos el rey en el estado temporal
 
-        // Si la pieza destino es del mismo color
-        if ($piezaDestino->getColor() === $this->turno) {
+      $torreTemp->setPosicion($posTorreDestino); // Movemos la torre en el estado temporal
+    }
 
-          // No se puede capturar a tus propias piezas
-          $this->mensaje = "No puedes capturar tus propias piezas"; // Actualizamos el mensaje
+    $miColor = $this->turno; // Color del jugador que mueve
 
-          return false; // Retornamos false
+    $quedaEnJaque = $this->estaEnJaque($miColor, $tempJugadores); // Verificamos si queda en jaque
 
-          // Si es de color contrario
-        } else {
+    //  Si queda en jaque
+    if ($quedaEnJaque) {
 
-          $piezaDestino->capturar(); // Capturamos la pieza
+      $this->mensaje = "Movimiento inválido: deja en jaque a tu rey"; // Actualizamos el mensaje
 
-          // Verificar si era el rey (porque sería fin de partida):
-          // Si la pieza capturada es un rey
-          if ($piezaDestino instanceof Rey) {
+      return false; // Retornamos false
+    }
 
-            $this->partidaTerminada = true; // Asignamos true a partidaTerminada
+    // 5. Verificar la casilla de destino:
+    // Si no es captura al paso ni enroque
+    if (!$esEnroque && !$esEnPassant && $piezaDestino !== null) {
 
-            // El ganador es el jugador que movió
-            $nombreGanador = $this->jugadores[$this->turno]->getNombre();
+      // Si la pieza destino es del mismo color
+      if ($piezaDestino->getColor() === $this->turno) {
 
-            // Actualizamos el mensaje de victoria
-            $this->mensaje = "¡Jaque mate! " . $nombreGanador . " ha ganado la partida";
+        // No se puede capturar a tus propias piezas
+        $this->mensaje = "No puedes capturar tus propias piezas"; // Actualizamos el mensaje
 
-            return true; // Retornamos true 
-          }
-        }
-      }
+        return false; // Retornamos false
 
-      // 6. Realizar el movimiento (incluye especiales):
-      // Si es enroque
-      if ($esEnroque) {
-
-        $color = $this->turno; // Color del jugador
-
-        // Posiciones según tipo de enroque
-        $posReyDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'G1' : 'C1') : (($tipoEnroque === 'corto') ? 'G8' : 'C8');
-
-        // Posiciones de la torre
-        $posTorreOrigen = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'H1' : 'A1') : (($tipoEnroque === 'corto') ? 'H8' : 'A8');
-
-        // Posición destino de la torre
-        $posTorreDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'F1' : 'D1') : (($tipoEnroque === 'corto') ? 'F8' : 'D8');
-
-        // Obtener la torre
-        $torre = $this->jugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
-
-        // Si no se encuentra la torre
-        if (!$torre || !($torre instanceof Torre)) {
-
-          $this->mensaje = 'No se encontró la torre para enroque'; // Actualizamos el mensaje
-
-          return false; // Retornamos false
-        }
-
-        // Mover rey y torre
-        $piezaOrigen->setPosicion($posReyDestino); // Mover el rey
-
-        $piezaOrigen->setHaMovido(true); // Marcar el rey como movido
-
-        $torre->setPosicion($posTorreDestino); // Mover la torre
-
-        $torre->setHaMovido(true); // Marcar la torre como movida
-
-        // Si no es enroque
+        // Si es de color contrario
       } else {
 
-        // Si la pieza origen es un peón
-        if ($piezaOrigen instanceof Peon) {
+        $piezaDestino->capturar(); // Capturamos la pieza
 
-          // Si es captura al paso
-          if ($esEnPassant && $posCapturaEnPassant) {
-
-            // Capturar la pieza al paso
-            $piezaAlPaso = $this->obtenerPiezaEnPosicion($posCapturaEnPassant);
-
-            // Si la pieza al paso existe, la capturamos
-            if ($piezaAlPaso && $piezaAlPaso instanceof Peon) $piezaAlPaso->capturar();
-          }
-
-          $piezaOrigen->movimiento($destino, $esCaptura); // Movemos el peón con captura
-
-          // Si no es peón, movemos la pieza
-        } else  $piezaOrigen->movimiento($destino);
-      }
-
-      // 6.5. Verificamos promoción de peón (mediante ventana modal)
-
-      // Registramos último movimiento (para captura al paso)
-      $this->ultimoMovimiento = [ // Array con datos del último movimiento
-
-        // Pieza, color, origen, destino:
-        'pieza' => ($piezaOrigen instanceof Peon) ? 'Peon' : (($piezaOrigen instanceof Rey) ? 'Rey' : get_class($piezaOrigen)),
-
-        'color' => $this->turno,
-
-        'origen' => $origen,
-
-        'destino' => $destino
-      ];
-
-      // 7. Cambiar el turno:
-
-      // Cambiamos el turno al otro jugador/oponente
-      $this->turno = ($this->turno === 'blancas') ? 'negras' : 'blancas';
-
-      $jugadorSiguiente = $this->turno; // Jugador al que le toca mover
-
-      // Si el siguiente jugador está en jaque
-      if ($this->estaEnJaque($jugadorSiguiente)) {
-
-        // Si además está en jaque mate
-        if ($this->esJaqueMate($jugadorSiguiente)) {
+        // Verificar si era el rey (porque sería fin de partida):
+        // Si la pieza capturada es un rey
+        if ($piezaDestino instanceof Rey) {
 
           $this->partidaTerminada = true; // Asignamos true a partidaTerminada
 
-          // El ganador es el jugador que movió (el anterior)
-          $ganadorColor = ($jugadorSiguiente === 'blancas') ? 'negras' : 'blancas';
+          // El ganador es el jugador que movió
+          $nombreGanador = $this->jugadores[$this->turno]->getNombre();
 
-          // Obtenemos el nombre del ganador
-          $nombreGanador = $this->jugadores[$ganadorColor]->getNombre();
-
-          // Actualizamos el mensaje de victoria!!!
+          // Actualizamos el mensaje de victoria
           $this->mensaje = "¡Jaque mate! " . $nombreGanador . " ha ganado la partida";
 
-          // Si solo está en jaque, actualizamos el mensaje
-        } else $this->mensaje = "Jaque a " . $this->jugadores[$jugadorSiguiente]->getNombre();
-
-        // Si no está en jaque, actualizamos el mensaje normal
-      } else $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
-        " (" . $this->turno . ")";
-
-      // Registrar movimiento en notación algebraica:
-      // Parámetros: origen, destino, pieza, esCaptura, esEnroque, tipoEnroque, enJaque, jaqueMate
-      $this->registrarMovimientoEnNotacion($origen, $destino, $piezaOrigen, $esCaptura, $esEnroque, $tipoEnroque, $this->estaEnJaque($jugadorSiguiente), $this->esJaqueMate($jugadorSiguiente));
-
-      return true; // Retornamos true
+          return true; // Retornamos true 
+        }
+      }
     }
+
+    // 6. Realizar el movimiento (incluye especiales):
+    // Si es enroque
+    if ($esEnroque) {
+
+      $color = $this->turno; // Color del jugador
+
+      // Posiciones según tipo de enroque
+      $posReyDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'G1' : 'C1') : (($tipoEnroque === 'corto') ? 'G8' : 'C8');
+
+      // Posiciones de la torre
+      $posTorreOrigen = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'H1' : 'A1') : (($tipoEnroque === 'corto') ? 'H8' : 'A8');
+
+      // Posición destino de la torre
+      $posTorreDestino = ($color === 'blancas') ? (($tipoEnroque === 'corto') ? 'F1' : 'D1') : (($tipoEnroque === 'corto') ? 'F8' : 'D8');
+
+      // Obtener la torre
+      $torre = $this->jugadores[$color]->getPiezaEnPosicion($posTorreOrigen);
+
+      // Si no se encuentra la torre
+      if (!$torre || !($torre instanceof Torre)) {
+
+        $this->mensaje = 'No se encontró la torre para enroque'; // Actualizamos el mensaje
+
+        return false; // Retornamos false
+      }
+
+      // Mover rey y torre
+      $piezaOrigen->setPosicion($posReyDestino); // Mover el rey
+
+      $piezaOrigen->setHaMovido(true); // Marcar el rey como movido
+
+      $torre->setPosicion($posTorreDestino); // Mover la torre
+
+      $torre->setHaMovido(true); // Marcar la torre como movida
+
+      // Si no es enroque
+    } else {
+
+      // Si la pieza origen es un peón
+      if ($piezaOrigen instanceof Peon) {
+
+        // Si es captura al paso
+        if ($esEnPassant && $posCapturaEnPassant) {
+
+          // Capturar la pieza al paso
+          $piezaAlPaso = $this->obtenerPiezaEnPosicion($posCapturaEnPassant);
+
+          // Si la pieza al paso existe, la capturamos
+          if ($piezaAlPaso && $piezaAlPaso instanceof Peon) $piezaAlPaso->capturar();
+        }
+
+        $piezaOrigen->movimiento($destino, $esCaptura); // Movemos el peón con captura
+
+        // Si no es peón, movemos la pieza
+      } else  $piezaOrigen->movimiento($destino);
+    }
+
+    // 6.5. Verificamos promoción de peón (mediante ventana modal)
+
+    // Registramos último movimiento (para captura al paso)
+    $this->ultimoMovimiento = [ // Array con datos del último movimiento
+
+      // Pieza, color, origen, destino:
+      'pieza' => ($piezaOrigen instanceof Peon) ? 'Peon' : (($piezaOrigen instanceof Rey) ? 'Rey' : get_class($piezaOrigen)),
+
+      'color' => $this->turno,
+
+      'origen' => $origen,
+
+      'destino' => $destino
+    ];
+
+    // 7. Cambiar el turno:
+
+    // Cambiamos el turno al otro jugador/oponente
+    $this->turno = ($this->turno === 'blancas') ? 'negras' : 'blancas';
+
+    $jugadorSiguiente = $this->turno; // Jugador al que le toca mover
+
+    // Si el siguiente jugador está en jaque
+    if ($this->estaEnJaque($jugadorSiguiente)) {
+
+      // Si además está en jaque mate
+      if ($this->esJaqueMate($jugadorSiguiente)) {
+
+        $this->partidaTerminada = true; // Asignamos true a partidaTerminada
+
+        // El ganador es el jugador que movió (el anterior)
+        $ganadorColor = ($jugadorSiguiente === 'blancas') ? 'negras' : 'blancas';
+
+        // Obtenemos el nombre del ganador
+        $nombreGanador = $this->jugadores[$ganadorColor]->getNombre();
+
+        // Actualizamos el mensaje de victoria!!!
+        $this->mensaje = "¡Jaque mate! " . $nombreGanador . " ha ganado la partida";
+
+        // Si solo está en jaque, actualizamos el mensaje
+      } else $this->mensaje = "Jaque a " . $this->jugadores[$jugadorSiguiente]->getNombre();
+
+      // Si no está en jaque, actualizamos el mensaje normal
+    } else $this->mensaje = "Turno de " . $this->jugadores[$this->turno]->getNombre() .
+      " (" . $this->turno . ")";
+
+    // Registrar movimiento en notación algebraica:
+    // Parámetros: origen, destino, pieza, esCaptura, esEnroque, tipoEnroque, enJaque, jaqueMate
+    $this->registrarMovimientoEnNotacion($origen, $destino, $piezaOrigen, $esCaptura, $esEnroque, $tipoEnroque, $this->estaEnJaque($jugadorSiguiente), $this->esJaqueMate($jugadorSiguiente));
+
+    return true; // Retornamos true
   }
 
   // Para registrar un movimiento en notación algebraica estándar

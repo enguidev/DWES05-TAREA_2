@@ -862,9 +862,6 @@ function procesarJugada($partida)
 
           $_SESSION['ultimo_tick'] = time(); // Actualizamos el ultimo tick
 
-          // Guardamos la partida actualizada en sesión INMEDIATAMENTE después del movimiento exitoso
-          $_SESSION['partida'] = serialize($partida);
-
           // Promoción elegible de peón
 
           $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida); // Obtenemos la pieza en la casilla de destino

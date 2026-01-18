@@ -158,20 +158,22 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
               <div class="casilla <?php echo $colorCasilla; ?> <?php echo $esSeleccionada ? 'seleccionada' : ''; ?>">
                 <?php if ($pieza !== null): ?>
                   <!-- Si hay una pieza en esta casilla, mostramos un botón para interactuar con ella -->
-                  <form method="post" action="index.php" class="formulario">
+                  <form method="post" action="index.php" class="formulario" style="margin:0;padding:0;">
                     <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>"
                       class="btn-pieza-casilla <?php echo ($pieza->getColor() === $turno) ? 'puede-seleccionar' : 'no-puede-seleccionar'; ?> <?php echo $esCaptura ? 'btn-captura' : ''; ?>"
-                      <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? 'disabled' : ''; ?>>
+                      <?php echo (isset($_SESSION['pausa']) && $_SESSION['pausa']) ? 'disabled' : ''; ?>
+                      title="Pieza en <?php echo $posicion; ?> - Click para seleccionar">
                       <!-- Mostramos la imagen de la pieza -->
                       <img src="<?php echo obtenerImagenPieza($pieza); ?>" class="imagen-pieza">
                     </button>
                   </form>
                 <?php elseif ($esMovimientoPosible): ?>
                   <!-- Si es un movimiento posible, mostramos un indicador visual (círculo verde) -->
-                  <form method="post" action="index.php" class="formulario">
-                    <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>" class="btn-movimiento">
-                      <!-- Indicador visual del movimiento posible -->
-                      <span class="indicador-movimiento"></span>
+                  <form method="post" action="index.php" class="formulario" style="margin:0;padding:0;">
+                    <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>" 
+                      style="width:100%;height:100%;border:2px solid green;background:lightgreen;cursor:pointer;font-size:18px;font-weight:bold;"
+                      title="Mover a <?php echo $posicion; ?>">
+                      ✓
                     </button>
                   </form>
                 <?php endif; ?>

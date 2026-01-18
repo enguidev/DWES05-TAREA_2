@@ -239,7 +239,6 @@
   transform: scale(1.3);
 }
 
-/* Botón de movimiento */
 .btn-movimiento {
   display: flex;
   justify-content: center;
@@ -252,10 +251,31 @@
   margin: 0;
   padding: 0;
   transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Círculo indicador de movimiento posible usando ::after */
+.btn-movimiento-decorado::after {
+  content: '';
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  background: rgba(76, 175, 80, 0.7);
+  border-radius: 50%;
+  border: 3px solid #388E3C;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
+  transition: all 0.2s ease;
+  pointer-events: none;
 }
 
 .btn-movimiento:hover {
   background: rgba(76, 175, 80, 0.2);
+}
+
+.btn-movimiento:hover .btn-movimiento-decorado::after {
+  background: #66BB6A;
+  transform: scale(1.3);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.8);
 }
 
 /* Indicador de movimiento posible */
