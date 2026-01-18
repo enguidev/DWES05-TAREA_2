@@ -450,7 +450,9 @@ document.addEventListener("DOMContentLoaded", function () {
         tiempoLocalBlancas = data.tiempo_blancas;
         tiempoLocalNegras = data.tiempo_negras;
         relojActivoLocal = data.reloj_activo;
-        pausaLocal = data.pausa || false;
+        pausaLocal = !!data.pausa;
+        // Si el servidor dice que NO está en pausa, forzamos la variable local a false
+        if (!data.pausa) pausaLocal = false;
         sinTiempoLocal = !!data.sin_tiempo;
         // Actualizamos la pantalla
         actualizarDisplayRelojes();
@@ -489,6 +491,36 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .catch(() => {});
+
+  // Verificar periódicamente si los relojes deben estar inicializados
+  // Esto es útil cuando la página se carga y luego entra a una partida sin recargar
+  setInterval(function () {
+    // Si no hay intervalo de relojes pero existe el elemento tiempo-blancas, reiniciamos los relojes
+    if (!intervaloRelojes && document.getElementById("tiempo-blancas")) {
+      console.log("Reiniciando relojes (intervalo de verificación)");
+      fetch("index.php?ajax=actualizar_relojes", { timeout: 5000 })
+        .then((r) => r.json())
+        .then((data) => {
+          // Si no hay partida o ya terminó, no iniciamos los relojes
+          if (data.sin_partida || data.partida_terminada) {
+            return;
+          }
+          // Si hay partida activa, inicializamos las variables locales
+          tiempoLocalBlancas = data.tiempo_blancas;
+          tiempoLocalNegras = data.tiempo_negras;
+          relojActivoLocal = data.reloj_activo;
+          pausaLocal = data.pausa || false;
+          sinTiempoLocal = !!data.sin_tiempo;
+          // Actualizamos la pantalla
+          actualizarDisplayRelojes();
+          // Iniciamos el intervalo para actualizar cada segundo si NO es sin tiempo
+          if (!sinTiempoLocal && !intervaloRelojes) {
+            intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+          }
+        })
+        .catch((e) => console.error("Error al reinicializar relojes:", e));
+    }
+  }, 2000); // Verificar cada 2 segundos
 
   // ========================================
   // GESTIÓN DE AVATARES PERSONALIZADOS

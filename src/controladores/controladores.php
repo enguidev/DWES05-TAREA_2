@@ -336,13 +336,6 @@ function resolverAcciones()
     if (isset($_SESSION['pausa']) && $_SESSION['pausa']) $_SESSION['pausa'] = false;
   }
 
-  // Si se confirmó el reinicio de la partida, la reiniciamos
-  if (isset($_POST['confirmar_reiniciar'])) {
-    reiniciarPartida();
-    header('Location: index.php');
-    exit();
-  }
-
   // Si se confirmó la revancha, iniciamos una nueva partida con los mismos jugadores
   if (isset($_POST['confirmar_revancha'])) revanchaPartida();
 
@@ -764,37 +757,28 @@ function procesarTogglePausa()
 // Para borrar toda la partida y volver a la pantalla de inicio
 function reiniciarPartida()
 {
-  // Borramos toda la información de la partida
+  // Eliminamos el archivo de partida guardada primero para evitar que se cargue automáticamente
+  $rutaPartidaGuardada = __DIR__ . '/../data/partida_guardada.json';
+  if (file_exists($rutaPartidaGuardada)) {
+    unlink($rutaPartidaGuardada);
+  }
 
-  unset($_SESSION['partida']); // Borramos la partida
-
-  unset($_SESSION['casilla_seleccionada']); // Borramos la casilla seleccionada
-
-  unset($_SESSION['tiempo_blancas']); // Borramos el tiempo de las blancas
-
-  unset($_SESSION['tiempo_negras']); // Borramos el tiempo de las negras
-
-  unset($_SESSION['reloj_activo']); // Borramos el reloj activo
-
-  unset($_SESSION['ultimo_tick']); // Borramos el último tick
-
-  unset($_SESSION['nombres_configurados']); // Borramos el indicador de nombres configurados
-
-  unset($_SESSION['pantalla_principal_mostrada']); // Borramos el indicador de pantalla principal
-
-  unset($_SESSION['pausa']); // Borramos el estado de pausa
-
-  unset($_SESSION['partida_terminada_por_tiempo']); // Borramos el indicador de tiempo agotado
-
-  unset($_SESSION['avatar_blancas']); // Borramos el avatar de las blancas
-
-  unset($_SESSION['avatar_negras']); // Borramos el avatar de las negras
-
-  unset($_SESSION['modo_reproduccion']); // Borramos el modo de reproducción
-
-  unset($_SESSION['replay_movs']); // Borramos los movimientos para reproducción
-
-  unset($_SESSION['replay_index']); // Borramos el índice de reproducción
+  // Borramos TODAS las variables de sesión de forma exhaustiva
+  $_SESSION = array();
+  
+  // Borramos la cookie de sesión para limpiar completamente
+  if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(
+      session_name(),
+      '',
+      time() - 42000,
+      $params["path"],
+      $params["domain"],
+      $params["secure"],
+      $params["httponly"]
+    );
+  }
 
   return true; // Retornamos true para indicar que se reinició
 }

@@ -12,6 +12,24 @@ require_once 'src/helpers/funciones_auxiliares.php';
 require_once 'src/vistas.php';
 require_once 'src/controladores/controladores.php';
 
+// VERIFICAR REINICIO DE PARTIDA - PRIMERO QUE NADA
+// Si el usuario confirma volver al inicio, destruimos la sesión ANTES de cargar nada
+if (isset($_POST['confirmar_reiniciar'])) {
+  // Eliminamos el archivo de partida guardada
+  $rutaPartidaGuardada = __DIR__ . '/data/partida_guardada.json';
+  if (file_exists($rutaPartidaGuardada)) {
+    unlink($rutaPartidaGuardada);
+  }
+
+  // Borramos toda la sesión completamente
+  $_SESSION = array();
+  session_destroy();
+  
+  // Redirigimos al index sin sesión
+  header('Location: index.php');
+  exit();
+}
+
 // CARGA AUTOMÁTICA DE PARTIDA GUARDADA
 // Si no hay partida en sesión pero hay un archivo guardado, intentamos cargarla
 error_log("DEBUG index.php: Verificando cargar partida automática");
