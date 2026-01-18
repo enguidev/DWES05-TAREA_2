@@ -862,6 +862,9 @@ function procesarJugada($partida)
 
           $_SESSION['ultimo_tick'] = time(); // Actualizamos el ultimo tick
 
+          // Guardamos la partida actualizada en sesión INMEDIATAMENTE después del movimiento exitoso
+          $_SESSION['partida'] = serialize($partida);
+
           // Promoción elegible de peón
 
           $piezaEnDestino = obtenerPiezaEnCasilla($destino, $partida); // Obtenemos la pieza en la casilla de destino
@@ -881,23 +884,19 @@ function procesarJugada($partida)
 
             $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
 
-            $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
-
             header("Location: " . $_SERVER['PHP_SELF']); // Recargamos la página para que vuelva a la pantalla de inicio
 
             exit; // Terminamos la ejecución del script
           }
+
+          // Auto-guardado tras cada jugada si está activo
+          if (isset($_SESSION['config']['auto_guardar_partidas']) && $_SESSION['config']['auto_guardar_partidas']) {
+            // Guardamos con nombre por defecto (jugadores vs)
+            guardarPartida($partida);
+          }
         }
 
-        $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada
-
-        $_SESSION['partida'] = serialize($partida); // Guardamos la partida en session
-
-        // Auto-guardado tras cada jugada si está activo
-        if (isset($_SESSION['config']['auto_guardar_partidas']) && $_SESSION['config']['auto_guardar_partidas']) {
-          // Guardamos con nombre por defecto (jugadores vs)
-          guardarPartida($partida);
-        }
+        $_SESSION['casilla_seleccionada'] = null; // Limpiamos la casilla seleccionada (exitosa o fallida)
       }
     }
   }
