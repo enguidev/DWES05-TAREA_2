@@ -169,9 +169,10 @@ function mostrarTablero($partida, $casillaSeleccionada, $turno, $piezasCapturada
                   </form>
                 <?php elseif ($esMovimientoPosible): ?>
                   <!-- Si es un movimiento posible, mostramos un indicador visual (círculo verde) -->
-                  <form method="post" action="index.php" class="formulario-movimiento">
+                  <form method="post" action="index.php" class="formulario">
                     <button type="submit" name="seleccionar_casilla" value="<?php echo $posicion; ?>"
-                      class="boton-movimiento" title="Mover a <?php echo $posicion; ?>">
+                      class="btn-movimiento" title="Mover a <?php echo $posicion; ?>">
+                      <div class="indicador-movimiento"></div>
                     </button>
                   </form>
                 <?php endif; ?>
