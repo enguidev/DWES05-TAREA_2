@@ -131,6 +131,12 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
 
 <body>
   <!-- Si no se ha decidido si mostrar pantalla principal o configuración... -->
+  <?php
+  // Si el usuario ha pulsado 'nueva partida', limpiamos el POST para evitar mostrar el modal de cargar
+  if (isset($_POST['nueva_partida']) && isset($_POST['abrir_modal_cargar'])) {
+    unset($_POST['abrir_modal_cargar']);
+  }
+  ?>
   <?php if (!isset($_SESSION['pantalla_principal_mostrada'])): ?>
     <!-- ...mostramos la pantalla principal -->
     <?php mostrarPantallaPrincipal($partidasGuardadasInicio); ?>
