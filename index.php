@@ -135,10 +135,17 @@ $partidasGuardadasInicio = $estado['partidasGuardadasInicio'];
     <!-- ...mostramos la pantalla principal -->
     <?php mostrarPantallaPrincipal($partidasGuardadasInicio); ?>
 
-    <!-- Modal para cargar una partida desde la pantalla principal (solo si se pidió abrir) -->
-    <?php if (!empty($partidasGuardadasInicio) && isset($_SESSION['pantalla_principal_mostrada'])): ?>
-      <?php mostrarModalCargarInicial($partidasGuardadasInicio); ?>
-    <?php endif; ?>
+    <!-- Modal para cargar una partida desde la pantalla principal (solo si se pidió abrir y no se acaba de crear nueva partida) -->
+    <?php
+    $mostrarModalCargar = false;
+    // Solo mostrar el modal si el usuario lo ha solicitado explícitamente (por ejemplo, por POST o GET)
+    if (!empty($partidasGuardadasInicio) && isset($_POST['abrir_modal_cargar'])) {
+      $mostrarModalCargar = true;
+    }
+    if ($mostrarModalCargar) {
+      mostrarModalCargarInicial($partidasGuardadasInicio);
+    }
+    ?>
     <!-- Si ya se han puesto nombres a los jugadores... -->
   <?php elseif (isset($_SESSION['nombres_configurados'])): ?>
     <!-- ...mostramos el tablero y la partida -->

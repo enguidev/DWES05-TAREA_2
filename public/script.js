@@ -299,14 +299,20 @@ function actualizarDisplayRelojes() {
         ? (r.classList.add("reloj-activo"),
           r.classList.remove("reloj-inactivo"))
         : (r.classList.remove("reloj-activo"),
-          r.classList.add("reloj-inactivo"));
-    }
-  });
-}
+              // Iniciamos el intervalo para actualizar cada segundo si NO es sin tiempo y no está en pausa
+              if (!sinTiempoLocal && !intervaloRelojes && !pausaLocal) {
+                intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+              }
 
 // Función que se ejecuta cada segundo para decrementar el reloj
 function actualizarTiempoLocal() {
   // Si ya estamos recargando la página, no hacer nada
+      // Refuerzo: reiniciar el intervalo tras cada movimiento si el tablero está visible y no es sin tiempo
+      document.addEventListener("tableroActualizado", function () {
+        if (!intervaloRelojes && document.getElementById("tiempo-blancas") && !sinTiempoLocal && !pausaLocal) {
+          intervaloRelojes = setInterval(actualizarTiempoLocal, 1000);
+        }
+      });
   if (recargandoPagina) return;
 
   // Si el modo sin tiempo está activo, solo refrescamos la vista y salimos
@@ -806,6 +812,22 @@ function cerrarModal(modalId) {
     modal.style.display = "none";
   }
 }
+
+// Cierre del modal de cargar partida guardada
+document.addEventListener("DOMContentLoaded", function () {
+  const modalCargar = document.getElementById("modalCargar");
+  if (modalCargar) {
+    // Buscar todos los botones de cerrar dentro del modal
+    modalCargar.querySelectorAll(".btn-cancelar").forEach(function(btn) {
+      btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        cerrarModal("modalCargar");
+        return false;
+      });
+    });
+  }
+});
 
 // Función genérica para abrir diferentes modales de confirmación
 // Soporta: eliminar, reiniciar, cargar
