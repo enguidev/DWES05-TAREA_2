@@ -58,9 +58,22 @@ class Partida
     // VALIDACIONES Y EJECUCIÓN DEL MOVIMIENTO:
 
     // 1. Guardar estado actual del tablero (historial)
-    $this->guardarHistorial();
+    // Guardamos captura del estado actual para poder deshacer la jugada si es necesario
+    $this->historial[] = serialize([
+      'jugadores' => $this->jugadores,
+      'turno' => $this->turno,
+      'mensaje' => $this->mensaje,
+      'partidaTerminada' => $this->partidaTerminada
+    ]);
 
-    // 1. Verificamos que existe una pieza en el origen
+    // Limitar historial según configuración para no consumir memoria
+    $limiteRetrocesos = 10;
+    if (isset($_SESSION['config']) && isset($_SESSION['config']['num_retrocesos'])) {
+      $limiteRetrocesos = max(1, min(20, (int)$_SESSION['config']['num_retrocesos']));
+    }
+    if (count($this->historial) > $limiteRetrocesos) array_shift($this->historial);
+
+    // 2. Verificamos que existe una pieza en el origen
     $piezaOrigen = $this->jugadores[$this->turno]->getPiezaEnPosicion($origen);
 
     // Si no hay pieza o no es del jugador actual, retornamos false
